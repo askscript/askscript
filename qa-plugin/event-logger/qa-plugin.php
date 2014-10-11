@@ -44,7 +44,7 @@
 	}
 
 
-	qa_register_plugin_module('event', 'qa-event-logger.php', 'qa_event_logger', 'Event Logger');
+	as_register_plugin_module('event', 'qa-event-logger.php', 'as_event_logger', 'Event Logger');
 	
 
 /*

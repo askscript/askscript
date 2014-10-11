@@ -29,8 +29,8 @@
 	require 'qa-base.php';
 	require_once QA_INCLUDE_DIR.'qa-app-users.php';
 	
-	if (qa_get_logged_in_level() < QA_USER_LEVEL_ADMIN)
-		qa_redirect('admin/general', null, qa_opt('site_url'));
+	if (as_get_logged_in_level() < QA_USER_LEVEL_ADMIN)
+		as_redirect('admin/general', null, as_opt('site_url'));
 	
 	header('Content-type: text/html; charset=utf-8');
 ?>
@@ -76,7 +76,7 @@
 	foreach ($includefiles as $includefile) {
 		$contents=file_get_contents($includefile);
 		
-		preg_match_all('/qa_lang[a-z_]*\s*\(\s*[\'\"]([a-z]+)\/([0-9a-z_]+)[\'\"]/', $contents, $matches, PREG_SET_ORDER);
+		preg_match_all('/as_lang[a-z_]*\s*\(\s*[\'\"]([a-z]+)\/([0-9a-z_]+)[\'\"]/', $contents, $matches, PREG_SET_ORDER);
 		
 		foreach ($matches as $matchparts)
 			if ($matchparts[2]=='date_month_') { // special case for month names
@@ -131,7 +131,7 @@
 	
 	require_once QA_INCLUDE_DIR.'qa-app-admin.php';
 	
-	$languages=qa_admin_language_options();
+	$languages=as_admin_language_options();
 	unset($languages['']);
 	
 	foreach ($languages as $code => $language) {
@@ -213,12 +213,12 @@
 	{
 		echo '<font color="'.($error ? '#cc0000' : '#cc9999').'"><code>';
 
-		echo 'qa-lang-<b>'.qa_html($prefix).'</b>.php:';
+		echo 'qa-lang-<b>'.as_html($prefix).'</b>.php:';
 
 		if (strlen($key))
-			echo "'<b>".qa_html($key)."</b>'";
+			echo "'<b>".as_html($key)."</b>'";
 		
-		echo '</code></font> &nbsp; '.qa_html($issue).'<br>';
+		echo '</code></font> &nbsp; '.as_html($issue).'<br>';
 	}
 
 

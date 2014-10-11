@@ -24,7 +24,7 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	class qa_activity_count {
+	class as_activity_count {
 		
 		function allow_template($template)
 		{
@@ -38,17 +38,17 @@
 		}
 
 		
-		function output_widget($region, $place, $themeobject, $template, $request, $qa_content)
+		function output_widget($region, $place, $themeobject, $template, $request, $as_content)
 		{
 			$themeobject->output('<div class="qa-activity-count">');
 			
-			$this->output_count($themeobject, qa_opt('cache_qcount'), 'main/1_question', 'main/x_questions');
-			$this->output_count($themeobject, qa_opt('cache_acount'), 'main/1_answer', 'main/x_answers');
+			$this->output_count($themeobject, as_opt('cache_qcount'), 'main/1_question', 'main/x_questions');
+			$this->output_count($themeobject, as_opt('cache_acount'), 'main/1_answer', 'main/x_answers');
 			
-			if (qa_opt('comment_on_qs') || qa_opt('comment_on_as'))
-				$this->output_count($themeobject, qa_opt('cache_ccount'), 'main/1_comment', 'main/x_comments');
+			if (as_opt('comment_on_qs') || as_opt('comment_on_as'))
+				$this->output_count($themeobject, as_opt('cache_ccount'), 'main/1_comment', 'main/x_comments');
 			
-			$this->output_count($themeobject, qa_opt('cache_userpointscount'), 'main/1_user', 'main/x_users');
+			$this->output_count($themeobject, as_opt('cache_userpointscount'), 'main/1_user', 'main/x_users');
 			
 			$themeobject->output('</div>');
 		}
@@ -59,9 +59,9 @@
 			$themeobject->output('<p class="qa-activity-count-item">');
 			
 			if ($value==1)
-				$themeobject->output(qa_lang_html_sub($langsingular, '<span class="qa-activity-count-data">1</span>', '1'));
+				$themeobject->output(as_lang_html_sub($langsingular, '<span class="qa-activity-count-data">1</span>', '1'));
 			else
-				$themeobject->output(qa_lang_html_sub($langplural, '<span class="qa-activity-count-data">'.number_format((int)$value).'</span>'));
+				$themeobject->output(as_lang_html_sub($langplural, '<span class="qa-activity-count-data">'.number_format((int)$value).'</span>'));
 
 			$themeobject->output('</p>');
 		}

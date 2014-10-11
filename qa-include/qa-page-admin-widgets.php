@@ -35,13 +35,13 @@
 	
 //	Get current list of widgets and determine the state of this admin page
 
-	$widgetid=qa_post_text('edit');
+	$widgetid=as_post_text('edit');
 	if (!strlen($widgetid))
-		$widgetid=qa_get('edit');
+		$widgetid=as_get('edit');
 		
-	list($widgets, $pages)=qa_db_select_with_pending(
-		qa_db_widgets_selectspec(),
-		qa_db_pages_selectspec()
+	list($widgets, $pages)=as_db_select_with_pending(
+		as_db_widgets_selectspec(),
+		as_db_pages_selectspec()
 	);
 
 	if (isset($widgetid)) {
@@ -51,20 +51,20 @@
 				$editwidget=$widget;
 
 	} else {
-		$editwidget=array('title' => qa_post_text('title'));
+		$editwidget=array('title' => as_post_text('title'));
 		if (!isset($editwidget['title']))
-			$editwidget['title']=qa_get('title');
+			$editwidget['title']=as_get('title');
 	}
 
-	$module=qa_load_module('widget', @$editwidget['title']);
+	$module=as_load_module('widget', @$editwidget['title']);
 	
 	$widgetfound=isset($module);
 			
 
 //	Check admin privileges (do late to allow one DB query)
 
-	if (!qa_admin_check_privileges($qa_content))
-		return $qa_content;
+	if (!as_admin_check_privileges($as_content))
+		return $as_content;
 		
 		
 //	Define an array of relevant templates we can use
@@ -105,12 +105,12 @@
 	if (isset($module) && method_exists($module, 'allow_template')) {
 		foreach ($templatelangkeys as $template => $langkey)
 			if ($module->allow_template($template))
-				$templateoptions[$template]=qa_lang_html($langkey);
+				$templateoptions[$template]=as_lang_html($langkey);
 				
 		if ($module->allow_template('custom'))
 			foreach ($pages as $page)
 				if (!($page['flags']&QA_PAGE_FLAGS_EXTERNAL))
-					$templateoptions['custom-'.$page['pageid']]=qa_html($page['title']);
+					$templateoptions['custom-'.$page['pageid']]=as_html($page['title']);
 	}
 	
 
@@ -118,31 +118,31 @@
 
 	$securityexpired=false;
 	
-	if (qa_clicked('docancel'))
-		qa_redirect('admin/layout');
+	if (as_clicked('docancel'))
+		as_redirect('admin/layout');
 
-	elseif (qa_clicked('dosavewidget')) {
+	elseif (as_clicked('dosavewidget')) {
 		require_once QA_INCLUDE_DIR.'qa-db-admin.php';
 		
-		if (!qa_check_form_security_code('admin/widgets', qa_post_text('code')))
+		if (!as_check_form_security_code('admin/widgets', as_post_text('code')))
 			$securityexpired=true;
 		
 		else {
-			if (qa_post_text('dodelete')) {
-				qa_db_widget_delete($editwidget['widgetid']);
-				qa_redirect('admin/layout');
+			if (as_post_text('dodelete')) {
+				as_db_widget_delete($editwidget['widgetid']);
+				as_redirect('admin/layout');
 			
 			} else {
 				if ($widgetfound) {
-					$intitle=qa_post_text('title');
-					$inposition=qa_post_text('position');
+					$intitle=as_post_text('title');
+					$inposition=as_post_text('position');
 					$intemplates=array();
 					
-					if (qa_post_text('template_all'))
+					if (as_post_text('template_all'))
 						$intemplates[]='all';
 					
 					foreach (array_keys($templateoptions) as $template)
-						if (qa_post_text('template_'.$template))
+						if (as_post_text('template_'.$template))
 							$intemplates[]=$template;
 							
 					$intags=implode(',', $intemplates);
@@ -151,15 +151,15 @@
 			
 					if (isset($editwidget['widgetid'])) { // changing existing widget
 						$widgetid=$editwidget['widgetid'];
-						qa_db_widget_set_fields($widgetid, $intags);
+						as_db_widget_set_fields($widgetid, $intags);
 		
 					} else
-						$widgetid=qa_db_widget_create($intitle, $intags);
+						$widgetid=as_db_widget_create($intitle, $intags);
 		
-					qa_db_widget_move($widgetid, substr($inposition, 0, 2), substr($inposition, 2));
+					as_db_widget_move($widgetid, substr($inposition, 0, 2), substr($inposition, 2));
 				}
 				
-				qa_redirect('admin/layout');
+				as_redirect('admin/layout');
 			}
 		}
 	}
@@ -167,14 +167,14 @@
 		
 //	Prepare content for theme
 	
-	$qa_content=qa_content_prepare();
+	$as_content=as_content_prepare();
 
-	$qa_content['title']=qa_lang_html('admin/admin_title').' - '.qa_lang_html('admin/layout_title');	
-	$qa_content['error']=$securityexpired ? qa_lang_html('admin/form_security_expired') : qa_admin_page_error();
+	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/layout_title');	
+	$as_content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
 	
 	$positionoptions=array();
 	
-	$placeoptionhtml=qa_admin_place_options();
+	$placeoptionhtml=as_admin_place_options();
 	
 	$regioncodes=array(
 		'F' => 'full',
@@ -202,7 +202,7 @@
 					$positionhtml=$optionhtml;
 					
 					if (isset($previous))
-						$positionhtml.=' - '.qa_lang_html_sub('admin/after_x', qa_html($passedself ? $widget['title'] : $previous['title']));
+						$positionhtml.=' - '.as_lang_html_sub('admin/after_x', as_html($passedself ? $widget['title'] : $previous['title']));
 						
 					if ($widget['widgetid']==@$editwidget['widgetid'])
 						$passedself=true;
@@ -217,7 +217,7 @@
 				$positionhtml=$optionhtml;
 				
 				if (isset($previous))
-					$positionhtml.=' - '.qa_lang_html_sub('admin/after_x', $previous['title']);
+					$positionhtml.=' - '.as_lang_html_sub('admin/after_x', $previous['title']);
 	
 				$positionoptions[$place.(isset($previous) ? (1+$maxposition) : 1)]=$positionhtml;
 			}
@@ -226,14 +226,14 @@
 	
 	$positionvalue=@$positionoptions[$editwidget['place'].$editwidget['position']];
 	
-	$qa_content['form']=array(
-		'tags' => 'method="post" action="'.qa_path_html(qa_request()).'"',
+	$as_content['form']=array(
+		'tags' => 'method="post" action="'.as_path_html(as_request()).'"',
 		
 		'style' => 'tall',
 		
 		'fields' => array(
 			'title' => array(
-				'label' => qa_lang_html('admin/widget_name').' &nbsp; '.qa_html($editwidget['title']),
+				'label' => as_lang_html('admin/widget_name').' &nbsp; '.as_html($editwidget['title']),
 				'type' => 'static',
 				'tight' => true,
 			),
@@ -241,7 +241,7 @@
 			'position' => array(
 				'id' => 'position_display',
 				'tags' => 'name="position"',
-				'label' => qa_lang_html('admin/position'),
+				'label' => as_lang_html('admin/position'),
 				'type' => 'select',
 				'options' => $positionoptions,
 				'value' => $positionvalue,
@@ -249,14 +249,14 @@
 			
 			'delete' => array(
 				'tags' => 'name="dodelete" id="dodelete"',
-				'label' => qa_lang_html('admin/delete_widget_position'),
+				'label' => as_lang_html('admin/delete_widget_position'),
 				'value' => 0,
 				'type' => 'checkbox',
 			),
 				
 			'all' => array(
 				'id' => 'all_display',
-				'label' => qa_lang_html('admin/widget_all_pages'),
+				'label' => as_lang_html('admin/widget_all_pages'),
 				'type' => 'checkbox',
 				'tags' => 'name="template_all" id="template_all"',
 				'value' => is_numeric(strpos(','.@$editwidget['tags'].',', ',all,')),
@@ -264,7 +264,7 @@
 
 			'templates' => array(
 				'id' => 'templates_display',
-				'label' => qa_lang_html('admin/widget_pages_explanation'),
+				'label' => as_lang_html('admin/widget_pages_explanation'),
 				'type' => 'custom',
 				'html' => '',
 			),
@@ -272,12 +272,12 @@
 
 		'buttons' => array(
 			'save' => array(
-				'label' => qa_lang_html(isset($editwidget['widgetid']) ? 'main/save_button' : ('admin/add_widget_button')),
+				'label' => as_lang_html(isset($editwidget['widgetid']) ? 'main/save_button' : ('admin/add_widget_button')),
 			),
 			
 			'cancel' => array(
 				'tags' => 'name="docancel"',
-				'label' => qa_lang_html('main/cancel_button'),
+				'label' => as_lang_html('main/cancel_button'),
 			),
 		),
 		
@@ -285,51 +285,51 @@
 			'dosavewidget' => '1', // for IE
 			'edit' => @$editwidget['widgetid'],
 			'title' => @$editwidget['title'],
-			'code' => qa_get_form_security_code('admin/widgets'),
+			'code' => as_get_form_security_code('admin/widgets'),
 		),
 	);
 	
 	foreach ($templateoptions as $template => $optionhtml)
-		$qa_content['form']['fields']['templates']['html'].=
-			'<input type="checkbox" name="template_'.qa_html($template).'"'.
+		$as_content['form']['fields']['templates']['html'].=
+			'<input type="checkbox" name="template_'.as_html($template).'"'.
 			(is_numeric(strpos(','.@$editwidget['tags'].',', ','.$template.',')) ? ' checked' : '').
 			'/> '.$optionhtml.'<br/>';
 			
 	if (isset($editwidget['widgetid']))
-		qa_set_display_rules($qa_content, array(
+		as_set_display_rules($as_content, array(
 			'templates_display' => '!(dodelete||template_all)',
 			'all_display' => '!dodelete',
 		));
 
 	else {
-		unset($qa_content['form']['fields']['delete']);
-		qa_set_display_rules($qa_content, array(
+		unset($as_content['form']['fields']['delete']);
+		as_set_display_rules($as_content, array(
 			'templates_display' => '!template_all',
 		));
 	}
 	
 	if (!$widgetfound) {
-		unset($qa_content['form']['fields']['title']['tight']);
-		$qa_content['form']['fields']['title']['error']=qa_lang_html('admin/widget_not_available');
-		unset($qa_content['form']['fields']['position']);
-		unset($qa_content['form']['fields']['all']);
-		unset($qa_content['form']['fields']['templates']);
+		unset($as_content['form']['fields']['title']['tight']);
+		$as_content['form']['fields']['title']['error']=as_lang_html('admin/widget_not_available');
+		unset($as_content['form']['fields']['position']);
+		unset($as_content['form']['fields']['all']);
+		unset($as_content['form']['fields']['templates']);
 		if (!isset($editwidget['widgetid']))
-			unset($qa_content['form']['buttons']['save']);
+			unset($as_content['form']['buttons']['save']);
 		
 	} elseif (!count($positionoptions)) {
-		unset($qa_content['form']['fields']['title']['tight']);
-		$qa_content['form']['fields']['title']['error']=qa_lang_html('admin/widget_no_positions');
-		unset($qa_content['form']['fields']['position']);
-		unset($qa_content['form']['fields']['all']);
-		unset($qa_content['form']['fields']['templates']);
-		unset($qa_content['form']['buttons']['save']);
+		unset($as_content['form']['fields']['title']['tight']);
+		$as_content['form']['fields']['title']['error']=as_lang_html('admin/widget_no_positions');
+		unset($as_content['form']['fields']['position']);
+		unset($as_content['form']['fields']['all']);
+		unset($as_content['form']['fields']['templates']);
+		unset($as_content['form']['buttons']['save']);
 	}
 
-	$qa_content['navigation']['sub']=qa_admin_sub_navigation();
+	$as_content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $qa_content;
+	return $as_content;
 
 
 /*

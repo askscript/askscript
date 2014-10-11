@@ -36,25 +36,25 @@
 
 //	Perform the search if appropriate
 
-	if (strlen(qa_get('q'))) {
+	if (strlen(as_get('q'))) {
 	
 	//	Pull in input parameters
 	
-		$inquery=trim(qa_get('q'));
-		$userid=qa_get_logged_in_userid();
-		$start=qa_get_start();
+		$inquery=trim(as_get('q'));
+		$userid=as_get_logged_in_userid();
+		$start=as_get_start();
 		
-		$display=qa_opt_if_loaded('page_size_search');
+		$display=as_opt_if_loaded('page_size_search');
 		$count=2*(isset($display) ? $display : QA_DB_RETRIEVE_QS_AS)+1;
 			// get enough results to be able to give some idea of how many pages of search results there are
 		
 	//	Perform the search using appropriate module
 
-		$results=qa_get_search_results($inquery, $start, $count, $userid, false, false);
+		$results=as_get_search_results($inquery, $start, $count, $userid, false, false);
 		
 	//	Count and truncate results
 		
-		$pagesize=qa_opt('page_size_search');
+		$pagesize=as_opt('page_size_search');
 		$gotcount=count($results);
 		$results=array_slice($results, 0, $pagesize);
 		
@@ -66,11 +66,11 @@
 			if (isset($result['question']))
 				$fullquestions[]=$result['question'];
 				
-		$usershtml=qa_userids_handles_html($fullquestions);
+		$usershtml=as_userids_handles_html($fullquestions);
 		
 	//	Report the search event
 		
-		qa_report_event('search', $userid, qa_get_logged_in_handle(), qa_cookie_get(), array(
+		as_report_event('search', $userid, as_get_logged_in_handle(), as_cookie_get(), array(
 			'query' => $inquery,
 			'start' => $start,
 		));
@@ -79,27 +79,27 @@
 
 //	Prepare content for theme
 
-	$qa_content=qa_content_prepare(true);
+	$as_content=as_content_prepare(true);
 
-	if (strlen(qa_get('q'))) {
-		$qa_content['search']['value']=qa_html($inquery);
+	if (strlen(as_get('q'))) {
+		$as_content['search']['value']=as_html($inquery);
 	
 		if (count($results))
-			$qa_content['title']=qa_lang_html_sub('main/results_for_x', qa_html($inquery));
+			$as_content['title']=as_lang_html_sub('main/results_for_x', as_html($inquery));
 		else
-			$qa_content['title']=qa_lang_html_sub('main/no_results_for_x', qa_html($inquery));
+			$as_content['title']=as_lang_html_sub('main/no_results_for_x', as_html($inquery));
 			
-		$qa_content['q_list']['form']=array(
-			'tags' => 'method="post" action="'.qa_self_html().'"',
+		$as_content['q_list']['form']=array(
+			'tags' => 'method="post" action="'.as_self_html().'"',
 
 			'hidden' => array(
-				'code' => qa_get_form_security_code('vote'),
+				'code' => as_get_form_security_code('vote'),
 			),
 		);
 		
-		$qa_content['q_list']['qs']=array();
+		$as_content['q_list']['qs']=array();
 		
-		$qdefaults=qa_post_html_defaults('Q');
+		$qdefaults=as_post_html_defaults('Q');
 		
 		foreach ($results as $result)
 			if (!isset($result['question'])) { // if we have any non-question results, display with less statistics
@@ -111,45 +111,45 @@
 		
 		foreach ($results as $result) {
 			if (isset($result['question']))
-				$fields=qa_post_html_fields($result['question'], $userid, qa_cookie_get(),
-					$usershtml, null, qa_post_html_options($result['question'], $qdefaults));
+				$fields=as_post_html_fields($result['question'], $userid, as_cookie_get(),
+					$usershtml, null, as_post_html_options($result['question'], $qdefaults));
 			
 			elseif (isset($result['url']))
 				$fields=array(
-					'what' => qa_html($result['url']),
-					'meta_order' => qa_lang_html('main/meta_order'),
+					'what' => as_html($result['url']),
+					'meta_order' => as_lang_html('main/meta_order'),
 				);
 
 			else
 				continue; // nothing to show here
 			
 			if (isset($qdefaults['blockwordspreg']))
-				$result['title']=qa_block_words_replace($result['title'], $qdefaults['blockwordspreg']);
+				$result['title']=as_block_words_replace($result['title'], $qdefaults['blockwordspreg']);
 				
-			$fields['title']=qa_html($result['title']);
-			$fields['url']=qa_html($result['url']);
+			$fields['title']=as_html($result['title']);
+			$fields['url']=as_html($result['url']);
 			
-			$qa_content['q_list']['qs'][]=$fields;
+			$as_content['q_list']['qs'][]=$fields;
 		}
 
-		$qa_content['page_links']=qa_html_page_links(qa_request(), $start, $pagesize, $start+$gotcount,
-			qa_opt('pages_prev_next'), array('q' => $inquery), $gotcount>=$count);
+		$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $start+$gotcount,
+			as_opt('pages_prev_next'), array('q' => $inquery), $gotcount>=$count);
 		
-		if (qa_opt('feed_for_search'))
-			$qa_content['feed']=array(
-				'url' => qa_path_html(qa_feed_request('search/'.$inquery)),
-				'label' => qa_lang_html_sub('main/results_for_x', qa_html($inquery)),
+		if (as_opt('feed_for_search'))
+			$as_content['feed']=array(
+				'url' => as_path_html(as_feed_request('search/'.$inquery)),
+				'label' => as_lang_html_sub('main/results_for_x', as_html($inquery)),
 			);
 
-		if (empty($qa_content['page_links']))
-			$qa_content['suggest_next']=qa_html_suggest_qs_tags(qa_using_tags());
+		if (empty($as_content['page_links']))
+			$as_content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
 
 	} else
-		$qa_content['error']=qa_lang_html('main/search_explanation');
+		$as_content['error']=as_lang_html('main/search_explanation');
 	
 
 		
-	return $qa_content;
+	return $as_content;
 
 
 /*

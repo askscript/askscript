@@ -35,49 +35,49 @@
 //	Check we're not using single-sign on integration
 	
 	if (QA_FINAL_EXTERNAL_USERS)
-		qa_fatal_error('User login is handled by external code');
+		as_fatal_error('User login is handled by external code');
 		
 
 //	Check the code and unsubscribe the user if appropriate
 
 	$unsubscribed=false;
-	$loginuserid=qa_get_logged_in_userid();
+	$loginuserid=as_get_logged_in_userid();
 	
-	$incode=trim(qa_get('c')); // trim to prevent passing in blank values to match uninitiated DB rows
-	$inhandle=qa_get('u');
+	$incode=trim(as_get('c')); // trim to prevent passing in blank values to match uninitiated DB rows
+	$inhandle=as_get('u');
 	
 	if (!empty($inhandle)) { // match based on code and handle provided on URL
-		$userinfo=qa_db_select_with_pending(qa_db_user_account_selectspec($inhandle, false));
+		$userinfo=as_db_select_with_pending(as_db_user_account_selectspec($inhandle, false));
 
 		if (strtolower(trim(@$userinfo['emailcode']))==strtolower($incode)) {
-			qa_db_user_set_flag($userinfo['userid'], QA_USER_FLAGS_NO_MAILINGS, true);
+			as_db_user_set_flag($userinfo['userid'], QA_USER_FLAGS_NO_MAILINGS, true);
 			$unsubscribed=true;
 		}
 	}
 	
 	if ( (!$unsubscribed) && isset($loginuserid)) { // as a backup, also unsubscribe logged in user
-		qa_db_user_set_flag($loginuserid, QA_USER_FLAGS_NO_MAILINGS, true);
+		as_db_user_set_flag($loginuserid, QA_USER_FLAGS_NO_MAILINGS, true);
 		$unsubscribed=true;
 	}
 
 
 //	Prepare content for theme
 	
-	$qa_content=qa_content_prepare();
+	$as_content=as_content_prepare();
 	
-	$qa_content['title']=qa_lang_html('users/unsubscribe_title');
+	$as_content['title']=as_lang_html('users/unsubscribe_title');
 
 	if ($unsubscribed)
-		$qa_content['error']=strtr(qa_lang_html('users/unsubscribe_complete'), array(
-			'^0' => qa_html(qa_opt('site_title')),
-			'^1' => '<a href="'.qa_path_html('account').'">',
+		$as_content['error']=strtr(as_lang_html('users/unsubscribe_complete'), array(
+			'^0' => as_html(as_opt('site_title')),
+			'^1' => '<a href="'.as_path_html('account').'">',
 			'^2' => '</a>',
 		));
 	else
-		$qa_content['error']=qa_insert_login_links(qa_lang_html('users/unsubscribe_wrong_log_in'), 'unsubscribe');
+		$as_content['error']=as_insert_login_links(as_lang_html('users/unsubscribe_wrong_log_in'), 'unsubscribe');
 
 		
-	return $qa_content;
+	return $as_content;
 
 
 /*

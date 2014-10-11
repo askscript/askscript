@@ -38,107 +38,107 @@
 	
 //	Check admin privileges
 
-	if (!qa_admin_check_privileges($qa_content))
-		return $qa_content;
+	if (!as_admin_check_privileges($as_content))
+		return $as_content;
 
 
 //	Process user actions
 	
 	$securityexpired=false;
 	$recalculate=false;
-	$optionnames=qa_db_points_option_names();
+	$optionnames=as_db_points_option_names();
 
-	if (qa_clicked('doshowdefaults')) {
+	if (as_clicked('doshowdefaults')) {
 		$options=array();
 		
 		foreach ($optionnames as $optionname)
-			$options[$optionname]=qa_default_option($optionname);
+			$options[$optionname]=as_default_option($optionname);
 		
 	} else {
-		if (qa_clicked('docancel'))
+		if (as_clicked('docancel'))
 			;
 
-		elseif (qa_clicked('dosaverecalc')) {
-			if (!qa_check_form_security_code('admin/points', qa_post_text('code')))
+		elseif (as_clicked('dosaverecalc')) {
+			if (!as_check_form_security_code('admin/points', as_post_text('code')))
 				$securityexpired=true;
 		
 			else {
 				foreach ($optionnames as $optionname)
-					qa_set_option($optionname, (int)qa_post_text('option_'.$optionname));
+					as_set_option($optionname, (int)as_post_text('option_'.$optionname));
 					
-				if (!qa_post_text('has_js'))
-					qa_redirect('admin/recalc', array('dorecalcpoints' => 1));
+				if (!as_post_text('has_js'))
+					as_redirect('admin/recalc', array('dorecalcpoints' => 1));
 				else
 					$recalculate=true;
 			}
 		}
 	
-		$options=qa_get_options($optionnames);
+		$options=as_get_options($optionnames);
 	}
 	
 	
 //	Prepare content for theme
 
-	$qa_content=qa_content_prepare();
+	$as_content=as_content_prepare();
 
-	$qa_content['title']=qa_lang_html('admin/admin_title').' - '.qa_lang_html('admin/points_title');
-	$qa_content['error']=$securityexpired ? qa_lang_html('admin/form_security_expired') : qa_admin_page_error();
+	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/points_title');
+	$as_content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
 
-	$qa_content['form']=array(
-		'tags' => 'method="post" action="'.qa_self_html().'" name="points_form" onsubmit="document.forms.points_form.has_js.value=1; return true;"',
+	$as_content['form']=array(
+		'tags' => 'method="post" action="'.as_self_html().'" name="points_form" onsubmit="document.forms.points_form.has_js.value=1; return true;"',
 		
 		'style' => 'wide',
 		
 		'buttons' => array(
 			'saverecalc' => array(
 				'tags' => 'id="dosaverecalc"',
-				'label' => qa_lang_html('admin/save_recalc_button'),
+				'label' => as_lang_html('admin/save_recalc_button'),
 			),
 		),
 		
 		'hidden' => array(
 			'dosaverecalc' => '1',
 			'has_js' => '0',
-			'code' => qa_get_form_security_code('admin/points'),
+			'code' => as_get_form_security_code('admin/points'),
 		),
 	);
 
 	
-	if (qa_clicked('doshowdefaults')) {
-		$qa_content['form']['ok']=qa_lang_html('admin/points_defaults_shown');
+	if (as_clicked('doshowdefaults')) {
+		$as_content['form']['ok']=as_lang_html('admin/points_defaults_shown');
 	
-		$qa_content['form']['buttons']['cancel']=array(
+		$as_content['form']['buttons']['cancel']=array(
 			'tags' => 'name="docancel"',
-			'label' => qa_lang_html('main/cancel_button'),
+			'label' => as_lang_html('main/cancel_button'),
 		);
 
 	} else {
 		if ($recalculate) {
-			$qa_content['form']['ok']='<span id="recalc_ok"></span>';
-			$qa_content['form']['hidden']['code_recalc']=qa_get_form_security_code('admin/recalc');
+			$as_content['form']['ok']='<span id="recalc_ok"></span>';
+			$as_content['form']['hidden']['code_recalc']=as_get_form_security_code('admin/recalc');
 			
-			$qa_content['script_rel'][]='qa-content/qa-admin.js?'.QA_VERSION;
-			$qa_content['script_var']['qa_warning_recalc']=qa_lang('admin/stop_recalc_warning');
+			$as_content['script_rel'][]='qa-content/qa-admin.js?'.QA_VERSION;
+			$as_content['script_var']['as_warning_recalc']=as_lang('admin/stop_recalc_warning');
 			
-			$qa_content['script_onloads'][]=array(
-				"qa_recalc_click('dorecalcpoints', document.getElementById('dosaverecalc'), null, 'recalc_ok');"
+			$as_content['script_onloads'][]=array(
+				"as_recalc_click('dorecalcpoints', document.getElementById('dosaverecalc'), null, 'recalc_ok');"
 			);
 		}
 		
-		$qa_content['form']['buttons']['showdefaults']=array(
+		$as_content['form']['buttons']['showdefaults']=array(
 			'tags' => 'name="doshowdefaults"',
-			'label' => qa_lang_html('admin/show_defaults_button'),
+			'label' => as_lang_html('admin/show_defaults_button'),
 		);
 	}
 
 	
 	foreach ($optionnames as $optionname) {
 		$optionfield=array(
-			'label' => qa_lang_html('options/'.$optionname),
+			'label' => as_lang_html('options/'.$optionname),
 			'tags' => 'name="option_'.$optionname.'"',
-			'value' => qa_html($options[$optionname]),
+			'value' => as_html($options[$optionname]),
 			'type' => 'number',
-			'note' => qa_lang_html('admin/points'),
+			'note' => as_lang_html('admin/points'),
 		);
 		
 		switch ($optionname) {
@@ -172,18 +172,18 @@
 		
 		$optionfield['prefix']='<span style="width:1em; display:inline-block; display:-moz-inline-stack;">'.$prefix.'</span>';
 		
-		$qa_content['form']['fields'][$optionname]=$optionfield;
+		$as_content['form']['fields'][$optionname]=$optionfield;
 	}
 	
-	qa_array_insert($qa_content['form']['fields'], 'points_post_a', array('blank0' => array('type' => 'blank')));
-	qa_array_insert($qa_content['form']['fields'], 'points_vote_up_q', array('blank1' => array('type' => 'blank')));
-	qa_array_insert($qa_content['form']['fields'], 'points_multiple', array('blank2' => array('type' => 'blank')));
+	as_array_insert($as_content['form']['fields'], 'points_post_a', array('blank0' => array('type' => 'blank')));
+	as_array_insert($as_content['form']['fields'], 'points_vote_up_q', array('blank1' => array('type' => 'blank')));
+	as_array_insert($as_content['form']['fields'], 'points_multiple', array('blank2' => array('type' => 'blank')));
 	
 	
-	$qa_content['navigation']['sub']=qa_admin_sub_navigation();
+	$as_content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $qa_content;
+	return $as_content;
 
 
 /*

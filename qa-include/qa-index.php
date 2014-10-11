@@ -50,15 +50,15 @@
 	
 	//	Determine the request and root of the installation, and the requested start position used by many pages
 		
-		function qa_index_set_request()
+		function as_index_set_request()
 		{
-			if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+			if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 			$relativedepth=0;
 			
 			if (isset($_GET['qa-rewrite'])) { // URLs rewritten by .htaccess
 				$urlformat=QA_URL_FORMAT_NEAT;
-				$requestparts=explode('/', qa_gpc_to_string($_GET['qa-rewrite']));
+				$requestparts=explode('/', as_gpc_to_string($_GET['qa-rewrite']));
 				unset($_GET['qa-rewrite']);
 				
 				if (!empty($_SERVER['REQUEST_URI'])) { // workaround for the fact that Apache unescapes characters while rewriting
@@ -72,7 +72,7 @@
 						foreach ($params as $param)
 							if (preg_match('/^([^\=]*)(\=(.*))?$/', $param, $matches)) {
 								$argument=strtr(urldecode($matches[1]), '.', '_'); // simulate PHP's $_GET behavior
-								$_GET[$argument]=qa_string_to_gpc(urldecode(@$matches[3]));
+								$_GET[$argument]=as_string_to_gpc(urldecode(@$matches[3]));
 							}
 		
 						$origpath=substr($origpath, 0, $questionpos);
@@ -98,17 +98,17 @@
 				if (strpos($_GET['qa'], '/')===false) {
 					$urlformat=( (empty($_SERVER['REQUEST_URI'])) || (strpos($_SERVER['REQUEST_URI'], '/index.php')!==false) )
 						? QA_URL_FORMAT_SAFEST : QA_URL_FORMAT_PARAMS;
-					$requestparts=array(qa_gpc_to_string($_GET['qa']));
+					$requestparts=array(as_gpc_to_string($_GET['qa']));
 					
 					for ($part=1; $part<10; $part++)
-						if (isset($_GET['qa_'.$part])) {
-							$requestparts[]=qa_gpc_to_string($_GET['qa_'.$part]);
-							unset($_GET['qa_'.$part]);
+						if (isset($_GET['as_'.$part])) {
+							$requestparts[]=as_gpc_to_string($_GET['as_'.$part]);
+							unset($_GET['as_'.$part]);
 						}
 				
 				} else {
 					$urlformat=QA_URL_FORMAT_PARAM;
-					$requestparts=explode('/', qa_gpc_to_string($_GET['qa']));
+					$requestparts=explode('/', as_gpc_to_string($_GET['qa']));
 				}
 				
 				unset($_GET['qa']);
@@ -136,23 +136,23 @@
 			reset($requestparts);
 			$key=key($requestparts);
 			
-			$replacement=array_search(@$requestparts[$key], qa_get_request_map());
+			$replacement=array_search(@$requestparts[$key], as_get_request_map());
 			if ($replacement!==false)
 				$requestparts[$key]=$replacement;
 		
-			qa_set_request(
+			as_set_request(
 				implode('/', $requestparts),
 				($relativedepth>1) ? str_repeat('../', $relativedepth-1) : './',
 				$urlformat
 			);
 		}
 	
-		qa_index_set_request();
+		as_index_set_request();
 		
 		
 	//	Branch off to appropriate file for further handling
 	
-		$requestlower=strtolower(qa_request());
+		$requestlower=strtolower(as_request());
 		
 		if ($requestlower=='install')
 			require QA_INCLUDE_DIR.'qa-install.php';
@@ -176,7 +176,7 @@
 		}
 	}
 	
-	qa_report_process_stage('shutdown');
+	as_report_process_stage('shutdown');
 
 
 /*

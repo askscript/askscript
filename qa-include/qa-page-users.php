@@ -36,49 +36,49 @@
 
 //	Get list of all users
 	
-	$start=qa_get_start();	
-	$users=qa_db_select_with_pending(qa_db_top_users_selectspec($start, qa_opt_if_loaded('page_size_users')));
+	$start=as_get_start();	
+	$users=as_db_select_with_pending(as_db_top_users_selectspec($start, as_opt_if_loaded('page_size_users')));
 	
-	$usercount=qa_opt('cache_userpointscount');
-	$pagesize=qa_opt('page_size_users');
+	$usercount=as_opt('cache_userpointscount');
+	$pagesize=as_opt('page_size_users');
 	$users=array_slice($users, 0, $pagesize);
-	$usershtml=qa_userids_handles_html($users);
+	$usershtml=as_userids_handles_html($users);
 
 
 //	Prepare content for theme
 	
-	$qa_content=qa_content_prepare();
+	$as_content=as_content_prepare();
 
-	$qa_content['title']=qa_lang_html('main/highest_users');
+	$as_content['title']=as_lang_html('main/highest_users');
 
-	$qa_content['ranking']=array(
+	$as_content['ranking']=array(
 		'items' => array(),
-		'rows' => ceil($pagesize/qa_opt('columns_users')),
+		'rows' => ceil($pagesize/as_opt('columns_users')),
 		'type' => 'users'
 	);
 	
 	if (count($users)) {
 		foreach ($users as $userid => $user)
-			$qa_content['ranking']['items'][]=array(
+			$as_content['ranking']['items'][]=array(
 				'label' =>
 					(QA_FINAL_EXTERNAL_USERS
-						? qa_get_external_avatar_html($user['userid'], qa_opt('avatar_users_size'), true)
-						: qa_get_user_avatar_html($user['flags'], $user['email'], $user['handle'],
-							$user['avatarblobid'], $user['avatarwidth'], $user['avatarheight'], qa_opt('avatar_users_size'), true)
+						? as_get_external_avatar_html($user['userid'], as_opt('avatar_users_size'), true)
+						: as_get_user_avatar_html($user['flags'], $user['email'], $user['handle'],
+							$user['avatarblobid'], $user['avatarwidth'], $user['avatarheight'], as_opt('avatar_users_size'), true)
 					).' '.$usershtml[$user['userid']],
-				'score' => qa_html(number_format($user['points'])),
+				'score' => as_html(number_format($user['points'])),
 				'raw' => $user,
 			);
 	
 	} else
-		$qa_content['title']=qa_lang_html('main/no_active_users');
+		$as_content['title']=as_lang_html('main/no_active_users');
 	
-	$qa_content['page_links']=qa_html_page_links(qa_request(), $start, $pagesize, $usercount, qa_opt('pages_prev_next'));
+	$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $usercount, as_opt('pages_prev_next'));
 
-	$qa_content['navigation']['sub']=qa_users_sub_navigation();
+	$as_content['navigation']['sub']=as_users_sub_navigation();
 	
 
-	return $qa_content;
+	return $as_content;
 
 
 /*

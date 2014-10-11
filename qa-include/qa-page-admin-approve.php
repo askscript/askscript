@@ -36,44 +36,44 @@
 //	Check we're not using single-sign on integration
 	
 	if (QA_FINAL_EXTERNAL_USERS)
-		qa_fatal_error('User accounts are handled by external code');
+		as_fatal_error('User accounts are handled by external code');
 
 
 //	Find most flagged questions, answers, comments
 
-	$userid=qa_get_logged_in_userid();
+	$userid=as_get_logged_in_userid();
 	
-	$users=qa_db_get_unapproved_users(qa_opt('page_size_users'));
-	$userfields=qa_db_select_with_pending(qa_db_userfields_selectspec());
+	$users=as_db_get_unapproved_users(as_opt('page_size_users'));
+	$userfields=as_db_select_with_pending(as_db_userfields_selectspec());
 
 
 //	Check admin privileges (do late to allow one DB query)
 
-	if (qa_get_logged_in_level()<QA_USER_LEVEL_MODERATOR) {
-		$qa_content=qa_content_prepare();
-		$qa_content['error']=qa_lang_html('users/no_permission');
-		return $qa_content;
+	if (as_get_logged_in_level()<QA_USER_LEVEL_MODERATOR) {
+		$as_content=as_content_prepare();
+		$as_content['error']=as_lang_html('users/no_permission');
+		return $as_content;
 	}
 		
 		
 //	Check to see if any were approved or blocked here
 
-	$pageerror=qa_admin_check_clicks();
+	$pageerror=as_admin_check_clicks();
 	
 
 //	Prepare content for theme
 	
-	$qa_content=qa_content_prepare();
+	$as_content=as_content_prepare();
 
-	$qa_content['title']=qa_lang_html('admin/approve_users_title');
-	$qa_content['error']=isset($pageerror) ? $pageerror : qa_admin_page_error();
+	$as_content['title']=as_lang_html('admin/approve_users_title');
+	$as_content['error']=isset($pageerror) ? $pageerror : as_admin_page_error();
 	
-	$qa_content['message_list']=array(
+	$as_content['message_list']=array(
 		'form' => array(
-			'tags' => 'method="post" action="'.qa_self_html().'"',
+			'tags' => 'method="post" action="'.as_self_html().'"',
 
 			'hidden' => array(
-				'code' => qa_get_form_security_code('admin/click'),
+				'code' => as_get_form_security_code('admin/click'),
 			),
 		),
 		
@@ -85,56 +85,56 @@
 		foreach ($users as $user) {
 			$message=array();
 			
-			$message['tags']='id="p'.qa_html($user['userid']).'"'; // use p prefix for qa_admin_click() in qa-admin.js
+			$message['tags']='id="p'.as_html($user['userid']).'"'; // use p prefix for as_admin_click() in qa-admin.js
 						
-			$message['content']=qa_lang_html('users/registered_label').' '.
-				strtr(qa_lang_html('users/x_ago_from_y'), array(
-					'^1' => qa_time_to_string(qa_opt('db_time')-$user['created']),
-					'^2' => qa_ip_anchor_html($user['createip']),
+			$message['content']=as_lang_html('users/registered_label').' '.
+				strtr(as_lang_html('users/x_ago_from_y'), array(
+					'^1' => as_time_to_string(as_opt('db_time')-$user['created']),
+					'^2' => as_ip_anchor_html($user['createip']),
 				)).'<br/>';
 				
-			$htmlemail=qa_html($user['email']);
+			$htmlemail=as_html($user['email']);
 			
-			$message['content'].=qa_lang_html('users/email_label').' <a href="mailto:'.$htmlemail.'">'.$htmlemail.'</a>';
+			$message['content'].=as_lang_html('users/email_label').' <a href="mailto:'.$htmlemail.'">'.$htmlemail.'</a>';
 			
-			if (qa_opt('confirm_user_emails'))
-				$message['content'].='<small> - '.qa_lang_html(($user['flags'] & QA_USER_FLAGS_EMAIL_CONFIRMED) ? 'users/email_confirmed' : 'users/email_not_confirmed').'</small>';
+			if (as_opt('confirm_user_emails'))
+				$message['content'].='<small> - '.as_lang_html(($user['flags'] & QA_USER_FLAGS_EMAIL_CONFIRMED) ? 'users/email_confirmed' : 'users/email_not_confirmed').'</small>';
 			
 			foreach ($userfields as $userfield)
 				if (strlen(@$user['profile'][$userfield['title']]))
-					$message['content'].='<br/>'.qa_html($userfield['content'].': '.$user['profile'][$userfield['title']]);
+					$message['content'].='<br/>'.as_html($userfield['content'].': '.$user['profile'][$userfield['title']]);
 				
-			$message['meta_order']=qa_lang_html('main/meta_order');
-			$message['who']['data']=qa_get_one_user_html($user['handle']);
+			$message['meta_order']=as_lang_html('main/meta_order');
+			$message['who']['data']=as_get_one_user_html($user['handle']);
 			
 			$message['form']=array(
 				'style' => 'light',
 
 				'buttons' => array(
 					'approve' => array(
-						'tags' => 'name="admin_'.$user['userid'].'_userapprove" onclick="return qa_admin_click(this);"',
-						'label' => qa_lang_html('question/approve_button'),
+						'tags' => 'name="admin_'.$user['userid'].'_userapprove" onclick="return as_admin_click(this);"',
+						'label' => as_lang_html('question/approve_button'),
 					),
 
 					'block' => array(
-						'tags' => 'name="admin_'.$user['userid'].'_userblock" onclick="return qa_admin_click(this);"',
-						'label' => qa_lang_html('admin/block_button'),
+						'tags' => 'name="admin_'.$user['userid'].'_userblock" onclick="return as_admin_click(this);"',
+						'label' => as_lang_html('admin/block_button'),
 					),
 				),
 			);
 			
-			$qa_content['message_list']['messages'][]=$message;
+			$as_content['message_list']['messages'][]=$message;
 		}
 		
 	} else
-		$qa_content['title']=qa_lang_html('admin/no_unapproved_found');
+		$as_content['title']=as_lang_html('admin/no_unapproved_found');
 
 
-	$qa_content['navigation']['sub']=qa_admin_sub_navigation();
-	$qa_content['script_rel'][]='qa-content/qa-admin.js?'.QA_VERSION;
+	$as_content['navigation']['sub']=as_admin_sub_navigation();
+	$as_content['script_rel'][]='qa-content/qa-admin.js?'.QA_VERSION;
 
 	
-	return $qa_content;
+	return $as_content;
 	
 
 /*

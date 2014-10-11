@@ -42,93 +42,93 @@
 	define('QA_LIMIT_WALL_POSTS', 'W');
 
 	
-	function qa_user_limits_remaining($action)
+	function as_user_limits_remaining($action)
 /*
 	Return how many more times the logged in user (and requesting IP address) can perform $action this hour,
 	where $action is one of the QA_LIMIT_* constants defined above.
 */
 	{
-		$userlimits=qa_db_get_pending_result('userlimits', qa_db_user_limits_selectspec(qa_get_logged_in_userid()));
-		$iplimits=qa_db_get_pending_result('iplimits', qa_db_ip_limits_selectspec(qa_remote_ip_address()));
+		$userlimits=as_db_get_pending_result('userlimits', as_db_user_limits_selectspec(as_get_logged_in_userid()));
+		$iplimits=as_db_get_pending_result('iplimits', as_db_ip_limits_selectspec(as_remote_ip_address()));
 		
-		return qa_limits_calc_remaining($action, @$userlimits[$action], @$iplimits[$action]);
+		return as_limits_calc_remaining($action, @$userlimits[$action], @$iplimits[$action]);
 	}
 	
 	
-	function qa_limits_remaining($userid, $action)
+	function as_limits_remaining($userid, $action)
 /*
 	Return how many more times user $userid and/or the requesting IP can perform $action this hour, where $action is one
 	of the QA_LIMIT_* constants above. This function is no longer used and only included for backwards compatibility.
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		require_once QA_INCLUDE_DIR.'qa-db-limits.php';
 
-		$dblimits=qa_db_limits_get($userid, qa_remote_ip_address(), $action);
+		$dblimits=as_db_limits_get($userid, as_remote_ip_address(), $action);
 		
-		return qa_limits_calc_remaining($action, @$dblimits['user'], @$dblimits['ip']);
+		return as_limits_calc_remaining($action, @$dblimits['user'], @$dblimits['ip']);
 	}
 	
 	
-	function qa_limits_calc_remaining($action, $userlimits, $iplimits)
+	function as_limits_calc_remaining($action, $userlimits, $iplimits)
 /*
 	Calculate how many more times $action can be performed this hour, based on $userlimits and $iplimits retrieved from the database
 */
 	{
 		switch ($action) {
 			case QA_LIMIT_QUESTIONS:
-				$usermax=qa_opt('max_rate_user_qs');
-				$ipmax=qa_opt('max_rate_ip_qs');
+				$usermax=as_opt('max_rate_user_qs');
+				$ipmax=as_opt('max_rate_ip_qs');
 				break;
 				
 			case QA_LIMIT_ANSWERS:
-				$usermax=qa_opt('max_rate_user_as');
-				$ipmax=qa_opt('max_rate_ip_as');
+				$usermax=as_opt('max_rate_user_as');
+				$ipmax=as_opt('max_rate_ip_as');
 				break;
 				
 			case QA_LIMIT_COMMENTS:
-				$usermax=qa_opt('max_rate_user_cs');
-				$ipmax=qa_opt('max_rate_ip_cs');
+				$usermax=as_opt('max_rate_user_cs');
+				$ipmax=as_opt('max_rate_ip_cs');
 				break;
 
 			case QA_LIMIT_VOTES:
-				$usermax=qa_opt('max_rate_user_votes');
-				$ipmax=qa_opt('max_rate_ip_votes');
+				$usermax=as_opt('max_rate_user_votes');
+				$ipmax=as_opt('max_rate_ip_votes');
 				break;
 				
 			case QA_LIMIT_REGISTRATIONS:
 				$usermax=1; // not really relevant
-				$ipmax=qa_opt('max_rate_ip_registers');
+				$ipmax=as_opt('max_rate_ip_registers');
 				break;
 
 			case QA_LIMIT_LOGINS:
 				$usermax=1; // not really relevant
-				$ipmax=qa_opt('max_rate_ip_logins');
+				$ipmax=as_opt('max_rate_ip_logins');
 				break;
 				
 			case QA_LIMIT_UPLOADS:
-				$usermax=qa_opt('max_rate_user_uploads');
-				$ipmax=qa_opt('max_rate_ip_uploads');
+				$usermax=as_opt('max_rate_user_uploads');
+				$ipmax=as_opt('max_rate_ip_uploads');
 				break;
 				
 			case QA_LIMIT_FLAGS:
-				$usermax=qa_opt('max_rate_user_flags');
-				$ipmax=qa_opt('max_rate_ip_flags');
+				$usermax=as_opt('max_rate_user_flags');
+				$ipmax=as_opt('max_rate_ip_flags');
 				break;
 				
 			case QA_LIMIT_MESSAGES:
 			case QA_LIMIT_WALL_POSTS:
-				$usermax=qa_opt('max_rate_user_messages');
-				$ipmax=qa_opt('max_rate_ip_messages');
+				$usermax=as_opt('max_rate_user_messages');
+				$ipmax=as_opt('max_rate_ip_messages');
 				break;
 			
 			default:
-				qa_fatal_error('Unknown limit code in qa_limits_calc_remaining: '.$action);
+				as_fatal_error('Unknown limit code in as_limits_calc_remaining: '.$action);
 				break;
 		}
 		
-		$period=(int)(qa_opt('db_time')/3600);
+		$period=(int)(as_opt('db_time')/3600);
 
 		return max(0, min(
 			$usermax-((@$userlimits['period']==$period) ? $userlimits['count'] : 0),
@@ -137,24 +137,24 @@
 	}
 	
 	
-	function qa_is_ip_blocked()
+	function as_is_ip_blocked()
 /*
 	Return whether the requesting IP address has been blocked from write operations
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		$blockipclauses=qa_block_ips_explode(qa_opt('block_ips_write'));
+		$blockipclauses=as_block_ips_explode(as_opt('block_ips_write'));
 		
 		foreach ($blockipclauses as $blockipclause)
-			if (qa_block_ip_match(qa_remote_ip_address(), $blockipclause))
+			if (as_block_ip_match(as_remote_ip_address(), $blockipclause))
 				return true;
 				
 		return false;
 	}
 
 	
-	function qa_block_ips_explode($blockipstring)
+	function as_block_ips_explode($blockipstring)
 /*
 	Return an array of the clauses within $blockipstring, each of which can contain hyphens or asterisks
 */
@@ -165,7 +165,7 @@
 	}
 
 	
-	function qa_block_ip_match($ip, $blockipclause)
+	function as_block_ip_match($ip, $blockipclause)
 /*
 	Returns whether the ip address $ip is matched by the clause $blockipclause, which can contain a hyphen or asterisk
 */
@@ -189,29 +189,29 @@
 	}
 	
 	
-	function qa_report_write_action($userid, $cookieid, $action, $questionid, $answerid, $commentid)
+	function as_report_write_action($userid, $cookieid, $action, $questionid, $answerid, $commentid)
 /*
 	Called after a database write $action performed by a user identified by $userid and/or $cookieid.
 */
 	{}
 
 	
-	function qa_limits_increment($userid, $action)
+	function as_limits_increment($userid, $action)
 /*
 	Take note for rate limits that user $userid and/or the requesting IP just performed $action,
 	where $action is one of the QA_LIMIT_* constants defined above.
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		require_once QA_INCLUDE_DIR.'qa-db-limits.php';
 
-		$period=(int)(qa_opt('db_time')/3600);
+		$period=(int)(as_opt('db_time')/3600);
 		
 		if (isset($userid))
-			qa_db_limits_user_add($userid, $action, $period, 1);
+			as_db_limits_user_add($userid, $action, $period, 1);
 		
-		qa_db_limits_ip_add(qa_remote_ip_address(), $action, $period, 1);
+		as_db_limits_ip_add(as_remote_ip_address(), $action, $period, 1);
 	}
 
 

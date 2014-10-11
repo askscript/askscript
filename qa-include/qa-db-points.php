@@ -30,12 +30,12 @@
 	}
 
 
-	function qa_db_points_option_names()
+	function as_db_points_option_names()
 /*
 	Returns an array of option names required to perform calculations in userpoints table
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		return array(
 			'points_post_q', 'points_select_a', 'points_per_q_voted_up', 'points_per_q_voted_down', 'points_q_voted_max_gain', 'points_q_voted_max_loss',
@@ -47,7 +47,7 @@
 	}
 
 	
-	function qa_db_points_calculations()
+	function as_db_points_calculations()
 /*
 	Returns an array containing all the calculation formulae for the userpoints table. Each element of this
 	array is for one column - the key contains the column name, and the value is a further array of two elements.
@@ -56,11 +56,11 @@
 	The element 'multiple' specifies what to multiply each column by to create the final sum in the points column.
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		require_once QA_INCLUDE_DIR.'qa-app-options.php';
 		
-		$options=qa_get_options(qa_db_points_option_names());
+		$options=as_get_options(as_db_points_option_names());
 		
 		return array(
 			'qposts' => array(
@@ -139,19 +139,19 @@
 	}
 
 	
-	function qa_db_points_update_ifuser($userid, $columns)
+	function as_db_points_update_ifuser($userid, $columns)
 /*
 	Update the userpoints table in the database for $userid and $columns, plus the summary points column.
 	Set $columns to true for all, empty for none, an array for several, or a single value for one.
 	This dynamically builds some fairly crazy looking SQL, but it works, and saves repeat calculations.
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		if (qa_should_update_counts() && isset($userid)) {
+		if (as_should_update_counts() && isset($userid)) {
 			require_once QA_INCLUDE_DIR.'qa-app-options.php';
 
-			$calculations=qa_db_points_calculations();
+			$calculations=as_db_points_calculations();
 			
 			if ($columns===true)
 				$keycolumns=$calculations;
@@ -164,7 +164,7 @@
 			
 			$insertfields='userid, ';
 			$insertvalues='$, ';
-			$insertpoints=(int)qa_opt('points_base');
+			$insertpoints=(int)as_opt('points_base');
 
 			$updates='';
 			$updatepoints=$insertpoints;
@@ -185,34 +185,34 @@
 			$query='INSERT INTO ^userpoints ('.$insertfields.'points) VALUES ('.$insertvalues.$insertpoints.') '.
 				'ON DUPLICATE KEY UPDATE '.$updates.'points='.$updatepoints.'+bonus';
 			
-			qa_db_query_raw(str_replace('~', "='".qa_db_escape_string($userid)."'", qa_db_apply_sub($query, array($userid))));
+			as_db_query_raw(str_replace('~', "='".as_db_escape_string($userid)."'", as_db_apply_sub($query, array($userid))));
 				// build like this so that a #, $ or ^ character in the $userid (if external integration) isn't substituted
 			
-			if (qa_db_insert_on_duplicate_inserted())
-				qa_db_userpointscount_update();
+			if (as_db_insert_on_duplicate_inserted())
+				as_db_userpointscount_update();
 		}
 	}
 
 
-	function qa_db_points_set_bonus($userid, $bonus)
+	function as_db_points_set_bonus($userid, $bonus)
 /*
 	Set the number of explicit bonus points for $userid to $bonus
 */
 	{
-		qa_db_query_sub(
+		as_db_query_sub(
 			"INSERT INTO ^userpoints (userid, bonus) VALUES ($, #) ON DUPLICATE KEY UPDATE bonus=#",
 			$userid, $bonus, $bonus
 		);
 	}
 	
 	
-	function qa_db_userpointscount_update()
+	function as_db_userpointscount_update()
 /*
 	Update the cached count in the database of the number of rows in the userpoints table
 */
 	{
-		if (qa_should_update_counts())
-			qa_db_query_sub("REPLACE ^options (title, content) SELECT 'cache_userpointscount', COUNT(*) FROM ^userpoints");
+		if (as_should_update_counts())
+			as_db_query_sub("REPLACE ^options (title, content) SELECT 'cache_userpointscount', COUNT(*) FROM ^userpoints");
 	}
 
 

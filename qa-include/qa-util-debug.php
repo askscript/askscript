@@ -24,32 +24,32 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	function qa_usage_init()
+	function as_usage_init()
 /*
 	Initialize the counts of resource usage
 */
 	{
-		global $qa_database_usage, $qa_database_queries, $qa_usage_start, $qa_usage_last;
+		global $as_database_usage, $as_database_queries, $as_usage_start, $as_usage_last;
 		
-		$qa_database_usage=array('queries' => 0, 'clock' => 0);
-		$qa_database_queries='';
-		$qa_usage_last=$qa_usage_start=qa_usage_get();
+		$as_database_usage=array('queries' => 0, 'clock' => 0);
+		$as_database_queries='';
+		$as_usage_last=$as_usage_start=as_usage_get();
 	}
 
 	
-	function qa_usage_get()
+	function as_usage_get()
 /*
 	Return an array representing the resource usage as of now
 */
 	{
-		global $qa_database_usage;
+		global $as_database_usage;
 		
 		$usage=array(
 			'files' => count(get_included_files()),
-			'queries' => $qa_database_usage['queries'],
+			'queries' => $as_database_usage['queries'],
 			'ram' => function_exists('memory_get_usage') ? memory_get_usage() : 0,
 			'clock' => array_sum(explode(' ', microtime())),
-			'mysql' => $qa_database_usage['clock'],
+			'mysql' => $as_database_usage['clock'],
 		);
 		
 		if (function_exists('getrusage')) {
@@ -65,7 +65,7 @@
 	}
 
 	
-	function qa_usage_delta($oldusage, $newusage)
+	function as_usage_delta($oldusage, $newusage)
 /*
 	Return the difference between two resource usage arrays, as an array
 */
@@ -79,20 +79,20 @@
 	}
 
 	
-	function qa_usage_mark($stage)
+	function as_usage_mark($stage)
 /*
 	Mark the beginning of a new stage of script execution and store usages accordingly
 */
 	{
-		global $qa_usage_last, $qa_usage_stages;
+		global $as_usage_last, $as_usage_stages;
 		
-		$usage=qa_usage_get();
-		$qa_usage_stages[$stage]=qa_usage_delta($qa_usage_last, $usage);
-		$qa_usage_last=$usage;
+		$usage=as_usage_get();
+		$as_usage_stages[$stage]=as_usage_delta($as_usage_last, $usage);
+		$as_usage_last=$usage;
 	}
 
 
-	function qa_usage_line($stage, $usage, $totalusage)
+	function as_usage_line($stage, $usage, $totalusage)
 /*
 	Return HTML to represent the resource $usage, showing appropriate proportions of $totalusage
 */
@@ -110,33 +110,33 @@
 	}
 
 	
-	function qa_usage_output()
+	function as_usage_output()
 /*
 	Output an (ugly) block of HTML detailing all resource usage and database queries
 */
 	{
-		global $qa_usage_start, $qa_usage_stages, $qa_database_queries;
+		global $as_usage_start, $as_usage_stages, $as_database_queries;
 		
 		echo '<p><br><table bgcolor="#cccccc" cellpadding="8" cellspacing="0" width="100%">';
 	
 		echo '<tr><td colspan="2">';
 		
-		$totaldelta=qa_usage_delta($qa_usage_start, qa_usage_get());
+		$totaldelta=as_usage_delta($as_usage_start, as_usage_get());
 		
-		echo qa_usage_line('Total', $totaldelta, $totaldelta).'<br>';
+		echo as_usage_line('Total', $totaldelta, $totaldelta).'<br>';
 		
-		foreach ($qa_usage_stages as $stage => $stagedelta)
+		foreach ($as_usage_stages as $stage => $stagedelta)
 			
-		echo '<br>'.qa_usage_line(ucfirst($stage), $stagedelta, $totaldelta);
+		echo '<br>'.as_usage_line(ucfirst($stage), $stagedelta, $totaldelta);
 		
 		echo '</td></tr><tr valign="bottom"><td width="30%"><textarea cols="40" rows="20" style="width:100%;">';
 		
 		foreach (get_included_files() as $file)
-			echo qa_html(implode('/', array_slice(explode('/', $file), -3)))."\n";
+			echo as_html(implode('/', array_slice(explode('/', $file), -3)))."\n";
 		
 		echo '</textarea></td>';
 		
-		echo '<td width="70%"><textarea cols="40" rows="20" style="width:100%;">'.qa_html($qa_database_queries).'</textarea></td>';
+		echo '<td width="70%"><textarea cols="40" rows="20" style="width:100%;">'.as_html($as_database_queries).'</textarea></td>';
 		
 		echo '</tr></table>';
 	}

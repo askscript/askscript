@@ -44,8 +44,8 @@
 	}
 
 
-	qa_register_plugin_module('page', 'qa-example-page.php', 'qa_example_page', 'Example Page');
-	qa_register_plugin_phrases('qa-example-lang-*.php', 'example_page');
+	as_register_plugin_module('page', 'qa-example-page.php', 'as_example_page', 'Example Page');
+	as_register_plugin_phrases('qa-example-lang-*.php', 'example_page');
 	
 
 /*

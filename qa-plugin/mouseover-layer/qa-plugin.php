@@ -44,8 +44,8 @@
 	}
 
 
-	qa_register_plugin_layer('qa-mouseover-layer.php', 'Mouseover Layer');
-	qa_register_plugin_module('module', 'qa-mouseover-admin-form.php', 'qa_mouseover_admin_form', 'Mouseover Layer');
+	as_register_plugin_layer('qa-mouseover-layer.php', 'Mouseover Layer');
+	as_register_plugin_module('module', 'qa-mouseover-admin-form.php', 'as_mouseover_admin_form', 'Mouseover Layer');
 	
 
 /*

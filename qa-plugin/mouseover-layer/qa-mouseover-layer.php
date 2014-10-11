@@ -24,11 +24,11 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	class qa_html_theme_layer extends qa_html_theme_base {
+	class as_html_theme_layer extends as_html_theme_base {
 		
 		function q_list($q_list)
 		{
-			if (count(@$q_list['qs']) && qa_opt('mouseover_content_on')) { // first check it is not an empty list and the feature is turned on
+			if (count(@$q_list['qs']) && as_opt('mouseover_content_on')) { // first check it is not an empty list and the feature is turned on
 
 			//	Collect the question ids of all items in the question list (so we can do this in one DB query)
 	
@@ -41,13 +41,13 @@
 
 				//	Retrieve the content for these questions from the database and put into an array
 				
-					$result=qa_db_query_sub('SELECT postid, content, format FROM ^posts WHERE postid IN (#)', $postids);
-					$postinfo=qa_db_read_all_assoc($result, 'postid');
+					$result=as_db_query_sub('SELECT postid, content, format FROM ^posts WHERE postid IN (#)', $postids);
+					$postinfo=as_db_read_all_assoc($result, 'postid');
 					
 				//	Get the regular expression fragment to use for blocked words and the maximum length of content to show
 					
-					$blockwordspreg=qa_get_block_words_preg();
-					$maxlength=qa_opt('mouseover_content_max_len');
+					$blockwordspreg=as_get_block_words_preg();
+					$maxlength=as_opt('mouseover_content_max_len');
 					
 				//	Now add the popup to the title for each question
 			
@@ -55,15 +55,15 @@
 						$thispost=@$postinfo[$question['raw']['postid']];
 						
 						if (isset($thispost)) {
-							$text=qa_viewer_text($thispost['content'], $thispost['format'], array('blockwordspreg' => $blockwordspreg));
-							$text=qa_shorten_string_line($text, $maxlength);
-							$q_list['qs'][$index]['title']='<span title="'.qa_html($text).'">'.@$question['title'].'</span>';
+							$text=as_viewer_text($thispost['content'], $thispost['format'], array('blockwordspreg' => $blockwordspreg));
+							$text=as_shorten_string_line($text, $maxlength);
+							$q_list['qs'][$index]['title']='<span title="'.as_html($text).'">'.@$question['title'].'</span>';
 						}
 					}
 				}
 			}
 			
-			qa_html_theme_base::q_list($q_list); // call back through to the default function
+			as_html_theme_base::q_list($q_list); // call back through to the default function
 		}
 
 	}

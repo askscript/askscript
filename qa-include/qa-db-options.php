@@ -30,12 +30,12 @@
 	}
 
 
-	function qa_db_set_option($name, $value)
+	function as_db_set_option($name, $value)
 /*
 	Set option $name to $value in the database
 */
 	{
-		qa_db_query_sub(
+		as_db_query_sub(
 			'REPLACE ^options (title, content) VALUES ($, $)',
 			$name, $value
 		);

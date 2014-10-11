@@ -44,7 +44,7 @@
 	}
 
 
-	qa_register_plugin_module('widget', 'qa-tag-cloud.php', 'qa_tag_cloud', 'Tag Cloud');
+	as_register_plugin_module('widget', 'qa-tag-cloud.php', 'as_tag_cloud', 'Tag Cloud');
 	
 
 /*

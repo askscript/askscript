@@ -22,61 +22,61 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-var qa_element_revealed=null;
+var as_element_revealed=null;
 
-function qa_toggle_element(elem)
+function as_toggle_element(elem)
 {
 	var e=elem ? document.getElementById(elem) : null;
 	
-	if (e && e.qa_disabled)
+	if (e && e.as_disabled)
 		e=null;
 	
-	if (e && (qa_element_revealed==e)) {
-		qa_conceal(qa_element_revealed, 'form');
-		qa_element_revealed=null;
+	if (e && (as_element_revealed==e)) {
+		as_conceal(as_element_revealed, 'form');
+		as_element_revealed=null;
 
 	} else {
-		if (qa_element_revealed)
-			qa_conceal(qa_element_revealed, 'form');
+		if (as_element_revealed)
+			as_conceal(as_element_revealed, 'form');
 	
 		if (e) {
-			if (e.qa_load && !e.qa_loaded) {
-				e.qa_load();
-				e.qa_loaded=true;
+			if (e.as_load && !e.as_loaded) {
+				e.as_load();
+				e.as_loaded=true;
 			}
 			
-			if (e.qa_show)
-				e.qa_show();
+			if (e.as_show)
+				e.as_show();
 			
-			qa_reveal(e, 'form', function() {
+			as_reveal(e, 'form', function() {
 				var t=$(e).offset().top;
 				var h=$(e).height()+16;
 				var wt=$(window).scrollTop();
 				var wh=$(window).height();
 				
 				if ( (t<wt) || (t>(wt+wh)) )
-					qa_scroll_page_to(t);
+					as_scroll_page_to(t);
 				else if ((t+h)>(wt+wh))
-					qa_scroll_page_to(t+h-wh);
+					as_scroll_page_to(t+h-wh);
 
-				if (e.qa_focus)
-					e.qa_focus();
+				if (e.as_focus)
+					e.as_focus();
 			});
 		}
 				
-		qa_element_revealed=e;
+		as_element_revealed=e;
 	}
 	
 	return !(e||!elem); // failed to find item
 }
 
-function qa_submit_answer(questionid, elem)
+function as_submit_answer(questionid, elem)
 {
-	var params=qa_form_params('a_form');
+	var params=as_form_params('a_form');
 	
 	params.a_questionid=questionid;
 	
-	qa_ajax_post('answer', params,
+	as_ajax_post('answer', params,
 		function(lines) {
 			
 			if (lines[0]=='1') {
@@ -87,8 +87,8 @@ function qa_submit_answer(questionid, elem)
 				}
 			
 				var t=document.getElementById('a_list_title');
-				qa_set_inner_html(t, 'a_list_title', lines[2]);
-				qa_reveal(t, 'a_list_title');
+				as_set_inner_html(t, 'a_list_title', lines[2]);
+				as_reveal(t, 'a_list_title');
 				
 				var e=document.createElement('div');
 				e.innerHTML=lines.slice(3).join("\n");
@@ -100,34 +100,34 @@ function qa_submit_answer(questionid, elem)
 				l.insertBefore(c, l.firstChild);
 				
 				var a=document.getElementById('anew');
-				a.qa_disabled=true;
+				a.as_disabled=true;
 				
-				qa_reveal(c, 'answer');
-				qa_conceal(a, 'form');
+				as_reveal(c, 'answer');
+				as_conceal(a, 'form');
 
 			} else if (lines[0]=='0') {
 				document.forms['a_form'].submit();
 			
 			} else {
-				qa_ajax_error();
+				as_ajax_error();
 			}
 
 		}
 	);
 	
-	qa_show_waiting_after(elem, false);
+	as_show_waiting_after(elem, false);
 	
 	return false;
 }
 
-function qa_submit_comment(questionid, parentid, elem)
+function as_submit_comment(questionid, parentid, elem)
 {
-	var params=qa_form_params('c_form_'+parentid);
+	var params=as_form_params('c_form_'+parentid);
 
 	params.c_questionid=questionid;
 	params.c_parentid=parentid;
 	
-	qa_ajax_post('comment', params,
+	as_ajax_post('comment', params,
 		function (lines) {
 
 			if (lines[0]=='1') {
@@ -136,32 +136,32 @@ function qa_submit_comment(questionid, parentid, elem)
 				l.style.display='';
 				
 				var a=document.getElementById('c'+parentid);
-				a.qa_disabled=true;
+				a.as_disabled=true;
 				
 				var c=document.getElementById(lines[1]); // id of comment
 				if (c) {
 					c.style.display='none';
-					qa_reveal(c, 'comment');
+					as_reveal(c, 'comment');
 				}
 				
-				qa_conceal(a, 'form');
+				as_conceal(a, 'form');
 
 			} else if (lines[0]=='0') {
 				document.forms['c_form_'+parentid].submit();
 			
 			} else {
-				qa_ajax_error();
+				as_ajax_error();
 			}
 
 		}
 	);
 	
-	qa_show_waiting_after(elem, false);
+	as_show_waiting_after(elem, false);
 	
 	return false;
 }
 
-function qa_answer_click(answerid, questionid, target)
+function as_answer_click(answerid, questionid, target)
 {
 	var params={};
 	
@@ -170,32 +170,32 @@ function qa_answer_click(answerid, questionid, target)
 	params.code=target.form.elements.code.value;
 	params[target.name]=target.value;
 	
-	qa_ajax_post('click_a', params,
+	as_ajax_post('click_a', params,
 		function (lines) {
 			if (lines[0]=='1') {
-				qa_set_inner_html(document.getElementById('a_list_title'), 'a_list_title', lines[1]);
+				as_set_inner_html(document.getElementById('a_list_title'), 'a_list_title', lines[1]);
 
 				var l=document.getElementById('a'+answerid);
 				var h=lines.slice(2).join("\n");
 				
 				if (h.length)
-					qa_set_outer_html(l, 'answer', h);
+					as_set_outer_html(l, 'answer', h);
 				else
-					qa_conceal(l, 'answer');
+					as_conceal(l, 'answer');
 			
 			} else {
-				target.form.elements.qa_click.value=target.name;
+				target.form.elements.as_click.value=target.name;
 				target.form.submit();
 			}
 		}
 	);
 	
-	qa_show_waiting_after(target, false);
+	as_show_waiting_after(target, false);
 	
 	return false;
 }
 
-function qa_comment_click(commentid, questionid, parentid, target)
+function as_comment_click(commentid, questionid, parentid, target)
 {
 	var params={};
 	
@@ -205,56 +205,56 @@ function qa_comment_click(commentid, questionid, parentid, target)
 	params.code=target.form.elements.code.value;
 	params[target.name]=target.value;
 	
-	qa_ajax_post('click_c', params,
+	as_ajax_post('click_c', params,
 		function (lines) {
 			if (lines[0]=='1') {
 				var l=document.getElementById('c'+commentid);
 				var h=lines.slice(1).join("\n");
 				
 				if (h.length)
-					qa_set_outer_html(l, 'comment', h)
+					as_set_outer_html(l, 'comment', h)
 				else
-					qa_conceal(l, 'comment');
+					as_conceal(l, 'comment');
 			
 			} else {
-				target.form.elements.qa_click.value=target.name;
+				target.form.elements.as_click.value=target.name;
 				target.form.submit();
 			}
 		}
 	);
 	
-	qa_show_waiting_after(target, false);
+	as_show_waiting_after(target, false);
 	
 	return false;
 }
 
-function qa_show_comments(questionid, parentid, elem)
+function as_show_comments(questionid, parentid, elem)
 {
 	var params={};
 	
 	params.c_questionid=questionid;
 	params.c_parentid=parentid;
 	
-	qa_ajax_post('show_cs', params,
+	as_ajax_post('show_cs', params,
 		function (lines) {
 			if (lines[0]=='1') {
 				var l=document.getElementById('c'+parentid+'_list');
 				l.innerHTML=lines.slice(1).join("\n");
 				l.style.display='none';
-				qa_reveal(l, 'comments');
+				as_reveal(l, 'comments');
 			
 			} else {
-				qa_ajax_error();
+				as_ajax_error();
 			}
 		}
 	);
 	
-	qa_show_waiting_after(elem, true);
+	as_show_waiting_after(elem, true);
 	
 	return false;
 }
 
-function qa_form_params(formname)
+function as_form_params(formname)
 {
 	var es=document.forms[formname].elements;
 	var params={};
@@ -270,7 +270,7 @@ function qa_form_params(formname)
 	return params;
 }
 
-function qa_scroll_page_to(scroll)
+function as_scroll_page_to(scroll)
 {
 	$('html,body').animate({scrollTop: scroll}, 400);
 }

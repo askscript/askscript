@@ -35,54 +35,54 @@
 	
 //	Get current list of user titles and determine the state of this admin page
 
-	$oldpoints=qa_post_text('edit');
+	$oldpoints=as_post_text('edit');
 	if (!isset($oldpoints))
-		$oldpoints=qa_get('edit');
+		$oldpoints=as_get('edit');
 		
-	$pointstitle=qa_get_points_to_titles();
+	$pointstitle=as_get_points_to_titles();
 
 
 //	Check admin privileges (do late to allow one DB query)
 
-	if (!qa_admin_check_privileges($qa_content))
-		return $qa_content;
+	if (!as_admin_check_privileges($as_content))
+		return $as_content;
 		
 		
 //	Process saving an old or new user title
 
 	$securityexpired=false;
 	
-	if (qa_clicked('docancel'))
-		qa_redirect('admin/users');
+	if (as_clicked('docancel'))
+		as_redirect('admin/users');
 
-	elseif (qa_clicked('dosavetitle')) {
+	elseif (as_clicked('dosavetitle')) {
 		require_once QA_INCLUDE_DIR.'qa-util-string.php';
 		
-		if (!qa_check_form_security_code('admin/usertitles', qa_post_text('code')))
+		if (!as_check_form_security_code('admin/usertitles', as_post_text('code')))
 			$securityexpired=true;
 		
 		else {
-			if (qa_post_text('dodelete')) {
+			if (as_post_text('dodelete')) {
 				unset($pointstitle[$oldpoints]);
 			
 			} else {
-				$intitle=qa_post_text('title');
-				$inpoints=qa_post_text('points');
+				$intitle=as_post_text('title');
+				$inpoints=as_post_text('points');
 		
 				$errors=array();
 				
 			//	Verify the title and points are legitimate
 			
 				if (!strlen($intitle))
-					$errors['title']=qa_lang('main/field_required');
+					$errors['title']=as_lang('main/field_required');
 					
 				if (!is_numeric($inpoints))
-					$errors['points']=qa_lang('main/field_required');
+					$errors['points']=as_lang('main/field_required');
 				else {
 					$inpoints=(int)$inpoints;
 					
 					if (isset($pointstitle[$inpoints]) && ((!strlen(@$oldpoints)) || ($inpoints!=$oldpoints)) )
-						$errors['points']=qa_lang('admin/title_already_used');
+						$errors['points']=as_lang('admin/title_already_used');
 				}
 		
 			//	Perform appropriate action
@@ -106,37 +106,37 @@
 			foreach ($pointstitle as $points => $title)
 				$option.=(strlen($option) ? ',' : '').$points.' '.$title;
 				
-			qa_set_option('points_to_titles', $option); 
+			as_set_option('points_to_titles', $option); 
 	
 			if (empty($errors))
-				qa_redirect('admin/users');
+				as_redirect('admin/users');
 		}
 	}
 	
 		
 //	Prepare content for theme
 	
-	$qa_content=qa_content_prepare();
+	$as_content=as_content_prepare();
 
-	$qa_content['title']=qa_lang_html('admin/admin_title').' - '.qa_lang_html('admin/users_title');	
-	$qa_content['error']=$securityexpired ? qa_lang_html('admin/form_security_expired') : qa_admin_page_error();
+	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/users_title');	
+	$as_content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
 
-	$qa_content['form']=array(
-		'tags' => 'method="post" action="'.qa_path_html(qa_request()).'"',
+	$as_content['form']=array(
+		'tags' => 'method="post" action="'.as_path_html(as_request()).'"',
 		
 		'style' => 'tall',
 		
 		'fields' => array(
 			'title' => array(
 				'tags' => 'name="title" id="title"',
-				'label' => qa_lang_html('admin/user_title'),
-				'value' => qa_html(isset($intitle) ? $intitle : @$pointstitle[$oldpoints]),
-				'error' => qa_html(@$errors['title']),
+				'label' => as_lang_html('admin/user_title'),
+				'value' => as_html(isset($intitle) ? $intitle : @$pointstitle[$oldpoints]),
+				'error' => as_html(@$errors['title']),
 			),
 			
 			'delete' => array(
 				'tags' => 'name="dodelete" id="dodelete"',
-				'label' => qa_lang_html('admin/delete_title'),
+				'label' => as_lang_html('admin/delete_title'),
 				'value' => 0,
 				'type' => 'checkbox',
 			),
@@ -144,44 +144,44 @@
 			'points' => array(
 				'id' => 'points_display',
 				'tags' => 'name="points"',
-				'label' => qa_lang_html('admin/points_required'),
+				'label' => as_lang_html('admin/points_required'),
 				'type' => 'number',
-				'value' => qa_html(isset($inpoints) ? $inpoints : @$oldpoints),
-				'error' => qa_html(@$errors['points']),
+				'value' => as_html(isset($inpoints) ? $inpoints : @$oldpoints),
+				'error' => as_html(@$errors['points']),
 			),
 		),
 
 		'buttons' => array(
 			'save' => array(
-				'label' => qa_lang_html(isset($pointstitle[$oldpoints]) ? 'main/save_button' : ('admin/add_title_button')),
+				'label' => as_lang_html(isset($pointstitle[$oldpoints]) ? 'main/save_button' : ('admin/add_title_button')),
 			),
 			
 			'cancel' => array(
 				'tags' => 'name="docancel"',
-				'label' => qa_lang_html('main/cancel_button'),
+				'label' => as_lang_html('main/cancel_button'),
 			),
 		),
 		
 		'hidden' => array(
 			'dosavetitle' => '1', // for IE
 			'edit' => @$oldpoints,
-			'code' => qa_get_form_security_code('admin/usertitles'),
+			'code' => as_get_form_security_code('admin/usertitles'),
 		),
 	);
 	
 	if (isset($pointstitle[$oldpoints]))
-		qa_set_display_rules($qa_content, array(
+		as_set_display_rules($as_content, array(
 			'points_display' => '!dodelete',
 		));
 	else
-		unset($qa_content['form']['fields']['delete']);
+		unset($as_content['form']['fields']['delete']);
 
-	$qa_content['focusid']='title';
+	$as_content['focusid']='title';
 
-	$qa_content['navigation']['sub']=qa_admin_sub_navigation();
+	$as_content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $qa_content;
+	return $as_content;
 
 
 /*

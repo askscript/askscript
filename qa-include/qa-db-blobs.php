@@ -30,20 +30,20 @@
 	}
 
 
-	function qa_db_blob_create($content, $format, $sourcefilename=null, $userid=null, $cookieid=null, $ip=null)
+	function as_db_blob_create($content, $format, $sourcefilename=null, $userid=null, $cookieid=null, $ip=null)
 /*
 	Create a new blob in the database with $content and $format, other fields as provided 
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		for ($attempt=0; $attempt<10; $attempt++) {
-			$blobid=qa_db_random_bigint();
+			$blobid=as_db_random_bigint();
 			
-			if (qa_db_blob_exists($blobid))
+			if (as_db_blob_exists($blobid))
 				continue;
 
-			qa_db_query_sub(
+			as_db_query_sub(
 				'INSERT INTO ^blobs (blobid, format, content, filename, userid, cookieid, createip, created) VALUES (#, $, $, $, $, #, INET_ATON($), NOW())',
 				$blobid, $format, $content, $sourcefilename, $userid, $cookieid, $ip
 			);
@@ -55,54 +55,54 @@
 	}
 	
 	
-	function qa_db_blob_read($blobid)
+	function as_db_blob_read($blobid)
 /*
 	Get the information about blob $blobid from the database
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		return qa_db_read_one_assoc(qa_db_query_sub(
+		return as_db_read_one_assoc(as_db_query_sub(
 			'SELECT content, format, filename FROM ^blobs WHERE blobid=#',
 			$blobid
 		), true);
 	}
 	
 	
-	function qa_db_blob_set_content($blobid, $content)
+	function as_db_blob_set_content($blobid, $content)
 /*
 	Change the content of blob $blobid in the database to $content (can also be null)
 */
 	{
-		qa_db_query_sub(
+		as_db_query_sub(
 			'UPDATE ^blobs SET content=$ WHERE blobid=#',
 			$content, $blobid
 		);
 	}
 	
 	
-	function qa_db_blob_delete($blobid)
+	function as_db_blob_delete($blobid)
 /*
 	Delete blob $blobid in the database
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		qa_db_query_sub(
+		as_db_query_sub(
 			'DELETE FROM ^blobs WHERE blobid=#',
 			$blobid
 		);
 	}
 
 	
-	function qa_db_blob_exists($blobid)
+	function as_db_blob_exists($blobid)
 /*
 	Check if blob $blobid exists in the database
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		return qa_db_read_one_value(qa_db_query_sub(
+		return as_db_read_one_value(as_db_query_sub(
 			'SELECT COUNT(*) FROM ^blobs WHERE blobid=#',
 			$blobid
 		)) > 0;

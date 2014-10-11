@@ -24,13 +24,13 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	class qa_html_theme_layer extends qa_html_theme_base {
+	class as_html_theme_layer extends as_html_theme_base {
 		
 		function head_css()
 		{
-			qa_html_theme_base::head_css();
+			as_html_theme_base::head_css();
 			
-			if (strlen(qa_opt('facebook_app_id')) && strlen(qa_opt('facebook_app_secret')))
+			if (strlen(as_opt('facebook_app_id')) && strlen(as_opt('facebook_app_secret')))
 				$this->output(
 					'<style><!--',
 					'.fb-login-button.fb_iframe_widget.fb_hide_iframes span {display:none;}',

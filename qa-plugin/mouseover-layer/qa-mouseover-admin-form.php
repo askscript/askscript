@@ -24,7 +24,7 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	class qa_mouseover_admin_form {
+	class as_mouseover_admin_form {
 		
 		function option_default($option)
 		{
@@ -33,17 +33,17 @@
 		}
 	
 	
-		function admin_form(&$qa_content)
+		function admin_form(&$as_content)
 		{
 			$saved=false;
 			
-			if (qa_clicked('mouseover_save_button')) {
-				qa_opt('mouseover_content_on', (int)qa_post_text('mouseover_content_on_field'));
-				qa_opt('mouseover_content_max_len', (int)qa_post_text('mouseover_content_max_len_field'));
+			if (as_clicked('mouseover_save_button')) {
+				as_opt('mouseover_content_on', (int)as_post_text('mouseover_content_on_field'));
+				as_opt('mouseover_content_max_len', (int)as_post_text('mouseover_content_max_len_field'));
 				$saved=true;
 			}
 			
-			qa_set_display_rules($qa_content, array(
+			as_set_display_rules($as_content, array(
 				'mouseover_content_max_len_display' => 'mouseover_content_on_field',
 			));
 			
@@ -54,7 +54,7 @@
 					array(
 						'label' => 'Show content preview on mouseover in question lists',
 						'type' => 'checkbox',
-						'value' => qa_opt('mouseover_content_on'),
+						'value' => as_opt('mouseover_content_on'),
 						'tags' => 'name="mouseover_content_on_field" id="mouseover_content_on_field"',
 					),
 					
@@ -63,7 +63,7 @@
 						'label' => 'Maximum length of preview:',
 						'suffix' => 'characters',
 						'type' => 'number',
-						'value' => (int)qa_opt('mouseover_content_max_len'),
+						'value' => (int)as_opt('mouseover_content_max_len'),
 						'tags' => 'name="mouseover_content_max_len_field"',
 					),
 				),

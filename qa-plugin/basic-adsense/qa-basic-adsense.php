@@ -24,7 +24,7 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	class qa_basic_adsense {
+	class as_basic_adsense {
 		
 		function allow_template($template)
 		{
@@ -49,13 +49,13 @@
 		}
 
 		
-		function admin_form(&$qa_content)
+		function admin_form(&$as_content)
 		{
 			$saved=false;
 			
-			if (qa_clicked('adsense_save_button')) {	
+			if (as_clicked('adsense_save_button')) {	
 				$trimchars="=;\"\' \t\r\n"; // prevent common errors by copying and pasting from Javascript
-				qa_opt('adsense_publisher_id', trim(qa_post_text('adsense_publisher_id_field'), $trimchars));
+				as_opt('adsense_publisher_id', trim(as_post_text('adsense_publisher_id_field'), $trimchars));
 				$saved=true;
 			}
 			
@@ -65,7 +65,7 @@
 				'fields' => array(
 					array(
 						'label' => 'AdSense Publisher ID:',
-						'value' => qa_html(qa_opt('adsense_publisher_id')),
+						'value' => as_html(as_opt('adsense_publisher_id')),
 						'tags' => 'name="adsense_publisher_id_field"',
 						'note' => 'Example: <i>pub-1234567890123456</i>',
 					),
@@ -81,7 +81,7 @@
 		}
 
 
-		function output_widget($region, $place, $themeobject, $template, $request, $qa_content)
+		function output_widget($region, $place, $themeobject, $template, $request, $as_content)
 		{
 			$divstyle='';
 			
@@ -105,10 +105,10 @@
 ?>
 <div style="<?php echo $divstyle?>">
 <script type="text/javascript">
-google_ad_client = <?php echo qa_js(qa_opt('adsense_publisher_id'))?>;
-google_ad_width = <?php echo qa_js($width)?>;
-google_ad_height = <?php echo qa_js($height)?>;
-google_ad_format = <?php echo qa_js($format)?>;
+google_ad_client = <?php echo as_js(as_opt('adsense_publisher_id'))?>;
+google_ad_width = <?php echo as_js($width)?>;
+google_ad_height = <?php echo as_js($height)?>;
+google_ad_format = <?php echo as_js($format)?>;
 google_ad_type = "text_image";
 google_ad_channel = "";
 </script>

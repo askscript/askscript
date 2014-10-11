@@ -31,7 +31,7 @@
 
 	require_once QA_INCLUDE_DIR.'qa-db-install.php';
 	
-	qa_report_process_stage('init_install');
+	as_report_process_stage('init_install');
 
 
 //	Output start of HTML early, so we can see a nicely-formatted list of database queries when upgrading	
@@ -52,9 +52,9 @@
 
 //	Define database failure handler for install process, if not defined already (file could be included more than once)
 
-	if (!function_exists('qa_install_db_fail_handler')) {
+	if (!function_exists('as_install_db_fail_handler')) {
 
-		function qa_install_db_fail_handler($type, $errno=null, $error=null, $query=null)
+		function as_install_db_fail_handler($type, $errno=null, $error=null, $query=null)
 	/*
 		Handler function for database failures during the installation process
 	*/
@@ -69,7 +69,7 @@
 			
 			require QA_INCLUDE_DIR.'qa-install.php';
 			
-			qa_exit('error');
+			as_exit('error');
 		}
 		
 	}
@@ -97,24 +97,24 @@
 				global $pass_failure_from_install;
 				
 				if (@$pass_failure_from_install)
-					$errorhtml.="Question2Answer was unable to perform the installation query below. Please check the user in the config file has CREATE and ALTER permissions:\n\n".qa_html($pass_failure_query."\n\nError ".$pass_failure_errno.": ".$pass_failure_error."\n\n");
+					$errorhtml.="Question2Answer was unable to perform the installation query below. Please check the user in the config file has CREATE and ALTER permissions:\n\n".as_html($pass_failure_query."\n\nError ".$pass_failure_errno.": ".$pass_failure_error."\n\n");
 				else
 					$errorhtml.="A Question2Answer database query failed when generating this page.\n\nA full description of the failure is available in the web server's error log file.";
 				break;
 		}
 
 	} else { // this page was requested by user GET/POST, so handle any incoming clicks on buttons
-		qa_db_connect('qa_install_db_fail_handler');
+		as_db_connect('as_install_db_fail_handler');
 		
-		if (qa_clicked('create')) {
-			qa_db_install_tables();
+		if (as_clicked('create')) {
+			as_db_install_tables();
 			
 			if (QA_FINAL_EXTERNAL_USERS) {
 				if (defined('QA_FINAL_WORDPRESS_INTEGRATE_PATH')) {
 					require_once QA_INCLUDE_DIR.'qa-db-admin.php';
 					require_once QA_INCLUDE_DIR.'qa-app-format.php';
 					
-					qa_db_page_move(qa_db_page_create(get_option('blogname'), QA_PAGE_FLAGS_EXTERNAL, get_option('home'), null, null, null), 'O', 1);
+					as_db_page_move(as_db_page_create(get_option('blogname'), QA_PAGE_FLAGS_EXTERNAL, get_option('home'), null, null, null), 'O', 1);
 						// create link back to WordPress home page
 					
 					$success.='Your Question2Answer database has been created and integrated with your WordPress site.';
@@ -126,68 +126,68 @@
 				$success.='Your Question2Answer database has been created.';
 		}
 		
-		if (qa_clicked('nonuser')) {
-			qa_db_install_tables();
+		if (as_clicked('nonuser')) {
+			as_db_install_tables();
 			$success.='The additional Question2Answer database tables have been created.';
 		}
 		
-		if (qa_clicked('upgrade')) {
-			qa_db_upgrade_tables();
+		if (as_clicked('upgrade')) {
+			as_db_upgrade_tables();
 			$success.='Your Question2Answer database has been updated.';
 		}
 
-		if (qa_clicked('repair')) {
-			qa_db_install_tables();
+		if (as_clicked('repair')) {
+			as_db_install_tables();
 			$success.='The Question2Answer database tables have been repaired.';
 		}
 		
-		if (qa_clicked('module')) {
-			$moduletype=qa_post_text('moduletype');
-			$modulename=qa_post_text('modulename');
+		if (as_clicked('module')) {
+			$moduletype=as_post_text('moduletype');
+			$modulename=as_post_text('modulename');
 			
-			$module=qa_load_module($moduletype, $modulename);
+			$module=as_load_module($moduletype, $modulename);
 			
-			$queries=$module->init_queries(qa_db_list_tables_lc());
+			$queries=$module->init_queries(as_db_list_tables_lc());
 			
 			if (!empty($queries)) {
 				if (!is_array($queries))
 					$queries=array($queries);
 					
 				foreach ($queries as $query)
-					qa_db_upgrade_query($query);
+					as_db_upgrade_query($query);
 			}
 
 			$success.='The '.$modulename.' '.$moduletype.' module has completed database initialization.';
 		}
 
-		if (qa_clicked('super')) {
+		if (as_clicked('super')) {
 			require_once QA_INCLUDE_DIR.'qa-db-users.php';
 			require_once QA_INCLUDE_DIR.'qa-app-users-edit.php';
 	
-			$inemail=qa_post_text('email');
-			$inpassword=qa_post_text('password');
-			$inhandle=qa_post_text('handle');
+			$inemail=as_post_text('email');
+			$inpassword=as_post_text('password');
+			$inhandle=as_post_text('handle');
 			
 			$fielderrors=array_merge(
-				qa_handle_email_filter($inhandle, $inemail),
-				qa_password_validate($inpassword)
+				as_handle_email_filter($inhandle, $inemail),
+				as_password_validate($inpassword)
 			);
 			
 			if (empty($fielderrors)) {
 				require_once QA_INCLUDE_DIR.'qa-app-users.php';
 				
-				$userid=qa_create_new_user($inemail, $inpassword, $inhandle, QA_USER_LEVEL_SUPER);
-				qa_set_logged_in_user($userid, $inhandle);
+				$userid=as_create_new_user($inemail, $inpassword, $inhandle, QA_USER_LEVEL_SUPER);
+				as_set_logged_in_user($userid, $inhandle);
 				
-				qa_set_option('feedback_email', $inemail);
+				as_set_option('feedback_email', $inemail);
 				
 				$success.="Congratulations - Your Question2Answer site is ready to go!\n\nYou are logged in as the super administrator and can start changing settings.\n\nThank you for installing Question2Answer.";
 			}
 		}
 	}
 	
-	if (is_resource(qa_db_connection(false)) && !@$pass_failure_from_install) {
-		$check=qa_db_check_tables(); // see where the database is at
+	if (is_resource(as_db_connection(false)) && !@$pass_failure_from_install) {
+		$check=as_db_check_tables(); // see where the database is at
 		
 		switch ($check) {
 			case 'none':
@@ -198,9 +198,9 @@
 
 				if (QA_FINAL_EXTERNAL_USERS) {
 					if (defined('QA_FINAL_WORDPRESS_INTEGRATE_PATH'))
-						$errorhtml.="\n\nWhen you click below, your Question2Answer site will be set up to integrate with the users of your WordPress site <a href=\"".qa_html(get_option('home'))."\" target=\"_blank\">".qa_html(get_option('blogname'))."</a>. Please consult the online documentation for more information.";
+						$errorhtml.="\n\nWhen you click below, your Question2Answer site will be set up to integrate with the users of your WordPress site <a href=\"".as_html(get_option('home'))."\" target=\"_blank\">".as_html(get_option('blogname'))."</a>. Please consult the online documentation for more information.";
 					else
-						$errorhtml.="\n\nWhen you click below, your Question2Answer site will be set up to integrate with your existing user database and management. Users will be referenced with database column type ".qa_html(qa_get_mysql_user_column_type()).". Please consult the online documentation for more information.";
+						$errorhtml.="\n\nWhen you click below, your Question2Answer site will be set up to integrate with your existing user database and management. Users will be referenced with database column type ".as_html(as_get_mysql_user_column_type()).". Please consult the online documentation for more information.";
 					
 					$buttons=array('create' => 'Create Database');
 				} else {
@@ -235,25 +235,25 @@
 			default:
 				require_once QA_INCLUDE_DIR.'qa-db-admin.php';
 	
-				if ( (!QA_FINAL_EXTERNAL_USERS) && (qa_db_count_users()==0) ) {
+				if ( (!QA_FINAL_EXTERNAL_USERS) && (as_db_count_users()==0) ) {
 					$errorhtml.="There are currently no users in the Question2Answer database.\n\nPlease enter your details below to create the super administrator:";
 					$fields=array('handle' => 'Username:', 'password' => 'Password:', 'email' => 'Email address:');
 					$buttons=array('super' => 'Create Super Administrator');
 	
 				} else {
-					$tables=qa_db_list_tables_lc();
+					$tables=as_db_list_tables_lc();
 					
-					$moduletypes=qa_list_module_types();
+					$moduletypes=as_list_module_types();
 					
 					foreach ($moduletypes as $moduletype) {
-						$modules=qa_load_modules_with($moduletype, 'init_queries');
+						$modules=as_load_modules_with($moduletype, 'init_queries');
 						
 						foreach ($modules as $modulename => $module) {
 							$queries=$module->init_queries($tables);
 							if (!empty($queries)) { // also allows single query to be returned
-								$errorhtml=strtr(qa_lang_html('admin/module_x_database_init'), array(
-									'^1' => qa_html($modulename),
-									'^2' => qa_html($moduletype),
+								$errorhtml=strtr(as_lang_html('admin/module_x_database_init'), array(
+									'^1' => as_html($modulename),
+									'^2' => as_html($moduletype),
 									'^3' => '',
 									'^4' => '',
 								));
@@ -275,17 +275,17 @@
 		if (empty($success))
 			$success='Your Question2Answer database has been checked with no problems.';
 		
-		$suggest='<a href="'.qa_path_html('admin', null, null, QA_URL_FORMAT_SAFEST).'">Go to admin center</a>';
+		$suggest='<a href="'.as_path_html('admin', null, null, QA_URL_FORMAT_SAFEST).'">Go to admin center</a>';
 	}
 
 ?>
 
-		<form method="post" action="<?php echo qa_path_html('install', null, null, QA_URL_FORMAT_SAFEST)?>">
+		<form method="post" action="<?php echo as_path_html('install', null, null, QA_URL_FORMAT_SAFEST)?>">
 
 <?php
 
 	if (strlen($success))
-		echo '<p><font color="#006600">'.nl2br(qa_html($success)).'</font></p>'; // green
+		echo '<p><font color="#006600">'.nl2br(as_html($success)).'</font></p>'; // green
 		
 	if (strlen($errorhtml))
 		echo '<p><font color="#990000">'.nl2br($errorhtml).'</font></p>'; // red
@@ -300,9 +300,9 @@
 		echo '<table>';
 		
 		foreach ($fields as $name => $prompt) {
-			echo '<tr><td>'.qa_html($prompt).'</td><td><input type="text" size="24" name="'.qa_html($name).'" value="'.qa_html(@${'in'.$name}).'"></td>';
+			echo '<tr><td>'.as_html($prompt).'</td><td><input type="text" size="24" name="'.as_html($name).'" value="'.as_html(@${'in'.$name}).'"></td>';
 			if (isset($fielderrors[$name]))
-				echo '<td><font color="#990000"><small>'.qa_html($fielderrors[$name]).'</small></font></td>';
+				echo '<td><font color="#990000"><small>'.as_html($fielderrors[$name]).'</small></font></td>';
 			echo '</tr>';
 		}
 		
@@ -310,12 +310,12 @@
 	}
 	
 	foreach ($buttons as $name => $value)
-		echo '<input type="submit" name="'.qa_html($name).'" value="'.qa_html($value).'">';
+		echo '<input type="submit" name="'.as_html($name).'" value="'.as_html($value).'">';
 		
 	foreach ($hidden as $name => $value)
-		echo '<input type="hidden" name="'.qa_html($name).'" value="'.qa_html($value).'">';
+		echo '<input type="hidden" name="'.as_html($name).'" value="'.as_html($value).'">';
 
-	qa_db_disconnect();
+	as_db_disconnect();
 ?>
 
 		</form>

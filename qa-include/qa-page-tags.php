@@ -35,35 +35,35 @@
 
 //	Get popular tags
 	
-	$start=qa_get_start();
-	$userid=qa_get_logged_in_userid();
-	$populartags=qa_db_select_with_pending(
-		qa_db_popular_tags_selectspec($start, qa_opt_if_loaded('page_size_tags'))
+	$start=as_get_start();
+	$userid=as_get_logged_in_userid();
+	$populartags=as_db_select_with_pending(
+		as_db_popular_tags_selectspec($start, as_opt_if_loaded('page_size_tags'))
 	);
 
-	$tagcount=qa_opt('cache_tagcount');
-	$pagesize=qa_opt('page_size_tags');
+	$tagcount=as_opt('cache_tagcount');
+	$pagesize=as_opt('page_size_tags');
 	
 	
 //	Prepare content for theme
 
-	$qa_content=qa_content_prepare();
+	$as_content=as_content_prepare();
 
-	$qa_content['title']=qa_lang_html('main/popular_tags');
+	$as_content['title']=as_lang_html('main/popular_tags');
 	
-	$qa_content['ranking']=array(
+	$as_content['ranking']=array(
 		'items' => array(),
-		'rows' => ceil($pagesize/qa_opt('columns_tags')),
+		'rows' => ceil($pagesize/as_opt('columns_tags')),
 		'type' => 'tags'
 	);
 	
 	if (count($populartags)) {
-		$favoritemap=qa_get_favorite_non_qs_map();
+		$favoritemap=as_get_favorite_non_qs_map();
 		
 		$output=0;
 		foreach ($populartags as $word => $count) {
-			$qa_content['ranking']['items'][]=array(
-				'label' => qa_tag_html($word, false, @$favoritemap['tag'][qa_strtolower($word)]),
+			$as_content['ranking']['items'][]=array(
+				'label' => as_tag_html($word, false, @$favoritemap['tag'][as_strtolower($word)]),
 				'count' => number_format($count),
 			);
 
@@ -72,15 +72,15 @@
 		}
 
 	} else
-		$qa_content['title']=qa_lang_html('main/no_tags_found');
+		$as_content['title']=as_lang_html('main/no_tags_found');
 	
-	$qa_content['page_links']=qa_html_page_links(qa_request(), $start, $pagesize, $tagcount, qa_opt('pages_prev_next'));
+	$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $tagcount, as_opt('pages_prev_next'));
 	
-	if (empty($qa_content['page_links']))
-		$qa_content['suggest_next']=qa_html_suggest_ask();
+	if (empty($as_content['page_links']))
+		$as_content['suggest_next']=as_html_suggest_ask();
 		
 
-	return $qa_content;
+	return $as_content;
 
 
 /*

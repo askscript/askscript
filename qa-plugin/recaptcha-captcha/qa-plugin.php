@@ -44,7 +44,7 @@
 	}
 
 
-	qa_register_plugin_module('captcha', 'qa-recaptcha-captcha.php', 'qa_recaptcha_captcha', 'reCAPTCHA');
+	as_register_plugin_module('captcha', 'qa-recaptcha-captcha.php', 'as_recaptcha_captcha', 'reCAPTCHA');
 	
 
 /*

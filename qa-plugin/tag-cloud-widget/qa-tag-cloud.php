@@ -24,7 +24,7 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	class qa_tag_cloud {
+	class as_tag_cloud {
 		
 		function option_default($option)
 		{
@@ -41,10 +41,10 @@
 		{
 			$saved=false;
 			
-			if (qa_clicked('tag_cloud_save_button')) {
-				qa_opt('tag_cloud_count_tags', (int)qa_post_text('tag_cloud_count_tags_field'));
-				qa_opt('tag_cloud_font_size', (int)qa_post_text('tag_cloud_font_size_field'));
-				qa_opt('tag_cloud_size_popular', (int)qa_post_text('tag_cloud_size_popular_field'));
+			if (as_clicked('tag_cloud_save_button')) {
+				as_opt('tag_cloud_count_tags', (int)as_post_text('tag_cloud_count_tags_field'));
+				as_opt('tag_cloud_font_size', (int)as_post_text('tag_cloud_font_size_field'));
+				as_opt('tag_cloud_size_popular', (int)as_post_text('tag_cloud_size_popular_field'));
 				$saved=true;
 			}
 			
@@ -55,7 +55,7 @@
 					array(
 						'label' => 'Maximum tags to show:',
 						'type' => 'number',
-						'value' => (int)qa_opt('tag_cloud_count_tags'),
+						'value' => (int)as_opt('tag_cloud_count_tags'),
 						'suffix' => 'tags',
 						'tags' => 'name="tag_cloud_count_tags_field"',
 					),
@@ -64,14 +64,14 @@
 						'label' => 'Starting font size:',
 						'suffix' => 'pixels',
 						'type' => 'number',
-						'value' => (int)qa_opt('tag_cloud_font_size'),
+						'value' => (int)as_opt('tag_cloud_font_size'),
 						'tags' => 'name="tag_cloud_font_size_field"',
 					),
 					
 					array(
 						'label' => 'Font size represents tag popularity',
 						'type' => 'checkbox',
-						'value' => qa_opt('tag_cloud_size_popular'),
+						'value' => as_opt('tag_cloud_size_popular'),
 						'tags' => 'name="tag_cloud_size_popular_field"',
 					),
 				),
@@ -121,35 +121,35 @@
 		}
 		
 
-		function output_widget($region, $place, $themeobject, $template, $request, $qa_content)
+		function output_widget($region, $place, $themeobject, $template, $request, $as_content)
 		{
 			require_once QA_INCLUDE_DIR.'qa-db-selects.php';
 			
-			$populartags=qa_db_single_select(qa_db_popular_tags_selectspec(0, (int)qa_opt('tag_cloud_count_tags')));
+			$populartags=as_db_single_select(as_db_popular_tags_selectspec(0, (int)as_opt('tag_cloud_count_tags')));
 			
 			reset($populartags);
 			$maxcount=current($populartags);
 			
 			$themeobject->output(
 				'<h2 style="margin-top:0; padding-top:0;">',
-				qa_lang_html('main/popular_tags'),
+				as_lang_html('main/popular_tags'),
 				'</h2>'
 			);
 			
 			$themeobject->output('<div style="font-size:10px;">');
 			
-			$maxsize=qa_opt('tag_cloud_font_size');
-			$scale=qa_opt('tag_cloud_size_popular');
-			$blockwordspreg=qa_get_block_words_preg();
+			$maxsize=as_opt('tag_cloud_font_size');
+			$scale=as_opt('tag_cloud_size_popular');
+			$blockwordspreg=as_get_block_words_preg();
 			
 			foreach ($populartags as $tag => $count) {
-				if (count(qa_block_words_match_all($tag, $blockwordspreg)))
+				if (count(as_block_words_match_all($tag, $blockwordspreg)))
 					continue; // skip censored tags
 					
 				$size=number_format(($scale ? ($maxsize*$count/$maxcount) : $maxsize), 1);
 				
 				if (($size>=5) || !$scale)
-					$themeobject->output('<a href="'.qa_path_html('tag/'.$tag).'" style="font-size:'.$size.'px; vertical-align:baseline;">'.qa_html($tag).'</a>');
+					$themeobject->output('<a href="'.as_path_html('tag/'.$tag).'" style="font-size:'.$size.'px; vertical-align:baseline;">'.as_html($tag).'</a>');
 			}
 			
 			$themeobject->output('</div>');

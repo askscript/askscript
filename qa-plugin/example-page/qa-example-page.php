@@ -24,7 +24,7 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	class qa_example_page {
+	class as_example_page {
 		
 		var $directory;
 		var $urltoroot;
@@ -60,18 +60,18 @@
 		
 		function process_request($request)
 		{
-			$qa_content=qa_content_prepare();
+			$as_content=as_content_prepare();
 
-			$qa_content['title']=qa_lang_html('example_page/page_title');
-			$qa_content['error']='An example error';
-			$qa_content['custom']='Some <b>custom html</b>';
+			$as_content['title']=as_lang_html('example_page/page_title');
+			$as_content['error']='An example error';
+			$as_content['custom']='Some <b>custom html</b>';
 
-			$qa_content['form']=array(
-				'tags' => 'method="post" action="'.qa_self_html().'"',
+			$as_content['form']=array(
+				'tags' => 'method="post" action="'.as_self_html().'"',
 				
 				'style' => 'wide',
 				
-				'ok' => qa_post_text('okthen') ? 'You clicked OK then!' : null,
+				'ok' => as_post_text('okthen') ? 'You clicked OK then!' : null,
 				
 				'title' => 'Form title',
 				
@@ -79,8 +79,8 @@
 					'request' => array(
 						'label' => 'The request',
 						'tags' => 'name="request"',
-						'value' => qa_html($request),
-						'error' => qa_html('Another error'),
+						'value' => as_html($request),
+						'error' => as_html('Another error'),
 					),
 					
 				),
@@ -98,9 +98,9 @@
 				),
 			);
 
-			$qa_content['custom_2']='<p><br>More <i>custom html</i></p>';
+			$as_content['custom_2']='<p><br>More <i>custom html</i></p>';
 			
-			return $qa_content;
+			return $as_content;
 		}
 	
 	}

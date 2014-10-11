@@ -33,52 +33,52 @@
 	require_once QA_INCLUDE_DIR.'qa-page-question-submit.php';
 	
 	
-	$code=qa_post_text('code');
+	$code=as_post_text('code');
 	
 
 //	Process general cancel button
 
-	if (qa_clicked('docancel'))
-		qa_page_q_refresh($pagestart);
+	if (as_clicked('docancel'))
+		as_page_q_refresh($pagestart);
 	
 
 //	Process incoming answer (or button)
 
 	if ($question['answerbutton']) {
-		if (qa_clicked('q_doanswer'))
-			qa_page_q_refresh($pagestart, 'answer');
+		if (as_clicked('q_doanswer'))
+			as_page_q_refresh($pagestart, 'answer');
 		
 		// The 'approve', 'login', 'confirm', 'limit', 'userblock', 'ipblock' permission errors are reported to the user here
-		// The other option ('level') prevents the answer button being shown, in qa_page_q_post_rules(...)
+		// The other option ('level') prevents the answer button being shown, in as_page_q_post_rules(...)
 
-		if (qa_clicked('a_doadd') || ($pagestate=='answer'))
-			switch (qa_user_post_permit_error('permit_post_a', $question, QA_LIMIT_ANSWERS)) {
+		if (as_clicked('a_doadd') || ($pagestate=='answer'))
+			switch (as_user_post_permit_error('permit_post_a', $question, QA_LIMIT_ANSWERS)) {
 				case 'login':
-					$pageerror=qa_insert_login_links(qa_lang_html('question/answer_must_login'), qa_request());
+					$pageerror=as_insert_login_links(as_lang_html('question/answer_must_login'), as_request());
 					break;
 					
 				case 'confirm':
-					$pageerror=qa_insert_login_links(qa_lang_html('question/answer_must_confirm'), qa_request());
+					$pageerror=as_insert_login_links(as_lang_html('question/answer_must_confirm'), as_request());
 					break;
 					
 				case 'approve':
-					$pageerror=qa_lang_html('question/answer_must_be_approved');
+					$pageerror=as_lang_html('question/answer_must_be_approved');
 					break;
 				
 				case 'limit':
-					$pageerror=qa_lang_html('question/answer_limit');
+					$pageerror=as_lang_html('question/answer_limit');
 					break;
 				
 				default:
-					$pageerror=qa_lang_html('users/no_permission');
+					$pageerror=as_lang_html('users/no_permission');
 					break;
 					
 				case false:
-					if (qa_clicked('a_doadd')) {
-						$answerid=qa_page_q_add_a_submit($question, $answers, $usecaptcha, $anewin, $anewerrors);
+					if (as_clicked('a_doadd')) {
+						$answerid=as_page_q_add_a_submit($question, $answers, $usecaptcha, $anewin, $anewerrors);
 						
 						if (isset($answerid))
-							qa_page_q_refresh(0, null, 'A', $answerid);
+							as_page_q_refresh(0, null, 'A', $answerid);
 						else
 							$formtype='a_add'; // show form again
 							
@@ -92,52 +92,52 @@
 //	Process close buttons for question
 		
 	if ($question['closeable']) {
-		if (qa_clicked('q_doclose'))
-			qa_page_q_refresh($pagestart, 'close');
+		if (as_clicked('q_doclose'))
+			as_page_q_refresh($pagestart, 'close');
 			
-		elseif (qa_clicked('doclose') && qa_page_q_permit_edit($question, 'permit_close_q', $pageerror)) {
-			if (qa_page_q_close_q_submit($question, $closepost, $closein, $closeerrors))
-				qa_page_q_refresh($pagestart);
+		elseif (as_clicked('doclose') && as_page_q_permit_edit($question, 'permit_close_q', $pageerror)) {
+			if (as_page_q_close_q_submit($question, $closepost, $closein, $closeerrors))
+				as_page_q_refresh($pagestart);
 			else
 				$formtype='q_close'; // keep editing if an error
 
-		} elseif (($pagestate=='close') && qa_page_q_permit_edit($question, 'permit_close_q', $pageerror))
+		} elseif (($pagestate=='close') && as_page_q_permit_edit($question, 'permit_close_q', $pageerror))
 			$formtype='q_close';
 	}
 	
 	
 //	Process any single click operations or delete button for question
 
-	if (qa_page_q_single_click_q($question, $answers, $commentsfollows, $closepost, $pageerror))
-		qa_page_q_refresh($pagestart);
+	if (as_page_q_single_click_q($question, $answers, $commentsfollows, $closepost, $pageerror))
+		as_page_q_refresh($pagestart);
 	
-	if (qa_clicked('q_dodelete') && $question['deleteable'] && qa_page_q_click_check_form_code($question, $pageerror)) {
-		qa_question_delete($question, $userid, qa_get_logged_in_handle(), $cookieid, $closepost);
-		qa_redirect(''); // redirect since question has gone
+	if (as_clicked('q_dodelete') && $question['deleteable'] && as_page_q_click_check_form_code($question, $pageerror)) {
+		as_question_delete($question, $userid, as_get_logged_in_handle(), $cookieid, $closepost);
+		as_redirect(''); // redirect since question has gone
 	}
 
 
 //	Process edit or save button for question
 
 	if ($question['editbutton'] || $question['retagcatbutton']) {
-		if (qa_clicked('q_doedit'))
-			qa_page_q_refresh($pagestart, 'edit-'.$questionid);
+		if (as_clicked('q_doedit'))
+			as_page_q_refresh($pagestart, 'edit-'.$questionid);
 			
-		elseif (qa_clicked('q_dosave') && qa_page_q_permit_edit($question, 'permit_edit_q', $pageerror, 'permit_retag_cat')) {
-			if (qa_page_q_edit_q_submit($question, $answers, $commentsfollows, $closepost, $qin, $qerrors))
-				qa_redirect(qa_q_request($questionid, $qin['title'])); // don't use refresh since URL may have changed
+		elseif (as_clicked('q_dosave') && as_page_q_permit_edit($question, 'permit_edit_q', $pageerror, 'permit_retag_cat')) {
+			if (as_page_q_edit_q_submit($question, $answers, $commentsfollows, $closepost, $qin, $qerrors))
+				as_redirect(as_q_request($questionid, $qin['title'])); // don't use refresh since URL may have changed
 			
 			else {
 				$formtype='q_edit'; // keep editing if an error
 				$pageerror=@$qerrors['page']; // for security code failure
 			}
 
-		} else if (($pagestate==('edit-'.$questionid)) && qa_page_q_permit_edit($question, 'permit_edit_q', $pageerror, 'permit_retag_cat'))
+		} else if (($pagestate==('edit-'.$questionid)) && as_page_q_permit_edit($question, 'permit_edit_q', $pageerror, 'permit_retag_cat'))
 			$formtype='q_edit';
 		
 		if ($formtype=='q_edit') { // get tags for auto-completion
-			if (qa_opt('do_complete_tags'))
-				$completetags=array_keys(qa_db_select_with_pending(qa_db_popular_tags_selectspec(0, QA_DB_RETRIEVE_COMPLETE_TAGS)));
+			if (as_opt('do_complete_tags'))
+				$completetags=array_keys(as_db_select_with_pending(as_db_popular_tags_selectspec(0, QA_DB_RETRIEVE_COMPLETE_TAGS)));
 			else
 				$completetags=array();
 		}
@@ -147,11 +147,11 @@
 //	Process adding a comment to question (shows form or processes it)
 	
 	if ($question['commentbutton']) {
-		if (qa_clicked('q_docomment'))
-			qa_page_q_refresh($pagestart, 'comment-'.$questionid);
+		if (as_clicked('q_docomment'))
+			as_page_q_refresh($pagestart, 'comment-'.$questionid);
 			
-		if (qa_clicked('c'.$questionid.'_doadd') || ($pagestate==('comment-'.$questionid)))
-			qa_page_q_do_comment($question, $question, $commentsfollows, $pagestart, $usecaptcha, $cnewin, $cnewerrors, $formtype, $formpostid, $pageerror);
+		if (as_clicked('c'.$questionid.'_doadd') || ($pagestate==('comment-'.$questionid)))
+			as_page_q_do_comment($question, $question, $commentsfollows, $pagestart, $usecaptcha, $cnewin, $cnewerrors, $formtype, $formpostid, $pageerror);
 	}
 	
 	
@@ -160,44 +160,44 @@
 	foreach ($answers as $answerid => $answer) {
 		$prefix='a'.$answerid.'_';
 		
-		if (qa_page_q_single_click_a($answer, $question, $answers, $commentsfollows, true, $pageerror))
-			qa_page_q_refresh($pagestart, null, 'A', $answerid);
+		if (as_page_q_single_click_a($answer, $question, $answers, $commentsfollows, true, $pageerror))
+			as_page_q_refresh($pagestart, null, 'A', $answerid);
 		
 		if ($answer['editbutton']) {
-			if (qa_clicked($prefix.'doedit'))
-				qa_page_q_refresh($pagestart, 'edit-'.$answerid);
+			if (as_clicked($prefix.'doedit'))
+				as_page_q_refresh($pagestart, 'edit-'.$answerid);
 				
-			elseif (qa_clicked($prefix.'dosave') && qa_page_q_permit_edit($answer, 'permit_edit_a', $pageerror)) {
-				$editedtype=qa_page_q_edit_a_submit($answer, $question, $answers, $commentsfollows, $aeditin[$answerid], $aediterrors[$answerid]);
+			elseif (as_clicked($prefix.'dosave') && as_page_q_permit_edit($answer, 'permit_edit_a', $pageerror)) {
+				$editedtype=as_page_q_edit_a_submit($answer, $question, $answers, $commentsfollows, $aeditin[$answerid], $aediterrors[$answerid]);
 				
 				if (isset($editedtype))
-					qa_page_q_refresh($pagestart, null, $editedtype, $answerid);
+					as_page_q_refresh($pagestart, null, $editedtype, $answerid);
 
 				else {
 					$formtype='a_edit';
 					$formpostid=$answerid; // keep editing if an error
 				}
 				
-			} elseif (($pagestate==('edit-'.$answerid)) && qa_page_q_permit_edit($answer, 'permit_edit_a', $pageerror)) {
+			} elseif (($pagestate==('edit-'.$answerid)) && as_page_q_permit_edit($answer, 'permit_edit_a', $pageerror)) {
 				$formtype='a_edit';
 				$formpostid=$answerid;
 			}
 		}
 		
 		if ($answer['commentbutton']) {
-			if (qa_clicked($prefix.'docomment'))
-				qa_page_q_refresh($pagestart, 'comment-'.$answerid, 'A', $answerid);
+			if (as_clicked($prefix.'docomment'))
+				as_page_q_refresh($pagestart, 'comment-'.$answerid, 'A', $answerid);
 				
-			if (qa_clicked('c'.$answerid.'_doadd') || ($pagestate==('comment-'.$answerid)))
-				qa_page_q_do_comment($question, $answer, $commentsfollows, $pagestart, $usecaptcha, $cnewin, $cnewerrors, $formtype, $formpostid, $pageerror);
+			if (as_clicked('c'.$answerid.'_doadd') || ($pagestate==('comment-'.$answerid)))
+				as_page_q_do_comment($question, $answer, $commentsfollows, $pagestart, $usecaptcha, $cnewin, $cnewerrors, $formtype, $formpostid, $pageerror);
 		}
 
-		if (qa_clicked($prefix.'dofollow')) {
+		if (as_clicked($prefix.'dofollow')) {
 			$params=array('follow' => $answerid);
 			if (isset($question['categoryid']))
 				$params['cat']=$question['categoryid'];
 			
-			qa_redirect('ask', $params);
+			as_redirect('ask', $params);
 		}
 	}
 
@@ -214,25 +214,25 @@
 
 			$prefix='c'.$commentid.'_';
 			
-			if (qa_page_q_single_click_c($comment, $question, $commentparent, $pageerror))
-				qa_page_q_refresh($pagestart, 'showcomments-'.$comment['parentid'], $commentparenttype, $comment['parentid']);
+			if (as_page_q_single_click_c($comment, $question, $commentparent, $pageerror))
+				as_page_q_refresh($pagestart, 'showcomments-'.$comment['parentid'], $commentparenttype, $comment['parentid']);
 			
 			if ($comment['editbutton']) {
-				if (qa_clicked($prefix.'doedit')) {
-					if (qa_page_q_permit_edit($comment, 'permit_edit_c', $pageerror)) // extra check here ensures error message is visible
-						qa_page_q_refresh($pagestart, 'edit-'.$commentid, $commentparenttype, $comment['parentid']);
+				if (as_clicked($prefix.'doedit')) {
+					if (as_page_q_permit_edit($comment, 'permit_edit_c', $pageerror)) // extra check here ensures error message is visible
+						as_page_q_refresh($pagestart, 'edit-'.$commentid, $commentparenttype, $comment['parentid']);
 				
-				} elseif (qa_clicked($prefix.'dosave') && qa_page_q_permit_edit($comment, 'permit_edit_c', $pageerror)) {
+				} elseif (as_clicked($prefix.'dosave') && as_page_q_permit_edit($comment, 'permit_edit_c', $pageerror)) {
 
-					if (qa_page_q_edit_c_submit($comment, $question, $commentparent, $ceditin[$commentid], $cediterrors[$commentid]))
-						qa_page_q_refresh($pagestart, null, $commentparenttype, $comment['parentid']);
+					if (as_page_q_edit_c_submit($comment, $question, $commentparent, $ceditin[$commentid], $cediterrors[$commentid]))
+						as_page_q_refresh($pagestart, null, $commentparenttype, $comment['parentid']);
 					
 					else {
 						$formtype='c_edit';
 						$formpostid=$commentid; // keep editing if an error
 					}
 
-				} elseif (($pagestate==('edit-'.$commentid)) && qa_page_q_permit_edit($comment, 'permit_edit_c', $pageerror)) {
+				} elseif (($pagestate==('edit-'.$commentid)) && as_page_q_permit_edit($comment, 'permit_edit_c', $pageerror)) {
 					$formtype='c_edit';
 					$formpostid=$commentid;
 				}
@@ -242,7 +242,7 @@
 
 //	Functions used above - also see functions in qa-page-question-submit.php (which are shared with Ajax)
 
-	function qa_page_q_refresh($start=0, $state=null, $showtype=null, $showid=null)
+	function as_page_q_refresh($start=0, $state=null, $showtype=null, $showid=null)
 /*
 	Redirects back to the question page, with the specified parameters
 */
@@ -255,29 +255,29 @@
 			$params['state']=$state;
 			
 		if (isset($showtype) && isset($showid)) {
-			$anchor=qa_anchor($showtype, $showid);
+			$anchor=as_anchor($showtype, $showid);
 			$params['show']=$showid;
 		} else
 			$anchor=null;
 			
-		qa_redirect(qa_request(), $params, null, null, $anchor);
+		as_redirect(as_request(), $params, null, null, $anchor);
 	}
 
 	
-	function qa_page_q_permit_edit($post, $permitoption, &$error, $permitoption2=null)
+	function as_page_q_permit_edit($post, $permitoption, &$error, $permitoption2=null)
 /*
 	Returns whether the editing operation (as specified by $permitoption or $permitoption2) on $post is permitted.
 	If not, sets the $error variable appropriately
 */
 	{
 		// The 'login', 'confirm', 'userblock', 'ipblock' permission errors are reported to the user here
-		// The other options ('approve', 'level') prevent the edit button being shown, in qa_page_q_post_rules(...)
+		// The other options ('approve', 'level') prevent the edit button being shown, in as_page_q_post_rules(...)
 
-		$permiterror=qa_user_post_permit_error($post['isbyuser'] ? null : $permitoption, $post);
+		$permiterror=as_user_post_permit_error($post['isbyuser'] ? null : $permitoption, $post);
 			// if it's by the user, this will only check whether they are blocked
 		
 		if ($permiterror && isset($permitoption2)) {
-			$permiterror2=qa_user_post_permit_error($post['isbyuser'] ? null : $permitoption2, $post);
+			$permiterror2=as_user_post_permit_error($post['isbyuser'] ? null : $permitoption2, $post);
 			
 			if ( ($permiterror=='level') || ($permiterror=='approve') || (!$permiterror2) ) // if it's a less strict error
 				$permiterror=$permiterror2;
@@ -285,15 +285,15 @@
 		
 		switch ($permiterror) {
 			case 'login':
-				$error=qa_insert_login_links(qa_lang_html('question/edit_must_login'), qa_request());
+				$error=as_insert_login_links(as_lang_html('question/edit_must_login'), as_request());
 				break;
 				
 			case 'confirm':
-				$error=qa_insert_login_links(qa_lang_html('question/edit_must_confirm'), qa_request());
+				$error=as_insert_login_links(as_lang_html('question/edit_must_confirm'), as_request());
 				break;
 				
 			default:
-				$error=qa_lang_html('users/no_permission');
+				$error=as_lang_html('users/no_permission');
 				break;
 				
 			case false:
@@ -304,63 +304,63 @@
 	}
 
 
-	function qa_page_q_edit_q_form(&$qa_content, $question, $in, $errors, $completetags, $categories)
+	function as_page_q_edit_q_form(&$as_content, $question, $in, $errors, $completetags, $categories)
 /*
-	Returns a $qa_content form for editing the question and sets up other parts of $qa_content accordingly
+	Returns a $as_content form for editing the question and sets up other parts of $as_content accordingly
 */
 	{
 		$form=array(
-			'tags' => 'method="post" action="'.qa_self_html().'"',
+			'tags' => 'method="post" action="'.as_self_html().'"',
 			
 			'style' => 'tall',
 			
 			'fields' => array(
 				'title' => array(
 					'type' => $question['editable'] ? 'text' : 'static',
-					'label' => qa_lang_html('question/q_title_label'),
+					'label' => as_lang_html('question/q_title_label'),
 					'tags' => 'name="q_title"',
-					'value' => qa_html(($question['editable'] && isset($in['title'])) ? $in['title'] : $question['title']),
-					'error' => qa_html(@$errors['title']),
+					'value' => as_html(($question['editable'] && isset($in['title'])) ? $in['title'] : $question['title']),
+					'error' => as_html(@$errors['title']),
 				),
 				
 				'category' => array(
-					'label' => qa_lang_html('question/q_category_label'),
-					'error' => qa_html(@$errors['categoryid']),
+					'label' => as_lang_html('question/q_category_label'),
+					'error' => as_html(@$errors['categoryid']),
 				),
 				
 				'content' => array(
-					'label' => qa_lang_html('question/q_content_label'),
-					'error' => qa_html(@$errors['content']),
+					'label' => as_lang_html('question/q_content_label'),
+					'error' => as_html(@$errors['content']),
 				),
 				
 				'extra' => array(
-					'label' => qa_html(qa_opt('extra_field_prompt')),
+					'label' => as_html(as_opt('extra_field_prompt')),
 					'tags' => 'name="q_extra"',
-					'value' => qa_html(isset($in['extra']) ? $in['extra'] : $question['extra']),
-					'error' => qa_html(@$errors['extra']),
+					'value' => as_html(isset($in['extra']) ? $in['extra'] : $question['extra']),
+					'error' => as_html(@$errors['extra']),
 				),
 				
 				'tags' => array(
-					'error' => qa_html(@$errors['tags']),
+					'error' => as_html(@$errors['tags']),
 				),
 
 			),
 			
 			'buttons' => array(
 				'save' => array(
-					'tags' => 'onclick="qa_show_waiting_after(this, false);"',
-					'label' => qa_lang_html('main/save_button'),
+					'tags' => 'onclick="as_show_waiting_after(this, false);"',
+					'label' => as_lang_html('main/save_button'),
 				),
 				
 				'cancel' => array(
 					'tags' => 'name="docancel"',
-					'label' => qa_lang_html('main/cancel_button'),
+					'label' => as_lang_html('main/cancel_button'),
 				),
 			),
 			
 			'hidden' => array(
 				'q_dosave' => '1',
-				'code' => qa_get_form_security_code('edit-'.$question['postid']),
+				'code' => as_get_form_security_code('edit-'.$question['postid']),
 			),
 		);
 		
@@ -368,58 +368,58 @@
 			$content=isset($in['content']) ? $in['content'] : $question['content'];
 			$format=isset($in['format']) ? $in['format'] : $question['format'];
 			
-			$editorname=isset($in['editor']) ? $in['editor'] : qa_opt('editor_for_qs');
-			$editor=qa_load_editor($content, $format, $editorname);
+			$editorname=isset($in['editor']) ? $in['editor'] : as_opt('editor_for_qs');
+			$editor=as_load_editor($content, $format, $editorname);
 			
 			$form['fields']['content']=array_merge($form['fields']['content'],
-				qa_editor_load_field($editor, $qa_content, $content, $format, 'q_content', 12, true));
+				as_editor_load_field($editor, $as_content, $content, $format, 'q_content', 12, true));
 				
 			if (method_exists($editor, 'update_script'))
-				$form['buttons']['save']['tags']='onclick="qa_show_waiting_after(this, false); '.$editor->update_script('q_content').'"';
+				$form['buttons']['save']['tags']='onclick="as_show_waiting_after(this, false); '.$editor->update_script('q_content').'"';
 			
-			$form['hidden']['q_editor']=qa_html($editorname);
+			$form['hidden']['q_editor']=as_html($editorname);
 		
 		} else
 			unset($form['fields']['content']);
 		
-		if (qa_using_categories() && count($categories) && $question['retagcatable'])
-			qa_set_up_category_field($qa_content, $form['fields']['category'], 'q_category', $categories,
+		if (as_using_categories() && count($categories) && $question['retagcatable'])
+			as_set_up_category_field($as_content, $form['fields']['category'], 'q_category', $categories,
 				isset($in['categoryid']) ? $in['categoryid'] : $question['categoryid'], 
-				qa_opt('allow_no_category') || !isset($question['categoryid']), qa_opt('allow_no_sub_category'));
+				as_opt('allow_no_category') || !isset($question['categoryid']), as_opt('allow_no_sub_category'));
 		else
 			unset($form['fields']['category']);
 			
-		if (!($question['editable'] && qa_opt('extra_field_active')))
+		if (!($question['editable'] && as_opt('extra_field_active')))
 			unset($form['fields']['extra']);
 		
-		if (qa_using_tags() && $question['retagcatable'])
-			qa_set_up_tag_field($qa_content, $form['fields']['tags'], 'q_tags', isset($in['tags']) ? $in['tags'] : qa_tagstring_to_tags($question['tags']),
-				array(), $completetags, qa_opt('page_size_ask_tags'));
+		if (as_using_tags() && $question['retagcatable'])
+			as_set_up_tag_field($as_content, $form['fields']['tags'], 'q_tags', isset($in['tags']) ? $in['tags'] : as_tagstring_to_tags($question['tags']),
+				array(), $completetags, as_opt('page_size_ask_tags'));
 		else
 			unset($form['fields']['tags']);
 		
 		if ($question['isbyuser']) {
-			if (!qa_is_logged_in())
-				qa_set_up_name_field($qa_content, $form['fields'], isset($in['name']) ? $in['name'] : @$question['name'], 'q_');
+			if (!as_is_logged_in())
+				as_set_up_name_field($as_content, $form['fields'], isset($in['name']) ? $in['name'] : @$question['name'], 'q_');
 
-			qa_set_up_notify_fields($qa_content, $form['fields'], 'Q', qa_get_logged_in_email(),
+			as_set_up_notify_fields($as_content, $form['fields'], 'Q', as_get_logged_in_email(),
 				isset($in['notify']) ? $in['notify'] : !empty($question['notify']),
 				isset($in['email']) ? $in['email'] : @$question['notify'], @$errors['email'], 'q_');
 		}
 		
-		if (!qa_user_post_permit_error('permit_edit_silent', $question))
+		if (!as_user_post_permit_error('permit_edit_silent', $question))
 			$form['fields']['silent']=array(
 				'type' => 'checkbox',
-				'label' => qa_lang_html('question/save_silent_label'),
+				'label' => as_lang_html('question/save_silent_label'),
 				'tags' => 'name="q_silent"',
-				'value' => qa_html(@$in['silent']),
+				'value' => as_html(@$in['silent']),
 			);
 		
 		return $form;
 	}
 	
 	
-	function qa_page_q_edit_q_submit($question, $answers, $commentsfollows, $closepost, &$in, &$errors)
+	function as_page_q_edit_q_submit($question, $answers, $commentsfollows, $closepost, &$in, &$errors)
 /*
 	Processes a POSTed form for editing the question and returns true if successful
 */
@@ -427,77 +427,77 @@
 		$in=array();
 		
 		if ($question['editable']) {
-			$in['title']=qa_post_text('q_title');
-			qa_get_post_content('q_editor', 'q_content', $in['editor'], $in['content'], $in['format'], $in['text']);
-			$in['extra']=qa_opt('extra_field_active') ? qa_post_text('q_extra') : null;
+			$in['title']=as_post_text('q_title');
+			as_get_post_content('q_editor', 'q_content', $in['editor'], $in['content'], $in['format'], $in['text']);
+			$in['extra']=as_opt('extra_field_active') ? as_post_text('q_extra') : null;
 		}
 		
 		if ($question['retagcatable']) {
-			if (qa_using_tags())
-				$in['tags']=qa_get_tags_field_value('q_tags');
+			if (as_using_tags())
+				$in['tags']=as_get_tags_field_value('q_tags');
 			
-			if (qa_using_categories())
-				$in['categoryid']=qa_get_category_field_value('q_category');
+			if (as_using_categories())
+				$in['categoryid']=as_get_category_field_value('q_category');
 		}
 		
 		if (array_key_exists('categoryid', $in)) { // need to check if we can move it to that category, and if we need moderation
-			$categories=qa_db_select_with_pending(qa_db_category_nav_selectspec($in['categoryid'], true));
-			$categoryids=array_keys(qa_category_path($categories, $in['categoryid']));
-			$userlevel=qa_user_level_for_categories($categoryids);
+			$categories=as_db_select_with_pending(as_db_category_nav_selectspec($in['categoryid'], true));
+			$categoryids=array_keys(as_category_path($categories, $in['categoryid']));
+			$userlevel=as_user_level_for_categories($categoryids);
 		
 		} else
 			$userlevel=null;
 			
 		if ($question['isbyuser']) {
-			$in['name']=qa_post_text('q_name');
-			$in['notify']=qa_post_text('q_notify') ? true : false;
-			$in['email']=qa_post_text('q_email');
+			$in['name']=as_post_text('q_name');
+			$in['notify']=as_post_text('q_notify') ? true : false;
+			$in['email']=as_post_text('q_email');
 		}
 		
-		if (!qa_user_post_permit_error('permit_edit_silent', $question))
-			$in['silent']=qa_post_text('q_silent');
+		if (!as_user_post_permit_error('permit_edit_silent', $question))
+			$in['silent']=as_post_text('q_silent');
 
 		// here the $in array only contains values for parts of the form that were displayed, so those are only ones checked by filters
 		
 		$errors=array();
 		
-		if (!qa_check_form_security_code('edit-'.$question['postid'], qa_post_text('code')))
-			$errors['page']=qa_lang_html('misc/form_security_again');
+		if (!as_check_form_security_code('edit-'.$question['postid'], as_post_text('code')))
+			$errors['page']=as_lang_html('misc/form_security_again');
 			
 		else {
-			$in['queued']=qa_opt('moderate_edited_again') && qa_user_moderation_reason($userlevel);
+			$in['queued']=as_opt('moderate_edited_again') && as_user_moderation_reason($userlevel);
 			
-			$filtermodules=qa_load_modules_with('filter', 'filter_question');
+			$filtermodules=as_load_modules_with('filter', 'filter_question');
 			foreach ($filtermodules as $filtermodule) {
 				$oldin=$in;
 				$filtermodule->filter_question($in, $errors, $question);
 				
 				if ($question['editable'])
-					qa_update_post_text($in, $oldin);
+					as_update_post_text($in, $oldin);
 			}
 			
 			if (array_key_exists('categoryid', $in) && strcmp($in['categoryid'], $question['categoryid']))
-				if (qa_user_permit_error('permit_post_q', null, $userlevel))
-					$errors['categoryid']=qa_lang_html('question/category_ask_not_allowed');
+				if (as_user_permit_error('permit_post_q', null, $userlevel))
+					$errors['categoryid']=as_lang_html('question/category_ask_not_allowed');
 			
 			if (empty($errors)) {
-				$userid=qa_get_logged_in_userid();
-				$handle=qa_get_logged_in_handle();
-				$cookieid=qa_cookie_get();
+				$userid=as_get_logged_in_userid();
+				$handle=as_get_logged_in_handle();
+				$cookieid=as_cookie_get();
 				
-				// now we fill in the missing values in the $in array, so that we have everything we need for qa_question_set_content()
+				// now we fill in the missing values in the $in array, so that we have everything we need for as_question_set_content()
 				// we do things in this way to avoid any risk of a validation failure on elements the user can't see (e.g. due to admin setting changes)
 				
 				if (!$question['editable']) {
 					$in['title']=$question['title'];
 					$in['content']=$question['content'];
 					$in['format']=$question['format'];
-					$in['text']=qa_viewer_text($in['content'], $in['format']);
+					$in['text']=as_viewer_text($in['content'], $in['format']);
 					$in['extra']=$question['extra'];
 				}
 				
 				if (!isset($in['tags']))
-					$in['tags']=qa_tagstring_to_tags($question['tags']);
+					$in['tags']=as_tagstring_to_tags($question['tags']);
 					
 				if (!array_key_exists('categoryid', $in))
 					$in['categoryid']=$question['categoryid'];
@@ -505,13 +505,13 @@
 				if (!isset($in['silent']))
 					$in['silent']=false;
 				
-				$setnotify=$question['isbyuser'] ? qa_combine_notify_email($question['userid'], $in['notify'], $in['email']) : $question['notify'];
+				$setnotify=$question['isbyuser'] ? as_combine_notify_email($question['userid'], $in['notify'], $in['email']) : $question['notify'];
 				
-				qa_question_set_content($question, $in['title'], $in['content'], $in['format'], $in['text'], qa_tags_to_tagstring($in['tags']),
+				as_question_set_content($question, $in['title'], $in['content'], $in['format'], $in['text'], as_tags_to_tagstring($in['tags']),
 					$setnotify, $userid, $handle, $cookieid, $in['extra'], @$in['name'], $in['queued'], $in['silent']);
 	
-				if (qa_using_categories() && strcmp($in['categoryid'], $question['categoryid']))
-					qa_question_set_category($question, $in['categoryid'], $userid, $handle, $cookieid,
+				if (as_using_categories() && strcmp($in['categoryid'], $question['categoryid']))
+					as_question_set_category($question, $in['categoryid'], $userid, $handle, $cookieid,
 						$answers, $commentsfollows, $closepost, $in['silent']);
 				
 				return true;
@@ -522,85 +522,85 @@
 	}
 	
 
-	function qa_page_q_close_q_form(&$qa_content, $question, $id, $in, $errors)
+	function as_page_q_close_q_form(&$as_content, $question, $id, $in, $errors)
 /*
-	Returns a $qa_content form for closing the question and sets up other parts of $qa_content accordingly
+	Returns a $as_content form for closing the question and sets up other parts of $as_content accordingly
 */
 	{
 		$form=array(
-			'tags' => 'method="post" action="'.qa_self_html().'"',
+			'tags' => 'method="post" action="'.as_self_html().'"',
 			
 			'id' => $id,
 			
 			'style' => 'tall',
 			
-			'title' => qa_lang_html('question/close_form_title'),
+			'title' => as_lang_html('question/close_form_title'),
 			
 			'fields' => array(
 				'duplicate' => array(
 					'type' => 'checkbox',
 					'tags' => 'name="q_close_duplicate" id="q_close_duplicate" onchange="document.getElementById(\'q_close_details\').focus();"',
-					'label' => qa_lang_html('question/close_duplicate'),
+					'label' => as_lang_html('question/close_duplicate'),
 					'value' => @$in['duplicate'],
 				),
 				
 				'details' => array(
 					'tags' => 'name="q_close_details" id="q_close_details"',
 					'label' =>
-						'<span id="close_label_duplicate">'.qa_lang_html('question/close_original_title').' </span>'.
-						'<span id="close_label_other">'.qa_lang_html('question/close_reason_title').'</span>',
-					'note' => '<span id="close_note_duplicate" style="display:none;">'.qa_lang_html('question/close_original_note').'</span>',
+						'<span id="close_label_duplicate">'.as_lang_html('question/close_original_title').' </span>'.
+						'<span id="close_label_other">'.as_lang_html('question/close_reason_title').'</span>',
+					'note' => '<span id="close_note_duplicate" style="display:none;">'.as_lang_html('question/close_original_note').'</span>',
 					'value' => @$in['details'],
-					'error' => qa_html(@$errors['details']),
+					'error' => as_html(@$errors['details']),
 				),
 			),
 			
 			'buttons' => array(
 				'close' => array(
-					'tags' => 'onclick="qa_show_waiting_after(this, false);"',
-					'label' => qa_lang_html('question/close_form_button'),
+					'tags' => 'onclick="as_show_waiting_after(this, false);"',
+					'label' => as_lang_html('question/close_form_button'),
 				),
 				
 				'cancel' => array(
 					'tags' => 'name="docancel"',
-					'label' => qa_lang_html('main/cancel_button'),
+					'label' => as_lang_html('main/cancel_button'),
 				),
 			),
 			
 			'hidden' => array(
 				'doclose' => '1',
-				'code' => qa_get_form_security_code('close-'.$question['postid']),
+				'code' => as_get_form_security_code('close-'.$question['postid']),
 			),
 		);
 		
-		qa_set_display_rules($qa_content, array(
+		as_set_display_rules($as_content, array(
 			'close_label_duplicate' => 'q_close_duplicate',
 			'close_label_other' => '!q_close_duplicate',
 			'close_note_duplicate' => 'q_close_duplicate',
 		));
 		
-		$qa_content['focusid']='q_close_details';
+		$as_content['focusid']='q_close_details';
 
 		return $form;
 	}
 	
 	
-	function qa_page_q_close_q_submit($question, $closepost, &$in, &$errors)
+	function as_page_q_close_q_submit($question, $closepost, &$in, &$errors)
 /*
 	Processes a POSTed form for closing the question and returns true if successful
 */
 	{
 		$in=array(
-			'duplicate' => qa_post_text('q_close_duplicate'),
-			'details' => qa_post_text('q_close_details'),
+			'duplicate' => as_post_text('q_close_duplicate'),
+			'details' => as_post_text('q_close_details'),
 		);
 		
-		$userid=qa_get_logged_in_userid();
-		$handle=qa_get_logged_in_handle();
-		$cookieid=qa_cookie_get();
+		$userid=as_get_logged_in_userid();
+		$handle=as_get_logged_in_handle();
+		$cookieid=as_cookie_get();
 		
-		if (!qa_check_form_security_code('close-'.$question['postid'], qa_post_text('code')))
-			$errors['details']=qa_lang_html('misc/form_security_again');
+		if (!as_check_form_security_code('close-'.$question['postid'], as_post_text('code')))
+			$errors['details']=as_lang_html('misc/form_security_again');
 
 		elseif ($in['duplicate']) {
 			// be liberal in what we accept, but there are two potential unlikely pitfalls here:
@@ -615,31 +615,31 @@
 				if (preg_match('/^[0-9]+$/', $part))
 					$keypostids[$part]=true;
 					
-			$questionids=qa_db_posts_filter_q_postids(array_keys($keypostids));
+			$questionids=as_db_posts_filter_q_postids(array_keys($keypostids));
 			
 			if ( (count($questionids)==1) && ($questionids[0]!=$question['postid']) ) {
-				qa_question_close_duplicate($question, $closepost, $questionids[0], $userid, $handle, $cookieid);
+				as_question_close_duplicate($question, $closepost, $questionids[0], $userid, $handle, $cookieid);
 				return true;
 			
 			} else
-				$errors['details']=qa_lang('question/close_duplicate_error');
+				$errors['details']=as_lang('question/close_duplicate_error');
 		
 		} else {
 			if (strlen($in['details'])>0) {
-				qa_question_close_other($question, $closepost, $in['details'], $userid, $handle, $cookieid);
+				as_question_close_other($question, $closepost, $in['details'], $userid, $handle, $cookieid);
 				return true;
 			
 			} else
-				$errors['details']=qa_lang('main/field_required');
+				$errors['details']=as_lang('main/field_required');
 		}
 		
 		return false; 
 	}
 	
 	
-	function qa_page_q_edit_a_form(&$qa_content, $id, $answer, $question, $answers, $commentsfollows, $in, $errors)
+	function as_page_q_edit_a_form(&$as_content, $id, $answer, $question, $answers, $commentsfollows, $in, $errors)
 /*
-	Returns a $qa_content form for editing an answer and sets up other parts of $qa_content accordingly
+	Returns a $as_content form for editing an answer and sets up other parts of $as_content accordingly
 */
 	{
 		require_once QA_INCLUDE_DIR.'qa-util-string.php';
@@ -650,8 +650,8 @@
 		$content=isset($in['content']) ? $in['content'] : $answer['content'];
 		$format=isset($in['format']) ? $in['format'] : $answer['format'];
 		
-		$editorname=isset($in['editor']) ? $in['editor'] : qa_opt('editor_for_as');
-		$editor=qa_load_editor($content, $format, $editorname);
+		$editorname=isset($in['editor']) ? $in['editor'] : as_opt('editor_for_as');
+		$editor=as_load_editor($content, $format, $editorname);
 		
 		$hascomments=false;
 		foreach ($commentsfollows as $commentfollow)
@@ -659,40 +659,40 @@
 				$hascomments=true;
 		
 		$form=array(
-			'tags' => 'method="post" action="'.qa_self_html().'"',
+			'tags' => 'method="post" action="'.as_self_html().'"',
 			
 			'id' => $id,
 			
-			'title' => qa_lang_html('question/edit_a_title'),
+			'title' => as_lang_html('question/edit_a_title'),
 			
 			'style' => 'tall',
 			
 			'fields' => array(
 				'content' => array_merge(
-					qa_editor_load_field($editor, $qa_content, $content, $format, $prefix.'content', 12),
+					as_editor_load_field($editor, $as_content, $content, $format, $prefix.'content', 12),
 					array(
-						'error' => qa_html(@$errors['content']),
+						'error' => as_html(@$errors['content']),
 					)
 				),
 			),
 
 			'buttons' => array(
 				'save' => array(
-					'tags' => 'onclick="qa_show_waiting_after(this, false); '.
+					'tags' => 'onclick="as_show_waiting_after(this, false); '.
 						(method_exists($editor, 'update_script') ? $editor->update_script($prefix.'content') : '').'"',
-					'label' => qa_lang_html('main/save_button'),
+					'label' => as_lang_html('main/save_button'),
 				),
 				
 				'cancel' => array(
 					'tags' => 'name="docancel"',
-					'label' => qa_lang_html('main/cancel_button'),
+					'label' => as_lang_html('main/cancel_button'),
 				),
 			),
 			
 			'hidden' => array(
-				$prefix.'editor' => qa_html($editorname),
+				$prefix.'editor' => as_html($editorname),
 				$prefix.'dosave' => '1',
-				$prefix.'code' => qa_get_form_security_code('edit-'.$answerid),
+				$prefix.'code' => as_get_form_security_code('edit-'.$answerid),
 			),
 		);
 		
@@ -705,12 +705,12 @@
 		
 		if ($question['commentable'])
 			$commentonoptions[$question['postid']]=
-				qa_lang_html('question/comment_on_q').qa_html(qa_shorten_string_line($question['title'], 80));
+				as_lang_html('question/comment_on_q').as_html(as_shorten_string_line($question['title'], 80));
 		
 		foreach ($answers as $otheranswer)
 			if (($otheranswer['postid']!=$answerid) && ($otheranswer['created']<$answer['created']) && $otheranswer['commentable'] && !$otheranswer['hidden']) {
 				$commentonoptions[$otheranswer['postid']]=
-					qa_lang_html('question/comment_on_a').qa_html(qa_shorten_string_line(qa_viewer_text($otheranswer['content'], $otheranswer['format']), 80));
+					as_lang_html('question/comment_on_a').as_html(as_shorten_string_line(as_viewer_text($otheranswer['content'], $otheranswer['format']), 80));
 				
 				if ($otheranswer['created']>$lastbeforetime) {
 					$lastbeforeid=$otheranswer['postid'];
@@ -721,8 +721,8 @@
 		if (count($commentonoptions)) {
 			$form['fields']['tocomment']=array(
 				'tags' => 'name="'.$prefix.'dotoc" id="'.$prefix.'dotoc"',
-				'label' => '<span id="'.$prefix.'toshown">'.qa_lang_html('question/a_convert_to_c_on').'</span>'.
-								'<span id="'.$prefix.'tohidden" style="display:none;">'.qa_lang_html('question/a_convert_to_c').'</span>',
+				'label' => '<span id="'.$prefix.'toshown">'.as_lang_html('question/a_convert_to_c_on').'</span>'.
+								'<span id="'.$prefix.'tohidden" style="display:none;">'.as_lang_html('question/a_convert_to_c').'</span>',
 				'type' => 'checkbox',
 				'tight' => true,
 			);
@@ -731,12 +731,12 @@
 				'tags' => 'name="'.$prefix.'commenton"',
 				'id' => $prefix.'commenton',
 				'type' => 'select',
-				'note' => qa_lang_html($hascomments ? 'question/a_convert_warn_cs' : 'question/a_convert_warn'),
+				'note' => as_lang_html($hascomments ? 'question/a_convert_warn_cs' : 'question/a_convert_warn'),
 				'options' => $commentonoptions,
 				'value' => @$commentonoptions[$lastbeforeid],
 			);
 			
-			qa_set_display_rules($qa_content, array(
+			as_set_display_rules($as_content, array(
 				$prefix.'commenton' => $prefix.'dotoc',
 				$prefix.'toshown' => $prefix.'dotoc',
 				$prefix.'tohidden' => '!'.$prefix.'dotoc',
@@ -746,27 +746,27 @@
 	//	Show name and notification field if appropriate
 		
 		if ($answer['isbyuser']) {
-			if (!qa_is_logged_in())
-				qa_set_up_name_field($qa_content, $form['fields'], isset($in['name']) ? $in['name'] : @$answer['name'], $prefix);
+			if (!as_is_logged_in())
+				as_set_up_name_field($as_content, $form['fields'], isset($in['name']) ? $in['name'] : @$answer['name'], $prefix);
 			
-			qa_set_up_notify_fields($qa_content, $form['fields'], 'A', qa_get_logged_in_email(),
+			as_set_up_notify_fields($as_content, $form['fields'], 'A', as_get_logged_in_email(),
 				isset($in['notify']) ? $in['notify'] : !empty($answer['notify']),
 				isset($in['email']) ? $in['email'] : @$answer['notify'], @$errors['email'], $prefix);
 		}
 		
-		if (!qa_user_post_permit_error('permit_edit_silent', $answer))
+		if (!as_user_post_permit_error('permit_edit_silent', $answer))
 			$form['fields']['silent']=array(
 				'type' => 'checkbox',
-				'label' => qa_lang_html('question/save_silent_label'),
+				'label' => as_lang_html('question/save_silent_label'),
 				'tags' => 'name="'.$prefix.'silent"',
-				'value' => qa_html(@$in['silent']),
+				'value' => as_html(@$in['silent']),
 			);
 		
 		return $form;
 	}
 	
 	
-	function qa_page_q_edit_a_submit($answer, $question, $answers, $commentsfollows, &$in, &$errors)
+	function as_page_q_edit_a_submit($answer, $question, $answers, $commentsfollows, &$in, &$errors)
 /*
 	Processes a POSTed form for editing an answer and returns the new type of the post if successful
 */
@@ -775,64 +775,64 @@
 		$prefix='a'.$answerid.'_';
 		
 		$in=array(
-			'dotoc' => qa_post_text($prefix.'dotoc'),
-			'commenton' => qa_post_text($prefix.'commenton'),
+			'dotoc' => as_post_text($prefix.'dotoc'),
+			'commenton' => as_post_text($prefix.'commenton'),
 		);
 		
 		if ($answer['isbyuser']) {
-			$in['name']=qa_post_text($prefix.'name');
-			$in['notify']=qa_post_text($prefix.'notify') ? true : false;
-			$in['email']=qa_post_text($prefix.'email');
+			$in['name']=as_post_text($prefix.'name');
+			$in['notify']=as_post_text($prefix.'notify') ? true : false;
+			$in['email']=as_post_text($prefix.'email');
 		}
 		
-		if (!qa_user_post_permit_error('permit_edit_silent', $answer))
-			$in['silent']=qa_post_text($prefix.'silent');
+		if (!as_user_post_permit_error('permit_edit_silent', $answer))
+			$in['silent']=as_post_text($prefix.'silent');
 
-		qa_get_post_content($prefix.'editor', $prefix.'content', $in['editor'], $in['content'], $in['format'], $in['text']);
+		as_get_post_content($prefix.'editor', $prefix.'content', $in['editor'], $in['content'], $in['format'], $in['text']);
 		
 		// here the $in array only contains values for parts of the form that were displayed, so those are only ones checked by filters
 		
 		$errors=array();
 		
-		if (!qa_check_form_security_code('edit-'.$answerid, qa_post_text($prefix.'code')))
-			$errors['content']=qa_lang_html('misc/form_security_again');
+		if (!as_check_form_security_code('edit-'.$answerid, as_post_text($prefix.'code')))
+			$errors['content']=as_lang_html('misc/form_security_again');
 			
 		else {
-			$in['queued']=qa_opt('moderate_edited_again') && qa_user_moderation_reason(qa_user_level_for_post($answer));
+			$in['queued']=as_opt('moderate_edited_again') && as_user_moderation_reason(as_user_level_for_post($answer));
 			
-			$filtermodules=qa_load_modules_with('filter', 'filter_answer');
+			$filtermodules=as_load_modules_with('filter', 'filter_answer');
 			foreach ($filtermodules as $filtermodule) {
 				$oldin=$in;
 				$filtermodule->filter_answer($in, $errors, $question, $answer);
-				qa_update_post_text($in, $oldin);
+				as_update_post_text($in, $oldin);
 			}
 			
 			if (empty($errors)) {
-				$userid=qa_get_logged_in_userid();
-				$handle=qa_get_logged_in_handle();
-				$cookieid=qa_cookie_get();
+				$userid=as_get_logged_in_userid();
+				$handle=as_get_logged_in_handle();
+				$cookieid=as_cookie_get();
 	
 				if (!isset($in['silent']))
 					$in['silent']=false;
 				
-				$setnotify=$answer['isbyuser'] ? qa_combine_notify_email($answer['userid'], $in['notify'], $in['email']) : $answer['notify'];			
+				$setnotify=$answer['isbyuser'] ? as_combine_notify_email($answer['userid'], $in['notify'], $in['email']) : $answer['notify'];			
 	
 				if ($in['dotoc'] && (
 					(($in['commenton']==$question['postid']) && $question['commentable']) ||
 					(($in['commenton']!=$answerid) && @$answers[$in['commenton']]['commentable'])
 				)) { // convert to a comment
 	
-					if (qa_user_limits_remaining(QA_LIMIT_COMMENTS)) { // already checked 'permit_post_c'
-						qa_answer_to_comment($answer, $in['commenton'], $in['content'], $in['format'], $in['text'], $setnotify,
+					if (as_user_limits_remaining(QA_LIMIT_COMMENTS)) { // already checked 'permit_post_c'
+						as_answer_to_comment($answer, $in['commenton'], $in['content'], $in['format'], $in['text'], $setnotify,
 							$userid, $handle, $cookieid, $question, $answers, $commentsfollows, @$in['name'], $in['queued'], $in['silent']);
 	
 						return 'C'; // to signify that redirect should be to the comment
 	
 					} else
-						$errors['content']=qa_lang_html('question/comment_limit'); // not really best place for error, but it will do
+						$errors['content']=as_lang_html('question/comment_limit'); // not really best place for error, but it will do
 				
 				} else {
-					qa_answer_set_content($answer, $in['content'], $in['format'], $in['text'], $setnotify,
+					as_answer_set_content($answer, $in['content'], $in['format'], $in['text'], $setnotify,
 						$userid, $handle, $cookieid, $question, @$in['name'], $in['queued'], $in['silent']);
 	
 					return 'A';
@@ -844,44 +844,44 @@
 	}
 
 
-	function qa_page_q_do_comment($question, $parent, $commentsfollows, $pagestart, $usecaptcha, &$cnewin, &$cnewerrors, &$formtype, &$formpostid, &$error)
+	function as_page_q_do_comment($question, $parent, $commentsfollows, $pagestart, $usecaptcha, &$cnewin, &$cnewerrors, &$formtype, &$formpostid, &$error)
 /*
 	Processes a request to add a comment to $parent, with antecedent $question, checking for permissions errors
 */
 	{
 		// The 'approve', 'login', 'confirm', 'userblock', 'ipblock' permission errors are reported to the user here
-		// The other option ('level') prevents the comment button being shown, in qa_page_q_post_rules(...)
+		// The other option ('level') prevents the comment button being shown, in as_page_q_post_rules(...)
 
 		$answer=($question['postid']==$parent['postid']) ? null : $parent;
 		$parentid=$parent['postid'];
 		
-		switch (qa_user_post_permit_error('permit_post_c', $parent, QA_LIMIT_COMMENTS)) {
+		switch (as_user_post_permit_error('permit_post_c', $parent, QA_LIMIT_COMMENTS)) {
 			case 'login':
-				$error=qa_insert_login_links(qa_lang_html('question/comment_must_login'), qa_request());
+				$error=as_insert_login_links(as_lang_html('question/comment_must_login'), as_request());
 				break;
 				
 			case 'confirm':
-				$error=qa_insert_login_links(qa_lang_html('question/comment_must_confirm'), qa_request());
+				$error=as_insert_login_links(as_lang_html('question/comment_must_confirm'), as_request());
 				break;
 				
 			case 'approve':
-				$error=qa_lang_html('question/comment_must_be_approved');
+				$error=as_lang_html('question/comment_must_be_approved');
 				break;
 				
 			case 'limit':
-				$error=qa_lang_html('question/comment_limit');
+				$error=as_lang_html('question/comment_limit');
 				break;
 				
 			default:
-				$error=qa_lang_html('users/no_permission');
+				$error=as_lang_html('users/no_permission');
 				break;
 				
 			case false:
-				if (qa_clicked('c'.$parentid.'_doadd')) {
-					$commentid=qa_page_q_add_c_submit($question, $parent, $commentsfollows, $usecaptcha, $cnewin[$parentid], $cnewerrors[$parentid]);
+				if (as_clicked('c'.$parentid.'_doadd')) {
+					$commentid=as_page_q_add_c_submit($question, $parent, $commentsfollows, $usecaptcha, $cnewin[$parentid], $cnewerrors[$parentid]);
 
 					if (isset($commentid))
-						qa_page_q_refresh($pagestart, null, $parent['basetype'], $parentid);
+						as_page_q_refresh($pagestart, null, $parent['basetype'], $parentid);
 					
 					else {
 						$formtype='c_add';
@@ -897,9 +897,9 @@
 	}
 
 	
-	function qa_page_q_edit_c_form(&$qa_content, $id, $comment, $in, $errors)
+	function as_page_q_edit_c_form(&$as_content, $id, $comment, $in, $errors)
 /*
-	Returns a $qa_content form for editing a comment and sets up other parts of $qa_content accordingly
+	Returns a $as_content form for editing a comment and sets up other parts of $as_content accordingly
 */
 	{
 		$commentid=$comment['postid'];
@@ -908,69 +908,69 @@
 		$content=isset($in['content']) ? $in['content'] : $comment['content'];
 		$format=isset($in['format']) ? $in['format'] : $comment['format'];
 		
-		$editorname=isset($in['editor']) ? $in['editor'] : qa_opt('editor_for_cs');
-		$editor=qa_load_editor($content, $format, $editorname);
+		$editorname=isset($in['editor']) ? $in['editor'] : as_opt('editor_for_cs');
+		$editor=as_load_editor($content, $format, $editorname);
 		
 		$form=array(
-			'tags' => 'method="post" action="'.qa_self_html().'"',
+			'tags' => 'method="post" action="'.as_self_html().'"',
 			
 			'id' => $id,
 			
-			'title' => qa_lang_html('question/edit_c_title'),
+			'title' => as_lang_html('question/edit_c_title'),
 			
 			'style' => 'tall',
 			
 			'fields' => array(
 				'content' => array_merge(
-					qa_editor_load_field($editor, $qa_content, $content, $format, $prefix.'content', 4, true),
+					as_editor_load_field($editor, $as_content, $content, $format, $prefix.'content', 4, true),
 					array(
-						'error' => qa_html(@$errors['content']),
+						'error' => as_html(@$errors['content']),
 					)
 				),
 			),
 			
 			'buttons' => array(
 				'save' => array(
-					'tags' => 'onclick="qa_show_waiting_after(this, false); '.
+					'tags' => 'onclick="as_show_waiting_after(this, false); '.
 						(method_exists($editor, 'update_script') ? $editor->update_script($prefix.'content') : '').'"',
-					'label' => qa_lang_html('main/save_button'),
+					'label' => as_lang_html('main/save_button'),
 				),
 				
 				'cancel' => array(
 					'tags' => 'name="docancel"',
-					'label' => qa_lang_html('main/cancel_button'),
+					'label' => as_lang_html('main/cancel_button'),
 				),
 			),
 			
 			'hidden' => array(
-				$prefix.'editor' => qa_html($editorname),
+				$prefix.'editor' => as_html($editorname),
 				$prefix.'dosave' => '1',
-				$prefix.'code' => qa_get_form_security_code('edit-'.$commentid),
+				$prefix.'code' => as_get_form_security_code('edit-'.$commentid),
 			),
 		);
 		
 		if ($comment['isbyuser']) {
-			if (!qa_is_logged_in())
-				qa_set_up_name_field($qa_content, $form['fields'], isset($in['name']) ? $in['name'] : @$comment['name'], $prefix);
+			if (!as_is_logged_in())
+				as_set_up_name_field($as_content, $form['fields'], isset($in['name']) ? $in['name'] : @$comment['name'], $prefix);
 
-			qa_set_up_notify_fields($qa_content, $form['fields'], 'C', qa_get_logged_in_email(),
+			as_set_up_notify_fields($as_content, $form['fields'], 'C', as_get_logged_in_email(),
 				isset($in['notify']) ? $in['notify'] : !empty($comment['notify']),
 				isset($in['email']) ? $in['email'] : @$comment['notify'], @$errors['email'], $prefix);
 		}
 
-		if (!qa_user_post_permit_error('permit_edit_silent', $comment))
+		if (!as_user_post_permit_error('permit_edit_silent', $comment))
 			$form['fields']['silent']=array(
 				'type' => 'checkbox',
-				'label' => qa_lang_html('question/save_silent_label'),
+				'label' => as_lang_html('question/save_silent_label'),
 				'tags' => 'name="'.$prefix.'silent"',
-				'value' => qa_html(@$in['silent']),
+				'value' => as_html(@$in['silent']),
 			);
 
 		return $form;
 	}
 	
 	
-	function qa_page_q_edit_c_submit($comment, $question, $parent, &$in, &$errors)
+	function as_page_q_edit_c_submit($comment, $question, $parent, &$in, &$errors)
 /*
 	Processes a POSTed form for editing a comment and returns true if successful
 */
@@ -981,44 +981,44 @@
 		$in=array();
 		
 		if ($comment['isbyuser']) {
-			$in['name']=qa_post_text($prefix.'name');
-			$in['notify']=qa_post_text($prefix.'notify') ? true : false;
-			$in['email']=qa_post_text($prefix.'email');
+			$in['name']=as_post_text($prefix.'name');
+			$in['notify']=as_post_text($prefix.'notify') ? true : false;
+			$in['email']=as_post_text($prefix.'email');
 		}
 
-		if (!qa_user_post_permit_error('permit_edit_silent', $comment))
-			$in['silent']=qa_post_text($prefix.'silent');
+		if (!as_user_post_permit_error('permit_edit_silent', $comment))
+			$in['silent']=as_post_text($prefix.'silent');
 
-		qa_get_post_content($prefix.'editor', $prefix.'content', $in['editor'], $in['content'], $in['format'], $in['text']);
+		as_get_post_content($prefix.'editor', $prefix.'content', $in['editor'], $in['content'], $in['format'], $in['text']);
 		
 		// here the $in array only contains values for parts of the form that were displayed, so those are only ones checked by filters
 
 		$errors=array();
 		
-		if (!qa_check_form_security_code('edit-'.$commentid, qa_post_text($prefix.'code')))
-			$errors['content']=qa_lang_html('misc/form_security_again');
+		if (!as_check_form_security_code('edit-'.$commentid, as_post_text($prefix.'code')))
+			$errors['content']=as_lang_html('misc/form_security_again');
 			
 		else {
-			$in['queued']=qa_opt('moderate_edited_again') && qa_user_moderation_reason(qa_user_level_for_post($comment));
+			$in['queued']=as_opt('moderate_edited_again') && as_user_moderation_reason(as_user_level_for_post($comment));
 			
-			$filtermodules=qa_load_modules_with('filter', 'filter_comment');
+			$filtermodules=as_load_modules_with('filter', 'filter_comment');
 			foreach ($filtermodules as $filtermodule) {
 				$oldin=$in;
 				$filtermodule->filter_comment($in, $errors, $question, $parent, $comment);
-				qa_update_post_text($in, $oldin);
+				as_update_post_text($in, $oldin);
 			}
 	
 			if (empty($errors)) {
-				$userid=qa_get_logged_in_userid();
-				$handle=qa_get_logged_in_handle();
-				$cookieid=qa_cookie_get();
+				$userid=as_get_logged_in_userid();
+				$handle=as_get_logged_in_handle();
+				$cookieid=as_cookie_get();
 	
 				if (!isset($in['silent']))
 					$in['silent']=false;
 					
-				$setnotify=$comment['isbyuser'] ? qa_combine_notify_email($comment['userid'], $in['notify'], $in['email']) : $comment['notify'];
+				$setnotify=$comment['isbyuser'] ? as_combine_notify_email($comment['userid'], $in['notify'], $in['email']) : $comment['notify'];
 				
-				qa_comment_set_content($comment, $in['content'], $in['format'], $in['text'], $setnotify,
+				as_comment_set_content($comment, $in['content'], $in['format'], $in['text'], $setnotify,
 					$userid, $handle, $cookieid, $question, $parent, @$in['name'], $in['queued'], $in['silent']);
 				
 				return true;

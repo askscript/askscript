@@ -44,8 +44,8 @@
 	}
 
 	
-	qa_register_plugin_layer('qa-opensearch-layer.php', 'OpenSearch Layer');
-	qa_register_plugin_module('page', 'qa-opensearch-page.php', 'qa_opensearch_xml', 'OpenSearch XML');
+	as_register_plugin_layer('qa-opensearch-layer.php', 'OpenSearch Layer');
+	as_register_plugin_module('page', 'qa-opensearch-page.php', 'as_opensearch_xml', 'OpenSearch XML');
 	
 
 /*

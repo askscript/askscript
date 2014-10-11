@@ -1,35 +1,35 @@
 <?php
 
 
-	class qa_html_theme extends qa_html_theme_base
+	class as_html_theme extends as_html_theme_base
 	{	
 
 		function head_script() // change style of WYSIWYG editor to match theme better
 		{
-			qa_html_theme_base::head_script();
+			as_html_theme_base::head_script();
 			
 			$this->output(
 				'<script type="text/javascript">',
-				"if (typeof qa_wysiwyg_editor_config == 'object')",
-				"\tqa_wysiwyg_editor_config.skin='kama';",
+				"if (typeof as_wysiwyg_editor_config == 'object')",
+				"\tas_wysiwyg_editor_config.skin='kama';",
 				'</script>'
 			);
 		}
 		
 		function nav_user_search() // outputs login form if user not logged in
 		{
-			if (!qa_is_logged_in()) {
+			if (!as_is_logged_in()) {
 				$login=@$this->content['navigation']['user']['login'];
 				
 				if (isset($login) && !QA_FINAL_EXTERNAL_USERS) {
 					$this->output(
 						'<!--[Begin: login form]-->',				
 						'<form id="qa-loginform" action="'.$login['url'].'" method="post">',
-							'<input type="text" id="qa-userid" name="emailhandle" placeholder="'.trim(qa_lang_html(qa_opt('allow_login_email_only') ? 'users/email_label' : 'users/email_handle_label'), ':').'" />',
-							'<input type="password" id="qa-password" name="password" placeholder="'.trim(qa_lang_html('users/password_label'), ':').'" />',
+							'<input type="text" id="qa-userid" name="emailhandle" placeholder="'.trim(as_lang_html(as_opt('allow_login_email_only') ? 'users/email_label' : 'users/email_handle_label'), ':').'" />',
+							'<input type="password" id="qa-password" name="password" placeholder="'.trim(as_lang_html('users/password_label'), ':').'" />',
 							'<div id="qa-rememberbox"><input type="checkbox" name="remember" id="qa-rememberme" value="1"/>',
-							'<label for="qa-rememberme" id="qa-remember">'.qa_lang_html('users/remember').'</label></div>',
-							'<input type="hidden" name="code" value="'.qa_html(qa_get_form_security_code('login')).'"/>',
+							'<label for="qa-rememberme" id="qa-remember">'.as_lang_html('users/remember').'</label></div>',
+							'<input type="hidden" name="code" value="'.as_html(as_get_form_security_code('login')).'"/>',
 							'<input type="submit" value="'.$login['label'].'" id="qa-login" name="dologin" />',
 						'</form>',				
 						'<!--[End: login form]-->'
@@ -39,30 +39,30 @@
 				}
 			}
 			
-			qa_html_theme_base::nav_user_search();
+			as_html_theme_base::nav_user_search();
 		}
 		
 		function logged_in() 
 		{
-			if (qa_is_logged_in()) // output user avatar to login bar
+			if (as_is_logged_in()) // output user avatar to login bar
 				$this->output(
 					'<div class="qa-logged-in-avatar">',
 					QA_FINAL_EXTERNAL_USERS
-					? qa_get_external_avatar_html(qa_get_logged_in_userid(), 24, true)
-					: qa_get_user_avatar_html(qa_get_logged_in_flags(), qa_get_logged_in_email(), qa_get_logged_in_handle(),
-						qa_get_logged_in_user_field('avatarblobid'), qa_get_logged_in_user_field('avatarwidth'), qa_get_logged_in_user_field('avatarheight'),
+					? as_get_external_avatar_html(as_get_logged_in_userid(), 24, true)
+					: as_get_user_avatar_html(as_get_logged_in_flags(), as_get_logged_in_email(), as_get_logged_in_handle(),
+						as_get_logged_in_user_field('avatarblobid'), as_get_logged_in_user_field('avatarwidth'), as_get_logged_in_user_field('avatarheight'),
 						24, true),
             		'</div>'
             	);				
 			
-			qa_html_theme_base::logged_in();
+			as_html_theme_base::logged_in();
 			
-			if (qa_is_logged_in()) { // adds points count after logged in username
-				$userpoints=qa_get_logged_in_points();
+			if (as_is_logged_in()) { // adds points count after logged in username
+				$userpoints=as_get_logged_in_points();
 				
 				$pointshtml=($userpoints==1)
-					? qa_lang_html_sub('main/1_point', '1', '1')
-					: qa_lang_html_sub('main/x_points', qa_html(number_format($userpoints)));
+					? as_lang_html_sub('main/1_point', '1', '1')
+					: as_lang_html_sub('main/x_points', as_html(number_format($userpoints)));
 						
 				$this->output(
 					'<span class="qa-logged-in-points">',
@@ -107,7 +107,7 @@
 		function sidepanel() // removes sidebar for user profile pages
 		{
 			if ($this->template!='user')
-				qa_html_theme_base::sidepanel();
+				as_html_theme_base::sidepanel();
 		}
 		
 		function footer() // prevent display of regular footer content (see body_suffix()) and replace with closing new <div>s
@@ -118,7 +118,7 @@
 		
 		function title() // add RSS feed icon after the page title
 		{
-			qa_html_theme_base::title();
+			as_html_theme_base::title();
 			
 			$feed=@$this->content['feed'];
 			
@@ -132,7 +132,7 @@
 			
 			$this->voting($q_item);
 			$this->a_count($q_item);
-			qa_html_theme_base::view_count($q_item);
+			as_html_theme_base::view_count($q_item);
 
 			$this->output('</div>');
 		}
@@ -140,13 +140,13 @@
 		function view_count($q_item) // prevent display of view count in the usual place
 		{	
 			if ($this->template=='question')
-				qa_html_theme_base::view_count($q_item);
+				as_html_theme_base::view_count($q_item);
 		}
 		
 		function body_suffix() // to replace standard Q2A footer
         {
 			$this->output('<div class="qa-footer-bottom-group">');
-			qa_html_theme_base::footer();
+			as_html_theme_base::footer();
 			$this->output('</div> <!-- END footer-bottom-group -->', '');
         }
 		
@@ -158,7 +158,7 @@
 				'</div>'
 			);
 
-			qa_html_theme_base::attribution();
+			as_html_theme_base::attribution();
 		}
 		
 	}

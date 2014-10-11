@@ -33,15 +33,15 @@
 /*
 	How do I make a theme which goes beyond CSS to actually modify the HTML output?
 	
-	Create a file named qa-theme.php in your new theme directory which defines a class qa_html_theme
-	that extends this base class qa_html_theme_base. You can then override any of the methods below,
-	referring back to the default method using double colon (qa_html_theme_base::) notation.
+	Create a file named qa-theme.php in your new theme directory which defines a class as_html_theme
+	that extends this base class as_html_theme_base. You can then override any of the methods below,
+	referring back to the default method using double colon (as_html_theme_base::) notation.
 	
 	Plugins can also do something similar by using a layer. For more information and to see some example
 	code, please consult the online Q2A documentation.
 */
 
-	class qa_html_theme_base {
+	class as_html_theme_base {
 	
 		var	$indent=0;
 		var $lines=0;
@@ -52,7 +52,7 @@
 		var $content;
 		var $request;
 		
-		function qa_html_theme_base($template, $content, $rooturl, $request)
+		function as_html_theme_base($template, $content, $rooturl, $request)
 	/*
 		Initialize the object and assign local variables
 	*/
@@ -147,12 +147,12 @@
 		function reorder_parts($parts, $beforekey=null, $reorderrelative=true)
 	/*
 		Reorder the parts of the page according to the $parts array which contains part keys in their new order. Call this
-		before main_parts(). See the docs for qa_array_reorder() in qa-util-sort.php for the other parameters.
+		before main_parts(). See the docs for as_array_reorder() in qa-util-sort.php for the other parameters.
 	*/
 		{
 			require_once QA_INCLUDE_DIR.'qa-util-sort.php';
 			
-			qa_array_reorder($this->content, $parts, $beforekey, $reorderrelative);
+			as_array_reorder($this->content, $parts, $beforekey, $reorderrelative);
 		}
 		
 		
@@ -378,11 +378,11 @@
 		
 		function body_tags()
 		{
-			$class='qa-template-'.qa_html($this->template);
+			$class='qa-template-'.as_html($this->template);
 			
 			if (isset($this->content['categoryids']))
 				foreach ($this->content['categoryids'] as $categoryid)
-					$class.=' qa-category-'.qa_html($categoryid);
+					$class.=' qa-category-'.as_html($categoryid);
 			
 			$this->output('class="'.$class.' qa-body-js-off"');
 		}
@@ -892,13 +892,13 @@
 		function form_reorder_fields(&$form, $keys, $beforekey=null, $reorderrelative=true)
 	/*
 		Reorder the fields of $form according to the $keys array which contains the field keys in their new order. Call
-		before any fields are output. See the docs for qa_array_reorder() in qa-util-sort.php for the other parameters.
+		before any fields are output. See the docs for as_array_reorder() in qa-util-sort.php for the other parameters.
 	*/
 		{
 			require_once QA_INCLUDE_DIR.'qa-util-sort.php';
 			
 			if (is_array($form['fields']))
-				qa_array_reorder($form['fields'], $keys, $beforekey, $reorderrelative);
+				as_array_reorder($form['fields'], $keys, $beforekey, $reorderrelative);
 		}
 
 		function form_fields($form, $columns)
@@ -1067,13 +1067,13 @@
 		function form_reorder_buttons(&$form, $keys, $beforekey=null, $reorderrelative=true)
 	/*
 		Reorder the buttons of $form according to the $keys array which contains the button keys in their new order. Call
-		before any buttons are output. See the docs for qa_array_reorder() in qa-util-sort.php for the other parameters.
+		before any buttons are output. See the docs for as_array_reorder() in qa-util-sort.php for the other parameters.
 	*/
 		{
 			require_once QA_INCLUDE_DIR.'qa-util-sort.php';
 			
 			if (is_array($form['buttons']))
-				qa_array_reorder($form['buttons'], $keys, $beforekey, $reorderrelative);
+				as_array_reorder($form['buttons'], $keys, $beforekey, $reorderrelative);
 		}
 
 		function form_buttons($form, $columns)

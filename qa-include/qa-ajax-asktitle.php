@@ -30,15 +30,15 @@
 
 //	Collect the information we need from the database
 
-	$intitle=qa_post_text('title');
-	$doaskcheck=qa_opt('do_ask_check_qs');
-	$doexampletags=qa_using_tags() && qa_opt('do_example_tags');
+	$intitle=as_post_text('title');
+	$doaskcheck=as_opt('do_ask_check_qs');
+	$doexampletags=as_using_tags() && as_opt('do_example_tags');
 
 	if ($doaskcheck || $doexampletags) {
-		$countqs=max($doexampletags ? QA_DB_RETRIEVE_ASK_TAG_QS : 0, $doaskcheck ? qa_opt('page_size_ask_check_qs') : 0);
+		$countqs=max($doexampletags ? QA_DB_RETRIEVE_ASK_TAG_QS : 0, $doaskcheck ? as_opt('page_size_ask_check_qs') : 0);
 	
-		$relatedquestions=qa_db_select_with_pending(
-			qa_db_search_posts_selectspec(null, qa_string_to_words($intitle), null, null, null, null, 0, false, $countqs)
+		$relatedquestions=as_db_select_with_pending(
+			as_db_search_posts_selectspec(null, as_string_to_words($intitle), null, null, null, null, 0, false, $countqs)
 		);
 	}
 	
@@ -50,7 +50,7 @@
 		
 		$tagweight=array();
 		foreach ($relatedquestions as $question) {
-			$tags=qa_tagstring_to_tags($question['tags']);
+			$tags=as_tagstring_to_tags($question['tags']);
 			foreach ($tags as $tag)
 				@$tagweight[$tag]+=exp($question['score']);
 		}
@@ -59,8 +59,8 @@
 		
 		$exampletags=array();
 		
-		$minweight=exp(qa_match_to_min_score(qa_opt('match_example_tags')));
-		$maxcount=qa_opt('page_size_ask_tags');
+		$minweight=exp(as_match_to_min_score(as_opt('match_example_tags')));
+		$maxcount=as_opt('page_size_ask_tags');
 
 		foreach ($tagweight as $tag => $weight) {
 			if ($weight<$minweight)
@@ -79,7 +79,7 @@
 
 	echo "QA_AJAX_RESPONSE\n1\n";
 	
-	echo strtr(qa_html(implode(',', $exampletags)), "\r\n", '  ')."\n";
+	echo strtr(as_html(implode(',', $exampletags)), "\r\n", '  ')."\n";
 	
 
 //	Collect and output the list of related questions
@@ -88,18 +88,18 @@
 		require_once QA_INCLUDE_DIR.'qa-app-format.php';
 		
 		$count=0;
-		$minscore=qa_match_to_min_score(qa_opt('match_ask_check_qs'));
-		$maxcount=qa_opt('page_size_ask_check_qs');
+		$minscore=as_match_to_min_score(as_opt('match_ask_check_qs'));
+		$maxcount=as_opt('page_size_ask_check_qs');
 		
 		foreach ($relatedquestions as $question) {
 			if ($question['score']<$minscore)
 				break;
 				
 			if (!$count)
-				echo qa_lang_html('question/ask_same_q').'<br/>';
+				echo as_lang_html('question/ask_same_q').'<br/>';
 			
 			echo strtr(
-				'<a href="'.qa_q_path_html($question['postid'], $question['title']).'" target="_blank">'.qa_html($question['title']).'</a><br/>',
+				'<a href="'.as_q_path_html($question['postid'], $question['title']).'" target="_blank">'.as_html($question['title']).'</a><br/>',
 				"\r\n", '  '
 			)."\n";
 			

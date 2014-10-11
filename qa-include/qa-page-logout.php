@@ -31,12 +31,12 @@
 
 
 	if (QA_FINAL_EXTERNAL_USERS)
-		qa_fatal_error('User logout is handled by external code');
+		as_fatal_error('User logout is handled by external code');
 	
-	if (qa_is_logged_in())
-		qa_set_logged_in_user(null);
+	if (as_is_logged_in())
+		as_set_logged_in_user(null);
 		
-	qa_redirect(''); // back to home page
+	as_redirect(''); // back to home page
 	
 
 /*

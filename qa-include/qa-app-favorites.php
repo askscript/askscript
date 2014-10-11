@@ -30,7 +30,7 @@
 	}
 
 
-	function qa_user_favorite_set($userid, $handle, $cookieid, $entitytype, $entityid, $favorite)
+	function as_user_favorite_set($userid, $handle, $cookieid, $entitytype, $entityid, $favorite)
 /*
 	If $favorite is true, set $entitytype and $entityid to be favorites of $userid with $handle and $cookieid, otherwise
 	remove them from its favorites list. Handles event reporting.
@@ -41,9 +41,9 @@
 		require_once QA_INCLUDE_DIR.'qa-app-updates.php';
 		
 		if ($favorite)
-			qa_db_favorite_create($userid, $entitytype, $entityid);
+			as_db_favorite_create($userid, $entitytype, $entityid);
 		else
-			qa_db_favorite_delete($userid, $entitytype, $entityid);
+			as_db_favorite_delete($userid, $entitytype, $entityid);
 		
 		switch ($entitytype) {
 			case QA_ENTITY_QUESTION:
@@ -67,11 +67,11 @@
 				break;
 			
 			default:
-				qa_fatal_error('Favorite type not recognized');
+				as_fatal_error('Favorite type not recognized');
 				break;
 		}
 		
-		qa_report_event($action, $userid, $handle, $cookieid, $params);
+		as_report_event($action, $userid, $handle, $cookieid, $params);
 	}
 	
 	

@@ -44,8 +44,8 @@
 	}
 
 
-	qa_register_plugin_module('editor', 'qa-wysiwyg-editor.php', 'qa_wysiwyg_editor', 'WYSIWYG Editor');
-	qa_register_plugin_module('page', 'qa-wysiwyg-upload.php', 'qa_wysiwyg_upload', 'WYSIWYG Upload');
+	as_register_plugin_module('editor', 'qa-wysiwyg-editor.php', 'as_wysiwyg_editor', 'WYSIWYG Editor');
+	as_register_plugin_module('page', 'qa-wysiwyg-upload.php', 'as_wysiwyg_upload', 'WYSIWYG Upload');
 
 
 /*

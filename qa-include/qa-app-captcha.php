@@ -30,35 +30,35 @@
 	}
 
 
-	function qa_captcha_available()
+	function as_captcha_available()
 /*
 	Return whether a captcha module has been selected and it indicates that it is fully set up to go
 */
 	{
-		$module=qa_load_module('captcha', qa_opt('captcha_module'));
+		$module=as_load_module('captcha', as_opt('captcha_module'));
 		
 		return isset($module) && ( (!method_exists($module, 'allow_captcha')) || $module->allow_captcha());
 	}
 	
 	
-	function qa_captcha_reason_note($captchareason)
+	function as_captcha_reason_note($captchareason)
 /*
-	Return an HTML string explaining $captchareason (from qa_user_captcha_reason()) to the user about why they are seeing a captcha
+	Return an HTML string explaining $captchareason (from as_user_captcha_reason()) to the user about why they are seeing a captcha
 */
 	{
 		$notehtml=null;
 		
 		switch ($captchareason) {
 			case 'login':
-				$notehtml=qa_insert_login_links(qa_lang_html('misc/captcha_login_fix'));
+				$notehtml=as_insert_login_links(as_lang_html('misc/captcha_login_fix'));
 				break;
 				
 			case 'confirm':
-				$notehtml=qa_insert_login_links(qa_lang_html('misc/captcha_confirm_fix'));
+				$notehtml=as_insert_login_links(as_lang_html('misc/captcha_confirm_fix'));
 				break;
 				
 			case 'approve':
-				$notehtml=qa_lang_html('misc/captcha_approve_fix');
+				$notehtml=as_lang_html('misc/captcha_approve_fix');
 				break;		
 		}
 		
@@ -66,45 +66,45 @@
 	}
 
 
-	function qa_set_up_captcha_field(&$qa_content, &$fields, $errors, $note=null)
+	function as_set_up_captcha_field(&$as_content, &$fields, $errors, $note=null)
 /*
-	Prepare $qa_content for showing a captcha, adding the element to $fields, given previous $errors, and a $note to display
+	Prepare $as_content for showing a captcha, adding the element to $fields, given previous $errors, and a $note to display
 */
 	{
-		if (qa_captcha_available()) {
-			$captcha=qa_load_module('captcha', qa_opt('captcha_module'));
+		if (as_captcha_available()) {
+			$captcha=as_load_module('captcha', as_opt('captcha_module'));
 			
-			$count=@++$qa_content['qa_captcha_count']; // work around fact that reCAPTCHA can only display per page
+			$count=@++$as_content['as_captcha_count']; // work around fact that reCAPTCHA can only display per page
 			
 			if ($count>1)
 				$html='[captcha placeholder]'; // single captcha will be moved about the page, to replace this
 			else {
-				$qa_content['script_var']['qa_captcha_in']='qa_captcha_div_1';
-				$html=$captcha->form_html($qa_content, @$errors['captcha']);
+				$as_content['script_var']['as_captcha_in']='as_captcha_div_1';
+				$html=$captcha->form_html($as_content, @$errors['captcha']);
 			}
 			
 			$fields['captcha']=array(
 				'type' => 'custom',
-				'label' => qa_lang_html('misc/captcha_label'),
-				'html' => '<div id="qa_captcha_div_'.$count.'">'.$html.'</div>',
-				'error' => @array_key_exists('captcha', $errors) ? qa_lang_html('misc/captcha_error') : null,
+				'label' => as_lang_html('misc/captcha_label'),
+				'html' => '<div id="as_captcha_div_'.$count.'">'.$html.'</div>',
+				'error' => @array_key_exists('captcha', $errors) ? as_lang_html('misc/captcha_error') : null,
 				'note' => $note,
 			);
 					
-			return "if (qa_captcha_in!='qa_captcha_div_".$count."') { document.getElementById('qa_captcha_div_".$count."').innerHTML=document.getElementById(qa_captcha_in).innerHTML; document.getElementById(qa_captcha_in).innerHTML=''; qa_captcha_in='qa_captcha_div_".$count."'; }";
+			return "if (as_captcha_in!='as_captcha_div_".$count."') { document.getElementById('as_captcha_div_".$count."').innerHTML=document.getElementById(as_captcha_in).innerHTML; document.getElementById(as_captcha_in).innerHTML=''; as_captcha_in='as_captcha_div_".$count."'; }";
 		}
 		
 		return '';
 	}
 
 
-	function qa_captcha_validate_post(&$errors)
+	function as_captcha_validate_post(&$errors)
 /*
 	Check if captcha is submitted correctly, and if not, set $errors['captcha'] to a descriptive string
 */
 	{
-		if (qa_captcha_available()) {
-			$captcha=qa_load_module('captcha', qa_opt('captcha_module'));
+		if (as_captcha_available()) {
+			$captcha=as_load_module('captcha', as_opt('captcha_module'));
 			
 			if (!$captcha->validate_post($error)) {
 				$errors['captcha']=$error;

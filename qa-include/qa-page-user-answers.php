@@ -35,18 +35,18 @@
 
 //	$handle, $userhtml are already set by qa-page-user.php - also $userid if using external user integration
 
-	$start=qa_get_start();
+	$start=as_get_start();
 	
 	
 //	Find the questions for this user
 	
-	$loginuserid=qa_get_logged_in_userid();
+	$loginuserid=as_get_logged_in_userid();
 	$identifier=QA_FINAL_EXTERNAL_USERS ? $userid : $handle;
 
-	list($useraccount, $userpoints, $questions)=qa_db_select_with_pending(
-		QA_FINAL_EXTERNAL_USERS ? null : qa_db_user_account_selectspec($handle, false),
-		qa_db_user_points_selectspec($identifier),
-		qa_db_user_recent_a_qs_selectspec($loginuserid, $identifier, qa_opt_if_loaded('page_size_activity'), $start)
+	list($useraccount, $userpoints, $questions)=as_db_select_with_pending(
+		QA_FINAL_EXTERNAL_USERS ? null : as_db_user_account_selectspec($handle, false),
+		as_db_user_points_selectspec($identifier),
+		as_db_user_recent_a_qs_selectspec($loginuserid, $identifier, as_opt_if_loaded('page_size_activity'), $start)
 	);
 	
 	if ((!QA_FINAL_EXTERNAL_USERS) && !is_array($useraccount)) // check the user exists
@@ -55,58 +55,58 @@
 
 //	Get information on user questions
 
-	$pagesize=qa_opt('page_size_activity');
+	$pagesize=as_opt('page_size_activity');
 	$count=(int)@$userpoints['aposts'];
 	$questions=array_slice($questions, 0, $pagesize);
-	$usershtml=qa_userids_handles_html($questions, false);
+	$usershtml=as_userids_handles_html($questions, false);
 
 	
 //	Prepare content for theme
 	
-	$qa_content=qa_content_prepare(true);
+	$as_content=as_content_prepare(true);
 	
 	if (count($questions))
-		$qa_content['title']=qa_lang_html_sub('profile/answers_by_x', $userhtml);
+		$as_content['title']=as_lang_html_sub('profile/answers_by_x', $userhtml);
 	else
-		$qa_content['title']=qa_lang_html_sub('profile/no_answers_by_x', $userhtml);
+		$as_content['title']=as_lang_html_sub('profile/no_answers_by_x', $userhtml);
 
 
 //	Recent questions by this user
 
-	$qa_content['q_list']['form']=array(
-		'tags' => 'method="post" action="'.qa_self_html().'"',
+	$as_content['q_list']['form']=array(
+		'tags' => 'method="post" action="'.as_self_html().'"',
 
 		'hidden' => array(
-			'code' => qa_get_form_security_code('vote'),
+			'code' => as_get_form_security_code('vote'),
 		),
 	);
 	
-	$qa_content['q_list']['qs']=array();
+	$as_content['q_list']['qs']=array();
 	
-	$htmldefaults=qa_post_html_defaults('Q');
+	$htmldefaults=as_post_html_defaults('Q');
 	$htmldefaults['whoview']=false;
 	$htmldefaults['avatarsize']=0;
 	$htmldefaults['ovoteview']=true;
 	$htmldefaults['answersview']=false;
 	
 	foreach ($questions as $question) {
-		$options=qa_post_html_options($question, $htmldefaults);
-		$options['voteview']=qa_get_vote_view('A', false, false);
+		$options=as_post_html_options($question, $htmldefaults);
+		$options['voteview']=as_get_vote_view('A', false, false);
 		
-		$qa_content['q_list']['qs'][]=qa_other_to_q_html_fields($question, $loginuserid, qa_cookie_get(),
+		$as_content['q_list']['qs'][]=as_other_to_q_html_fields($question, $loginuserid, as_cookie_get(),
 			$usershtml, null, $options);
 	}
 
-	$qa_content['page_links']=qa_html_page_links(qa_request(), $start, $pagesize, $count, qa_opt('pages_prev_next'));
+	$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $count, as_opt('pages_prev_next'));
 
 
 //	Sub menu for navigation in user pages
 
-	$qa_content['navigation']['sub']=qa_user_sub_navigation($handle, 'answers',
+	$as_content['navigation']['sub']=as_user_sub_navigation($handle, 'answers',
 		isset($loginuserid) && ($loginuserid==(QA_FINAL_EXTERNAL_USERS ? $userid : $useraccount['userid'])));
 
 
-	return $qa_content;
+	return $as_content;
 
 
 /*

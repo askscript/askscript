@@ -31,37 +31,37 @@
 
 	@ini_set('display_errors', 0); // we don't want to show PHP errors to RSS readers
 
-	qa_report_process_stage('init_feed');
+	as_report_process_stage('init_feed');
 
 	require_once QA_INCLUDE_DIR.'qa-app-options.php';
 
 
 //	Functions used within this file
 
-	function qa_feed_db_fail_handler($type, $errno=null, $error=null, $query=null)
+	function as_feed_db_fail_handler($type, $errno=null, $error=null, $query=null)
 /*
 	Database failure handler function for RSS feeds - outputs HTTP and text errors
 */
 
 	{
 		header('HTTP/1.1 500 Internal Server Error');
-		echo qa_lang_html('main/general_error');
-		qa_exit('error');
+		echo as_lang_html('main/general_error');
+		as_exit('error');
 	}
 
 	
-	function qa_feed_not_found()
+	function as_feed_not_found()
 /*
 	Common function called when a non-existent feed is requested - outputs HTTP and text errors
 */
 	{
 		header('HTTP/1.0 404 Not Found');
-		echo qa_lang_html('misc/feed_not_found');
-		qa_exit();
+		echo as_lang_html('misc/feed_not_found');
+		as_exit();
 	}
 
 	
-	function qa_feed_load_ifcategory($categoryslugs, $allkey, $catkey, &$title,
+	function as_feed_load_ifcategory($categoryslugs, $allkey, $catkey, &$title,
 		$questionselectspec1=null, $questionselectspec2=null, $questionselectspec3=null, $questionselectspec4=null)
 /*
 	Common function to load appropriate set of questions for requested feed, check category exists, and set up page title
@@ -69,20 +69,20 @@
 	{
 		$countslugs=@count($categoryslugs);
 		
-		list($questions1, $questions2, $questions3, $questions4, $categories, $categoryid)=qa_db_select_with_pending(
+		list($questions1, $questions2, $questions3, $questions4, $categories, $categoryid)=as_db_select_with_pending(
 			$questionselectspec1,
 			$questionselectspec2,
 			$questionselectspec3,
 			$questionselectspec4,
-			$countslugs ? qa_db_category_nav_selectspec($categoryslugs, false) : null,
-			$countslugs ? qa_db_slugs_to_category_id_selectspec($categoryslugs) : null
+			$countslugs ? as_db_category_nav_selectspec($categoryslugs, false) : null,
+			$countslugs ? as_db_slugs_to_category_id_selectspec($categoryslugs) : null
 		);
 
 		if ($countslugs && !isset($categoryid))
-			qa_feed_not_found();
+			as_feed_not_found();
 
 		if (isset($allkey))
-			$title=(isset($categoryid) && isset($catkey)) ? qa_lang_sub($catkey, $categories[$categoryid]['title']) : qa_lang($allkey);
+			$title=(isset($categoryid) && isset($catkey)) ? as_lang_sub($catkey, $categories[$categoryid]['title']) : as_lang($allkey);
 			
 		return array_merge(
 			is_array($questions1) ? $questions1 : array(),
@@ -95,10 +95,10 @@
 
 //	Connect to database and get the type of feed and category requested (in some cases these are overridden later)
 
-	qa_db_connect('qa_feed_db_fail_handler');
-	qa_preload_options();
+	as_db_connect('as_feed_db_fail_handler');
+	as_preload_options();
 	
-	$requestlower=strtolower(qa_request());
+	$requestlower=strtolower(as_request());
 	$foursuffix=substr($requestlower, -4);
 	
 	if ( ($foursuffix=='.rss') || ($foursuffix=='.xml') )
@@ -160,86 +160,86 @@
 	$countslugs=@count($categoryslugs);
 
 	if (!isset($feedoption))
-		qa_feed_not_found();
+		as_feed_not_found();
 	
 
 //	Check that all the appropriate options are in place to allow this feed to be retrieved
 
 	if (!(
-		(qa_opt($feedoption)) &&
-		($countslugs ? (qa_using_categories() && qa_opt('feed_per_category')) : true)
+		(as_opt($feedoption)) &&
+		($countslugs ? (as_using_categories() && as_opt('feed_per_category')) : true)
 	))
-		qa_feed_not_found();
+		as_feed_not_found();
 
 
 //	Retrieve the appropriate questions and other information for this feed
 
 	require_once QA_INCLUDE_DIR.'qa-db-selects.php';
 
-	$sitetitle=qa_opt('site_title');
-	$siteurl=qa_opt('site_url');
-	$full=qa_opt('feed_full_text');
-	$count=qa_opt('feed_number_items');
-	$showurllinks=qa_opt('show_url_links');
+	$sitetitle=as_opt('site_title');
+	$siteurl=as_opt('site_url');
+	$full=as_opt('feed_full_text');
+	$count=as_opt('feed_number_items');
+	$showurllinks=as_opt('show_url_links');
 	
 	$linkrequest=$feedtype.($countslugs ? ('/'.implode('/', $categoryslugs)) : '');
 	$linkparams=null;
 
 	switch ($feedtype) {
 		case 'questions':
-			$questions=qa_feed_load_ifcategory($categoryslugs, 'main/recent_qs_title', 'main/recent_qs_in_x', $title,
-				qa_db_qs_selectspec(null, 'created', 0, $categoryslugs, null, false, $full, $count)
+			$questions=as_feed_load_ifcategory($categoryslugs, 'main/recent_qs_title', 'main/recent_qs_in_x', $title,
+				as_db_qs_selectspec(null, 'created', 0, $categoryslugs, null, false, $full, $count)
 			);
 			break;
 			
 		case 'hot':
-			$questions=qa_feed_load_ifcategory($categoryslugs, 'main/hot_qs_title', 'main/hot_qs_in_x', $title,
-				qa_db_qs_selectspec(null, 'hotness', 0, $categoryslugs, null, false, $full, $count)
+			$questions=as_feed_load_ifcategory($categoryslugs, 'main/hot_qs_title', 'main/hot_qs_in_x', $title,
+				as_db_qs_selectspec(null, 'hotness', 0, $categoryslugs, null, false, $full, $count)
 			);
 			break;
 		
 		case 'unanswered':
-			$questions=qa_feed_load_ifcategory($categoryslugs, 'main/unanswered_qs_title', 'main/unanswered_qs_in_x', $title,
-				qa_db_unanswered_qs_selectspec(null, null, 0, $categoryslugs, false, $full, $count)
+			$questions=as_feed_load_ifcategory($categoryslugs, 'main/unanswered_qs_title', 'main/unanswered_qs_in_x', $title,
+				as_db_unanswered_qs_selectspec(null, null, 0, $categoryslugs, false, $full, $count)
 			);
 			break;
 			
 		case 'answers':
-			$questions=qa_feed_load_ifcategory($categoryslugs, 'main/recent_as_title', 'main/recent_as_in_x', $title,
-				qa_db_recent_a_qs_selectspec(null, 0, $categoryslugs, null, false, $full, $count)
+			$questions=as_feed_load_ifcategory($categoryslugs, 'main/recent_as_title', 'main/recent_as_in_x', $title,
+				as_db_recent_a_qs_selectspec(null, 0, $categoryslugs, null, false, $full, $count)
 			);
 			break;
 
 		case 'comments':
-			$questions=qa_feed_load_ifcategory($categoryslugs, 'main/recent_cs_title', 'main/recent_cs_in_x', $title,
-				qa_db_recent_c_qs_selectspec(null, 0, $categoryslugs, null, false, $full, $count)
+			$questions=as_feed_load_ifcategory($categoryslugs, 'main/recent_cs_title', 'main/recent_cs_in_x', $title,
+				as_db_recent_c_qs_selectspec(null, 0, $categoryslugs, null, false, $full, $count)
 			);
 			break;
 			
 		case 'qa':
-			$questions=qa_feed_load_ifcategory($categoryslugs, 'main/recent_qs_as_title', 'main/recent_qs_as_in_x', $title,
-				qa_db_qs_selectspec(null, 'created', 0, $categoryslugs, null, false, $full, $count),
-				qa_db_recent_a_qs_selectspec(null, 0, $categoryslugs, null, false, $full, $count)
+			$questions=as_feed_load_ifcategory($categoryslugs, 'main/recent_qs_as_title', 'main/recent_qs_as_in_x', $title,
+				as_db_qs_selectspec(null, 'created', 0, $categoryslugs, null, false, $full, $count),
+				as_db_recent_a_qs_selectspec(null, 0, $categoryslugs, null, false, $full, $count)
 			);
 			break;
 		
 		case 'activity':
-			$questions=qa_feed_load_ifcategory($categoryslugs, 'main/recent_activity_title', 'main/recent_activity_in_x', $title,
-				qa_db_qs_selectspec(null, 'created', 0, $categoryslugs, null, false, $full, $count),
-				qa_db_recent_a_qs_selectspec(null, 0, $categoryslugs, null, false, $full, $count),
-				qa_db_recent_c_qs_selectspec(null, 0, $categoryslugs, null, false, $full, $count),
-				qa_db_recent_edit_qs_selectspec(null, 0, $categoryslugs, null, true, $full, $count)
+			$questions=as_feed_load_ifcategory($categoryslugs, 'main/recent_activity_title', 'main/recent_activity_in_x', $title,
+				as_db_qs_selectspec(null, 'created', 0, $categoryslugs, null, false, $full, $count),
+				as_db_recent_a_qs_selectspec(null, 0, $categoryslugs, null, false, $full, $count),
+				as_db_recent_c_qs_selectspec(null, 0, $categoryslugs, null, false, $full, $count),
+				as_db_recent_edit_qs_selectspec(null, 0, $categoryslugs, null, true, $full, $count)
 			);
 			break;
 			
 		case 'tag':
 			$tag=$feedparams[0];
 
-			$questions=qa_feed_load_ifcategory(null, null, null, $title,
-				qa_db_tag_recent_qs_selectspec(null, $tag, 0, $full, $count)
+			$questions=as_feed_load_ifcategory(null, null, null, $title,
+				as_db_tag_recent_qs_selectspec(null, $tag, 0, $full, $count)
 			);
 			
-			$title=qa_lang_sub('main/questions_tagged_x', $tag);
+			$title=as_lang_sub('main/questions_tagged_x', $tag);
 			$linkrequest='tag/'.$tag;
 			break;
 			
@@ -248,9 +248,9 @@
 			
 			$query=$feedparams[0];
 
-			$results=qa_get_search_results($query, 0, $count, null, true, $full);
+			$results=as_get_search_results($query, 0, $count, null, true, $full);
 			
-			$title=qa_lang_sub('main/results_for_x', $query);
+			$title=as_lang_sub('main/results_for_x', $query);
 			$linkrequest='search';
 			$linkparams=array('q' => $query);
 
@@ -278,10 +278,10 @@
 	require_once QA_INCLUDE_DIR.'qa-util-string.php';
 
 	if ( ($feedtype!='search') && ($feedtype!='hot') ) // leave search results and hot questions sorted by relevance
-		$questions=qa_any_sort_and_dedupe($questions);
+		$questions=as_any_sort_and_dedupe($questions);
 	
 	$questions=array_slice($questions, 0, $count);
-	$blockwordspreg=qa_get_block_words_preg();
+	$blockwordspreg=as_get_block_words_preg();
 
 
 //	Prepare the XML output
@@ -292,8 +292,8 @@
 	$lines[]='<rss version="2.0">';
 	$lines[]='<channel>';
 
-	$lines[]='<title>'.qa_xml($sitetitle.' - '.$title).'</title>';
-	$lines[]='<link>'.qa_xml(qa_path($linkrequest, $linkparams, $siteurl)).'</link>';
+	$lines[]='<title>'.as_xml($sitetitle.' - '.$title).'</title>';
+	$lines[]='<link>'.as_xml(as_path($linkrequest, $linkparams, $siteurl)).'</link>';
 	$lines[]='<description>Powered by Question2Answer</description>';
 	
 	foreach ($questions as $question) {
@@ -309,18 +309,18 @@
 			$time=$question['otime'];
 				
 			if ($full)
-				$htmlcontent=qa_viewer_html($question['ocontent'], $question['oformat'], $options);
+				$htmlcontent=as_viewer_html($question['ocontent'], $question['oformat'], $options);
 		
 		} elseif (isset($question['postid'])) {
 			$time=$question['created'];
 			
 			if ($full)
-				$htmlcontent=qa_viewer_html($question['content'], $question['format'], $options);
+				$htmlcontent=as_viewer_html($question['content'], $question['format'], $options);
 		}
 			
 		if ($feedtype=='search') {
 			$titleprefix='';
-			$urlxml=qa_xml($question['url']);
+			$urlxml=as_xml($question['url']);
 		
 		} else {
 			switch (@$question['obasetype'].'-'.@$question['oupdatetype']) {
@@ -384,30 +384,30 @@
 			
 			}
 			
-			$titleprefix=isset($langstring) ? qa_lang($langstring) : '';
+			$titleprefix=isset($langstring) ? as_lang($langstring) : '';
 							
-			$urlxml=qa_xml(qa_q_path($question['postid'], $question['title'], true, @$question['obasetype'], @$question['opostid']));
+			$urlxml=as_xml(as_q_path($question['postid'], $question['title'], true, @$question['obasetype'], @$question['opostid']));
 		}
 		
 		if (isset($blockwordspreg))
-			$question['title']=qa_block_words_replace($question['title'], $blockwordspreg);
+			$question['title']=as_block_words_replace($question['title'], $blockwordspreg);
 		
 	//	Build the inner XML structure for each item
 		
 		$lines[]='<item>';
-		$lines[]='<title>'.qa_xml($titleprefix.$question['title']).'</title>';
+		$lines[]='<title>'.as_xml($titleprefix.$question['title']).'</title>';
 		$lines[]='<link>'.$urlxml.'</link>';
 
 		if (isset($htmlcontent))
-			$lines[]='<description>'.qa_xml($htmlcontent).'</description>';
+			$lines[]='<description>'.as_xml($htmlcontent).'</description>';
 			
 		if (isset($question['categoryname']))
-			$lines[]='<category>'.qa_xml($question['categoryname']).'</category>';
+			$lines[]='<category>'.as_xml($question['categoryname']).'</category>';
 			
 		$lines[]='<guid isPermaLink="true">'.$urlxml.'</guid>';
 		
 		if (isset($time))
-			$lines[]='<pubDate>'.qa_xml(gmdate('r', $time)).'</pubDate>';
+			$lines[]='<pubDate>'.as_xml(gmdate('r', $time)).'</pubDate>';
 		
 		$lines[]='</item>';
 	}
@@ -418,7 +418,7 @@
 
 //	Disconnect here, once all output is ready to go
 
-	qa_db_disconnect();
+	as_db_disconnect();
 
 
 //	Output the XML - and we're done!

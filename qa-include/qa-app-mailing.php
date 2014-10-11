@@ -30,47 +30,47 @@
 	}
 
 
-	function qa_mailing_start()
+	function as_mailing_start()
 /*
 	Start a mailing to all users, unless one has already been started
 */
 	{
 		require_once QA_INCLUDE_DIR.'qa-db-admin.php';
 		
-		if (strlen(qa_opt('mailing_last_userid'))==0) {
-			qa_opt('mailing_last_timestamp', time());
-			qa_opt('mailing_last_userid', '0');
-			qa_opt('mailing_total_users', qa_db_count_users());
-			qa_opt('mailing_done_users', 0);
+		if (strlen(as_opt('mailing_last_userid'))==0) {
+			as_opt('mailing_last_timestamp', time());
+			as_opt('mailing_last_userid', '0');
+			as_opt('mailing_total_users', as_db_count_users());
+			as_opt('mailing_done_users', 0);
 		}
 	}
 
 	
-	function qa_mailing_stop()
+	function as_mailing_stop()
 /*
 	Stop a mailing to all users
 */
 	{
-		qa_opt('mailing_last_timestamp', '');
-		qa_opt('mailing_last_userid', '');
-		qa_opt('mailing_done_users', '');
-		qa_opt('mailing_total_users', '');
+		as_opt('mailing_last_timestamp', '');
+		as_opt('mailing_last_userid', '');
+		as_opt('mailing_done_users', '');
+		as_opt('mailing_total_users', '');
 	}
 
 	
-	function qa_mailing_perform_step()
+	function as_mailing_perform_step()
 /*
 	Allow the mailing to proceed forwards, for the appropriate amount of time and users, based on the options
 */
 	{
 		require_once QA_INCLUDE_DIR.'qa-db-users.php';
 
-		$lastuserid=qa_opt('mailing_last_userid');
+		$lastuserid=as_opt('mailing_last_userid');
 		
 		if (strlen($lastuserid)) {
 			$thistime=time();
-			$lasttime=qa_opt('mailing_last_timestamp');
-			$perminute=qa_opt('mailing_per_minute');
+			$lasttime=as_opt('mailing_last_timestamp');
+			$perminute=as_opt('mailing_per_minute');
 			
 			if (($lasttime-$thistime)>60) // if it's been a while, we assume there hasn't been continuous mailing...
 				$lasttime=$thistime-1; // ... so only do 1 second's worth
@@ -80,35 +80,35 @@
 			$count=min(floor(($thistime-$lasttime)*$perminute/60), 100); // don't do more than 100 messages at a time
 			
 			if ($count>0) {
-				qa_opt('mailing_last_timestamp', $thistime+30);
-					// prevents a parallel call to qa_mailing_perform_step() from sending messages, unless we're very unlucky with timing (poor man's mutex)
+				as_opt('mailing_last_timestamp', $thistime+30);
+					// prevents a parallel call to as_mailing_perform_step() from sending messages, unless we're very unlucky with timing (poor man's mutex)
 				
 				$sentusers=0;
-				$users=qa_db_users_get_mailing_next($lastuserid, $count);
+				$users=as_db_users_get_mailing_next($lastuserid, $count);
 				
 				if (count($users)) {
 					foreach ($users as $user)
 						$lastuserid=max($lastuserid, $user['userid']);
 					
-					qa_opt('mailing_last_userid', $lastuserid);
-					qa_opt('mailing_done_users', qa_opt('mailing_done_users')+count($users));
+					as_opt('mailing_last_userid', $lastuserid);
+					as_opt('mailing_done_users', as_opt('mailing_done_users')+count($users));
 					
 					foreach ($users as $user)
 						if (!($user['flags'] & QA_USER_FLAGS_NO_MAILINGS)) {
-							qa_mailing_send_one($user['userid'], $user['handle'], $user['email'], $user['emailcode']);
+							as_mailing_send_one($user['userid'], $user['handle'], $user['email'], $user['emailcode']);
 							$sentusers++;
 						}
 				
-					qa_opt('mailing_last_timestamp', $lasttime+$sentusers*60/$perminute); // can be floating point result, based on number of mails actually sent
+					as_opt('mailing_last_timestamp', $lasttime+$sentusers*60/$perminute); // can be floating point result, based on number of mails actually sent
 
 				} else
-					qa_mailing_stop();
+					as_mailing_stop();
 			}
 		}
 	}
 
 	
-	function qa_mailing_send_one($userid, $handle, $email, $emailcode)
+	function as_mailing_send_one($userid, $handle, $email, $emailcode)
 /*
 	Send a single message from the mailing, to $userid with $handle and $email.
 	Pass the user's existing $emailcode if there is one, otherwise a new one will be set up
@@ -118,33 +118,33 @@
 		require_once QA_INCLUDE_DIR.'qa-db-users.php';
 		
 		if (!strlen(trim($emailcode))) {
-			$emailcode=qa_db_user_rand_emailcode();
-			qa_db_user_set($userid, 'emailcode', $emailcode);
+			$emailcode=as_db_user_rand_emailcode();
+			as_db_user_set($userid, 'emailcode', $emailcode);
 		}
 		
-		$unsubscribeurl=qa_path_absolute('unsubscribe', array('c' => $emailcode, 'u' => $handle));
+		$unsubscribeurl=as_path_absolute('unsubscribe', array('c' => $emailcode, 'u' => $handle));
 		
-		return qa_send_email(array(
-			'fromemail' => qa_opt('mailing_from_email'),
-			'fromname' => qa_opt('mailing_from_name'),
+		return as_send_email(array(
+			'fromemail' => as_opt('mailing_from_email'),
+			'fromname' => as_opt('mailing_from_name'),
 			'toemail' => $email,
 			'toname' => $handle,
-			'subject' => qa_opt('mailing_subject'),
-			'body' => trim(qa_opt('mailing_body'))."\n\n\n".qa_lang('users/unsubscribe').' '.$unsubscribeurl,
+			'subject' => as_opt('mailing_subject'),
+			'body' => trim(as_opt('mailing_body'))."\n\n\n".as_lang('users/unsubscribe').' '.$unsubscribeurl,
 			'html' => false,
 		));
 	}
 
 
-	function qa_mailing_progress_message()
+	function as_mailing_progress_message()
 /*
 	Return a message describing current progress in the mailing
 */
 	{
-		if (strlen(qa_opt('mailing_last_userid')))
-			return strtr(qa_lang('admin/mailing_progress'), array(
-				'^1' => number_format(qa_opt('mailing_done_users')),
-				'^2' => number_format(qa_opt('mailing_total_users')),
+		if (strlen(as_opt('mailing_last_userid')))
+			return strtr(as_lang('admin/mailing_progress'), array(
+				'^1' => number_format(as_opt('mailing_done_users')),
+				'^2' => number_format(as_opt('mailing_total_users')),
 			));
 		else
 			return null;

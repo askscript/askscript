@@ -30,37 +30,37 @@
 	}
 
 
-	function qa_sort_by(&$array, $by1, $by2=null)
+	function as_sort_by(&$array, $by1, $by2=null)
 /*
 	Sort the $array of inner arrays by sub-element $by1 of each inner array, and optionally then by sub-element $by2
 */
 	{
-		global $qa_sort_by_1, $qa_sort_by_2;
+		global $as_sort_by_1, $as_sort_by_2;
 		
-		$qa_sort_by_1=$by1;
-		$qa_sort_by_2=$by2;
+		$as_sort_by_1=$by1;
+		$as_sort_by_2=$by2;
 		
-		uasort($array, 'qa_sort_by_fn');
+		uasort($array, 'as_sort_by_fn');
 	}
 
 
-	function qa_sort_by_fn($a, $b)
+	function as_sort_by_fn($a, $b)
 /*
-	Function used in uasort to implement qa_sort_by()
+	Function used in uasort to implement as_sort_by()
 */
 	{
-		global $qa_sort_by_1, $qa_sort_by_2;
+		global $as_sort_by_1, $as_sort_by_2;
 		
-		$compare=qa_sort_cmp($a[$qa_sort_by_1], $b[$qa_sort_by_1]);
+		$compare=as_sort_cmp($a[$as_sort_by_1], $b[$as_sort_by_1]);
 
-		if (($compare==0) && $qa_sort_by_2)
-			$compare=qa_sort_cmp($a[$qa_sort_by_2], $b[$qa_sort_by_2]);
+		if (($compare==0) && $as_sort_by_2)
+			$compare=as_sort_cmp($a[$as_sort_by_2], $b[$as_sort_by_2]);
 
 		return $compare;
 	}
 
 
-	function qa_sort_cmp($a, $b)
+	function as_sort_cmp($a, $b)
 /*
 	General comparison function for two values, textual or numeric
 */
@@ -72,7 +72,7 @@
 	}
 	
 	
-	function qa_array_insert(&$array, $beforekey, $addelements)
+	function as_array_insert(&$array, $beforekey, $addelements)
 /*
 	Inserts $addelements into $array, preserving their keys, before $beforekey in that array.
 	If $beforekey cannot be found, the elements are appended at the end of the array.
@@ -100,14 +100,14 @@
 	}
 	
 	
-//	Special values for the $beforekey parameter for qa_array_reorder() - use floats since these cannot be real keys
+//	Special values for the $beforekey parameter for as_array_reorder() - use floats since these cannot be real keys
 
 	define('QA_ARRAY_WITH_FIRST', null); // collect the elements together in the position of the first one found
 	define('QA_ARRAY_WITH_LAST', 0.6); // collect the elements together in the position of the last one found
 	define('QA_ARRAY_AT_START', 0.1); // place all the elements at the start of the array
 	define('QA_ARRAY_AT_END', 0.9); // place all the elements at the end of the array
 	
-	function qa_array_reorder(&$array, $keys, $beforekey=null, $reorderrelative=true)
+	function as_array_reorder(&$array, $keys, $beforekey=null, $reorderrelative=true)
 /*
 	Moves all of the elements in $array whose keys are in the parameter $keys. They can be moved to before a specific
 	element by passing the key of that element in $beforekey (if $beforekey is not found, the elements are moved to the

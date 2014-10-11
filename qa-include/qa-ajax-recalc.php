@@ -28,29 +28,29 @@
 	require_once QA_INCLUDE_DIR.'qa-app-recalc.php';
 	
 
-	if (qa_get_logged_in_level()>=QA_USER_LEVEL_ADMIN) {
+	if (as_get_logged_in_level()>=QA_USER_LEVEL_ADMIN) {
 		
-		if (!qa_check_form_security_code('admin/recalc', qa_post_text('code'))) {
+		if (!as_check_form_security_code('admin/recalc', as_post_text('code'))) {
 			$state='';
-			$message=qa_lang('misc/form_security_reload');
+			$message=as_lang('misc/form_security_reload');
 		
 		} else {
-			$state=qa_post_text('state');
+			$state=as_post_text('state');
 			$stoptime=time()+3;
 			
-			while ( qa_recalc_perform_step($state) && (time()<$stoptime) )
+			while ( as_recalc_perform_step($state) && (time()<$stoptime) )
 				;
 				
-			$message=qa_recalc_get_message($state);
+			$message=as_recalc_get_message($state);
 		}
 	
 	} else {
 		$state='';
-		$message=qa_lang('admin/no_privileges');
+		$message=as_lang('admin/no_privileges');
 	}
 	
 
-	echo "QA_AJAX_RESPONSE\n1\n".$state."\n".qa_html($message);
+	echo "QA_AJAX_RESPONSE\n1\n".$state."\n".as_html($message);
 
 
 /*

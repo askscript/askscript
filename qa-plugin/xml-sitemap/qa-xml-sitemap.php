@@ -24,7 +24,7 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	class qa_xml_sitemap {
+	class as_xml_sitemap {
 		
 		var $directory;
 		var $urltoroot;
@@ -56,18 +56,18 @@
 			
 			$saved=false;
 			
-			if (qa_clicked('xml_sitemap_save_button')) {
-				qa_opt('xml_sitemap_show_questions', (int)qa_post_text('xml_sitemap_show_questions_field'));
+			if (as_clicked('xml_sitemap_save_button')) {
+				as_opt('xml_sitemap_show_questions', (int)as_post_text('xml_sitemap_show_questions_field'));
 				
 				if (!QA_FINAL_EXTERNAL_USERS)
-					qa_opt('xml_sitemap_show_users', (int)qa_post_text('xml_sitemap_show_users_field'));
+					as_opt('xml_sitemap_show_users', (int)as_post_text('xml_sitemap_show_users_field'));
 				
-				if (qa_using_tags())
-					qa_opt('xml_sitemap_show_tag_qs', (int)qa_post_text('xml_sitemap_show_tag_qs_field'));
+				if (as_using_tags())
+					as_opt('xml_sitemap_show_tag_qs', (int)as_post_text('xml_sitemap_show_tag_qs_field'));
 					
-				if (qa_using_categories()) {
-					qa_opt('xml_sitemap_show_category_qs', (int)qa_post_text('xml_sitemap_show_category_qs_field'));
-					qa_opt('xml_sitemap_show_categories', (int)qa_post_text('xml_sitemap_show_categories_field'));
+				if (as_using_categories()) {
+					as_opt('xml_sitemap_show_category_qs', (int)as_post_text('xml_sitemap_show_category_qs_field'));
+					as_opt('xml_sitemap_show_categories', (int)as_post_text('xml_sitemap_show_categories_field'));
 				}
 				
 				$saved=true;
@@ -80,7 +80,7 @@
 					'questions' => array(
 						'label' => 'Include question pages',
 						'type' => 'checkbox',
-						'value' => (int)qa_opt('xml_sitemap_show_questions'),
+						'value' => (int)as_opt('xml_sitemap_show_questions'),
 						'tags' => 'name="xml_sitemap_show_questions_field"',
 					),
 				),
@@ -97,30 +97,30 @@
 				$form['fields']['users']=array(
 					'label' => 'Include user pages',
 					'type' => 'checkbox',
-					'value' => (int)qa_opt('xml_sitemap_show_users'),
+					'value' => (int)as_opt('xml_sitemap_show_users'),
 					'tags' => 'name="xml_sitemap_show_users_field"',
 				);
 			
-			if (qa_using_tags())
+			if (as_using_tags())
 				$form['fields']['tagqs']=array(
 					'label' => 'Include question list for each tag',
 					'type' => 'checkbox',
-					'value' => (int)qa_opt('xml_sitemap_show_tag_qs'),
+					'value' => (int)as_opt('xml_sitemap_show_tag_qs'),
 					'tags' => 'name="xml_sitemap_show_tag_qs_field"',
 				);
 
-			if (qa_using_categories()) {
+			if (as_using_categories()) {
 				$form['fields']['categoryqs']=array(
 					'label' => 'Include question list for each category',
 					'type' => 'checkbox',
-					'value' => (int)qa_opt('xml_sitemap_show_category_qs'),
+					'value' => (int)as_opt('xml_sitemap_show_category_qs'),
 					'tags' => 'name="xml_sitemap_show_category_qs_field"',
 				);
 
 				$form['fields']['categories']=array(
 					'label' => 'Include category browser',
 					'type' => 'checkbox',
-					'value' => (int)qa_opt('xml_sitemap_show_categories'),
+					'value' => (int)as_opt('xml_sitemap_show_categories'),
 					'tags' => 'name="xml_sitemap_show_categories_field"',
 				);
 			}
@@ -151,7 +151,7 @@
 		{
 			@ini_set('display_errors', 0); // we don't want to show PHP errors inside XML
 
-			$siteurl=qa_opt('site_url');
+			$siteurl=as_opt('site_url');
 			
 			header('Content-type: text/xml; charset=utf-8');
 			
@@ -161,15 +161,15 @@
 
 		//	Question pages
 		
-			if (qa_opt('xml_sitemap_show_questions')) {
-				$hotstats=qa_db_read_one_assoc(qa_db_query_sub(
+			if (as_opt('xml_sitemap_show_questions')) {
+				$hotstats=as_db_read_one_assoc(as_db_query_sub(
 					"SELECT MIN(hotness) AS base, MAX(hotness)-MIN(hotness) AS spread FROM ^posts WHERE type='Q'"
 				));
 				
 				$nextpostid=0;
 				
 				while (1) {
-					$questions=qa_db_read_all_assoc(qa_db_query_sub(
+					$questions=as_db_read_all_assoc(as_db_query_sub(
 						"SELECT postid, title, hotness FROM ^posts WHERE postid>=# AND type='Q' ORDER BY postid LIMIT 100",
 						$nextpostid
 					));
@@ -178,7 +178,7 @@
 						break;
 	
 					foreach ($questions as $question) {
-						$this->sitemap_output(qa_q_request($question['postid'], $question['title']),
+						$this->sitemap_output(as_q_request($question['postid'], $question['title']),
 							0.1+0.9*($question['hotness']-$hotstats['base'])/(1+$hotstats['spread']));
 						$nextpostid=max($nextpostid, $question['postid']+1);
 					}
@@ -188,11 +188,11 @@
 
 		//	User pages
 		
-			if ((!QA_FINAL_EXTERNAL_USERS) && qa_opt('xml_sitemap_show_users')) {
+			if ((!QA_FINAL_EXTERNAL_USERS) && as_opt('xml_sitemap_show_users')) {
 				$nextuserid=0;
 				
 				while (1) {
-					$users=qa_db_read_all_assoc(qa_db_query_sub(
+					$users=as_db_read_all_assoc(as_db_query_sub(
 						"SELECT userid, handle FROM ^users WHERE userid>=# ORDER BY userid LIMIT 100",
 						$nextuserid
 					));
@@ -210,11 +210,11 @@
 
 		//	Tag pages
 			
-			if (qa_using_tags() && qa_opt('xml_sitemap_show_tag_qs')) {
+			if (as_using_tags() && as_opt('xml_sitemap_show_tag_qs')) {
 				$nextwordid=0;
 			
 				while (1) {
-					$tagwords=qa_db_read_all_assoc(qa_db_query_sub(
+					$tagwords=as_db_read_all_assoc(as_db_query_sub(
 						"SELECT wordid, word, tagcount FROM ^words WHERE wordid>=# AND tagcount>0 ORDER BY wordid LIMIT 100",
 						$nextwordid
 					));
@@ -232,11 +232,11 @@
 			
 		//	Question list for each category
 		
-			if (qa_using_categories() && qa_opt('xml_sitemap_show_category_qs')) {
+			if (as_using_categories() && as_opt('xml_sitemap_show_category_qs')) {
 				$nextcategoryid=0;
 				
 				while (1) {
-					$categories=qa_db_read_all_assoc(qa_db_query_sub(
+					$categories=as_db_read_all_assoc(as_db_query_sub(
 						"SELECT categoryid, backpath FROM ^categories WHERE categoryid>=# AND qcount>0 ORDER BY categoryid LIMIT 2",
 						$nextcategoryid
 					));
@@ -254,13 +254,13 @@
 		
 		//	Pages in category browser
 		
-			if (qa_using_categories() && qa_opt('xml_sitemap_show_categories')) {
+			if (as_using_categories() && as_opt('xml_sitemap_show_categories')) {
 				$this->sitemap_output('categories', 0.5);
 				
 				$nextcategoryid=0;
 				
 				while (1) { // only find categories with a child
-					$categories=qa_db_read_all_assoc(qa_db_query_sub(
+					$categories=as_db_read_all_assoc(as_db_query_sub(
 						"SELECT parent.categoryid, parent.backpath FROM ^categories AS parent ".
 						"JOIN ^categories AS child ON child.parentid=parent.categoryid WHERE parent.categoryid>=# GROUP BY parent.categoryid LIMIT 100",
 						$nextcategoryid
@@ -288,7 +288,7 @@
 		function sitemap_output($request, $priority)
 		{
 			echo "\t<url>\n".
-				"\t\t<loc>".qa_xml(qa_path($request, null, qa_opt('site_url')))."</loc>\n".
+				"\t\t<loc>".as_xml(as_path($request, null, as_opt('site_url')))."</loc>\n".
 				"\t\t<priority>".max(0, min(1.0, $priority))."</priority>\n".
 				"\t</url>\n";
 		}

@@ -30,36 +30,36 @@
 	}
 
 
-	function qa_db_allow_connect()
+	function as_db_allow_connect()
 /*
 	Indicates to the Q2A database layer that database connections are permitted fro this point forwards
 	(before this point, some plugins may not have had a chance to override some database access functions)
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_db_allow_connect;
+		global $as_db_allow_connect;
 
-		$qa_db_allow_connect=true;
+		$as_db_allow_connect=true;
 	}
 	
 	
-	function qa_db_connect($failhandler=null)
+	function as_db_connect($failhandler=null)
 /*
 	Connect to the Q2A database, select the right database, optionally install the $failhandler (and call it if necessary)
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_db_connection, $qa_db_fail_handler, $qa_db_allow_connect;
+		global $as_db_connection, $as_db_fail_handler, $as_db_allow_connect;
 		
-		if (!$qa_db_allow_connect)
-			qa_fatal_error('It appears that a plugin is trying to access the database, but this is not allowed until Q2A initialization is complete.');
+		if (!$as_db_allow_connect)
+			as_fatal_error('It appears that a plugin is trying to access the database, but this is not allowed until Q2A initialization is complete.');
 		
 		if (isset($failhandler))
-			$qa_db_fail_handler=$failhandler; // set this even if connection already opened
+			$as_db_fail_handler=$failhandler; // set this even if connection already opened
 			
-		if (!is_resource($qa_db_connection)) {
+		if (!is_resource($as_db_connection)) {
 			if (QA_PERSISTENT_CONN_DB)
 				$db=mysql_pconnect(QA_FINAL_MYSQL_HOSTNAME, QA_FINAL_MYSQL_USERNAME, QA_FINAL_MYSQL_PASSWORD);
 			else
@@ -68,7 +68,7 @@
 			if (is_resource($db)) {
 				if (!mysql_select_db(QA_FINAL_MYSQL_DATABASE, $db)) {
 					mysql_close($db);
-					qa_db_fail_error('select');
+					as_db_fail_error('select');
 				}
 				
 			/*
@@ -76,7 +76,7 @@
 				of using lots of "SELECT BINARY col AS col"-style queries, as in previous versions of Q2A.
 				Although this introduces the latency of another query here, testing showed that the delay is
 				the same as that from calling mysql_select_db() and only a quarter of that of mysql_connect().
-				So overall it adds 20% to the latency delay in qa_db_connect(), and this seems worth trading
+				So overall it adds 20% to the latency delay in as_db_connect(), and this seems worth trading
 				off against the benefit of more straightforward queries, especially for plugin developers.
 			*/
 				
@@ -85,131 +85,131 @@
 				else
 					mysql_query('SET NAMES utf8', $db);
 					
-				qa_report_process_stage('db_connected');
+				as_report_process_stage('db_connected');
 					
 			} else
-				qa_db_fail_error('connect');
+				as_db_fail_error('connect');
 		
-			$qa_db_connection=$db;
+			$as_db_connection=$db;
 		}
 	}
 	
 	
-	function qa_db_fail_error($type, $errno=null, $error=null, $query=null)
+	function as_db_fail_error($type, $errno=null, $error=null, $query=null)
 /*
 	If a DB error occurs, call the installed fail handler (if any) otherwise report error and exit immediately
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_db_fail_handler;
+		global $as_db_fail_handler;
 		
 		@error_log('PHP Question2Answer MySQL '.$type.' error '.$errno.': '.$error.(isset($query) ? (' - Query: '.$query) : ''));
 		
-		if (function_exists($qa_db_fail_handler))
-			$qa_db_fail_handler($type, $errno, $error, $query);
+		if (function_exists($as_db_fail_handler))
+			$as_db_fail_handler($type, $errno, $error, $query);
 		
 		else {
 			echo '<hr><font color="red">Database '.htmlspecialchars($type.' error '.$errno).'<p>'.nl2br(htmlspecialchars($error."\n\n".$query));
-			qa_exit('error');
+			as_exit('error');
 		}
 	}
 
 	
-	function qa_db_connection($connect=true)
+	function as_db_connection($connect=true)
 /*
 	Return the current connection to the Q2A database, connecting if necessary and $connect is true
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_db_connection;
+		global $as_db_connection;
 		
-		if ($connect && !is_resource($qa_db_connection)) {
-			qa_db_connect();
+		if ($connect && !is_resource($as_db_connection)) {
+			as_db_connect();
 			
-			if (!is_resource($qa_db_connection))
-				qa_fatal_error('Failed to connect to database');
+			if (!is_resource($as_db_connection))
+				as_fatal_error('Failed to connect to database');
 		}
 		
-		return $qa_db_connection;
+		return $as_db_connection;
 	}
 
 	
-	function qa_db_disconnect()
+	function as_db_disconnect()
 /*
 	Disconnect from the Q2A database
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_db_connection;
+		global $as_db_connection;
 		
-		if (is_resource($qa_db_connection)) {
-			qa_report_process_stage('db_disconnect');
+		if (is_resource($as_db_connection)) {
+			as_report_process_stage('db_disconnect');
 			
 			if (!QA_PERSISTENT_CONN_DB)
-				if (!mysql_close($qa_db_connection))
-					qa_fatal_error('Database disconnect failed');
+				if (!mysql_close($as_db_connection))
+					as_fatal_error('Database disconnect failed');
 					
-			$qa_db_connection=null;
+			$as_db_connection=null;
 		}
 	}
 
 	
-	function qa_db_query_raw($query)
+	function as_db_query_raw($query)
 /*
 	Run the raw $query, call the global failure handler if necessary, otherwise return the result resource.
 	If appropriate, also track the resources used by database queries, and the queries themselves, for performance debugging.
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		if (QA_DEBUG_PERFORMANCE) {
-			global $qa_database_usage, $qa_database_queries;
+			global $as_database_usage, $as_database_queries;
 			
 			$oldtime=array_sum(explode(' ', microtime()));
-			$result=qa_db_query_execute($query);
+			$result=as_db_query_execute($query);
 			$usedtime=array_sum(explode(' ', microtime()))-$oldtime;
 
-			if (is_array($qa_database_usage)) {
-				$qa_database_usage['clock']+=$usedtime;
+			if (is_array($as_database_usage)) {
+				$as_database_usage['clock']+=$usedtime;
 		
-				if (strlen($qa_database_queries)<1048576) { // don't keep track of big tests
+				if (strlen($as_database_queries)<1048576) { // don't keep track of big tests
 					$gotrows=is_resource($result) ? mysql_num_rows($result) : null;
 					$gotcolumns=is_resource($result) ? mysql_num_fields($result) : null;
 					
-					$qa_database_queries.=$query."\n\n".sprintf('%.2f ms', $usedtime*1000).
+					$as_database_queries.=$query."\n\n".sprintf('%.2f ms', $usedtime*1000).
 						(is_numeric($gotrows) ? (' - '.$gotrows.(($gotrows==1) ? ' row' : ' rows')) : '').
 						(is_numeric($gotcolumns) ? (' - '.$gotcolumns.(($gotcolumns==1) ? ' column' : ' columns')) : '').
 						"\n\n";
 				}
 			
-				$qa_database_usage['queries']++;
+				$as_database_usage['queries']++;
 			}
 		
 		} else
-			$result=qa_db_query_execute($query);
+			$result=as_db_query_execute($query);
 	
 	//	@error_log('Question2Answer MySQL query: '.$query);
 
 		if ($result===false) {
-			$db=qa_db_connection();
-			qa_db_fail_error('query', mysql_errno($db), mysql_error($db), $query);
+			$db=as_db_connection();
+			as_db_fail_error('query', mysql_errno($db), mysql_error($db), $query);
 		}
 			
 		return $result;
 	}
 	
 	
-	function qa_db_query_execute($query)
+	function as_db_query_execute($query)
 /*
 	Lower-level function to execute a query, which automatically retries if there is a MySQL deadlock error
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		$db=qa_db_connection();
+		$db=as_db_connection();
 		
 		for ($attempt=0; $attempt<100; $attempt++) {
 			$result=mysql_query($query, $db);
@@ -224,18 +224,18 @@
 	}
 	
 	
-	function qa_db_escape_string($string)
+	function as_db_escape_string($string)
 /*
 	Return $string escaped for use in queries to the Q2A database (to which a connection must have been made)
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		return mysql_real_escape_string($string, qa_db_connection());
+		return mysql_real_escape_string($string, as_db_connection());
 	}
 
 	
-	function qa_db_argument_to_mysql($argument, $alwaysquote, $arraybrackets=false)
+	function as_db_argument_to_mysql($argument, $alwaysquote, $arraybrackets=false)
 /*
 	Return $argument escaped for MySQL. Add quotes around it if $alwaysquote is true or it's not numeric.
 	If $argument is an array, return a comma-separated list of escaped elements, with or without $arraybrackets.
@@ -245,7 +245,7 @@
 			$parts=array();
 			
 			foreach ($argument as $subargument)
-				$parts[]=qa_db_argument_to_mysql($subargument, $alwaysquote, true);
+				$parts[]=as_db_argument_to_mysql($subargument, $alwaysquote, true);
 			
 			if ($arraybrackets)
 				$result='('.implode(',', $parts).')';
@@ -254,9 +254,9 @@
 		
 		} elseif (isset($argument)) {
 			if ($alwaysquote || !is_numeric($argument))
-				$result="'".qa_db_escape_string($argument)."'";
+				$result="'".as_db_escape_string($argument)."'";
 			else
-				$result=qa_db_escape_string($argument);
+				$result=as_db_escape_string($argument);
 		
 		} else
 			$result='NULL';
@@ -265,12 +265,12 @@
 	}
 	
 	
-	function qa_db_add_table_prefix($rawname)
+	function as_db_add_table_prefix($rawname)
 /*
 	Return the full name (with prefix) of database table $rawname, usually if it used after a ^ symbol
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		$prefix=QA_MYSQL_TABLE_PREFIX;
 		
@@ -295,16 +295,16 @@
 	}
 	
 	
-	function qa_db_prefix_callback($matches)
+	function as_db_prefix_callback($matches)
 /*
-	Callback function to add table prefixes, as used in qa_db_apply_sub()
+	Callback function to add table prefixes, as used in as_db_apply_sub()
 */
 	{
-		return qa_db_add_table_prefix($matches[1]);
+		return as_db_add_table_prefix($matches[1]);
 	}
 
 	
-	function qa_db_apply_sub($query, $arguments)
+	function as_db_apply_sub($query, $arguments)
 /*
 	Substitute ^, $ and # symbols in $query. ^ symbols are replaced with the table prefix set in qa-config.php.
 	$ and # symbols are replaced in order by the corresponding element in $arguments (if the element is an array,
@@ -313,7 +313,7 @@
 	It's important to use $ when matching a textual column since MySQL won't use indexes to compare text against numbers.
 */
 	{
-		$query=preg_replace_callback('/\^([A-Za-z_0-9]+)/', 'qa_db_prefix_callback', $query);
+		$query=preg_replace_callback('/\^([A-Za-z_0-9]+)/', 'as_db_prefix_callback', $query);
 		
 		if (is_array($arguments)) {
 			$countargs=count($arguments);
@@ -333,9 +333,9 @@
 				}
 				
 				if (!is_numeric($position))
-					qa_fatal_error('Insufficient parameters in query: '.$query);
+					as_fatal_error('Insufficient parameters in query: '.$query);
 				
-				$value=qa_db_argument_to_mysql($arguments[$argument], $alwaysquote);
+				$value=as_db_argument_to_mysql($arguments[$argument], $alwaysquote);
 				$query=substr_replace($query, $value, $position, 1);
 				$offset=$position+strlen($value); // allows inserting strings which contain #/$ character
 			}
@@ -345,45 +345,45 @@
 	}
 
 	
-	function qa_db_query_sub($query) // arguments for substitution retrieved using func_get_args()
+	function as_db_query_sub($query) // arguments for substitution retrieved using func_get_args()
 /*
 	Run $query after substituting ^, # and $ symbols, and return the result resource (or call fail handler)
 */
 	{
 		$funcargs=func_get_args();
 
-		return qa_db_query_raw(qa_db_apply_sub($query, array_slice($funcargs, 1)));
+		return as_db_query_raw(as_db_apply_sub($query, array_slice($funcargs, 1)));
 	}
 
 	
-	function qa_db_last_insert_id()
+	function as_db_last_insert_id()
 /*
 	Return the value of the auto-increment column for the last inserted row
 */
 	{
-		return qa_db_read_one_value(qa_db_query_raw('SELECT LAST_INSERT_ID()'));
+		return as_db_read_one_value(as_db_query_raw('SELECT LAST_INSERT_ID()'));
 	}
 	
 
-	function qa_db_affected_rows()
+	function as_db_affected_rows()
 /*
 	Does what it says on the tin
 */
 	{
-		return mysql_affected_rows(qa_db_connection());
+		return mysql_affected_rows(as_db_connection());
 	}
 	
 	
-	function qa_db_insert_on_duplicate_inserted()
+	function as_db_insert_on_duplicate_inserted()
 /*
 	For the previous INSERT ... ON DUPLICATE KEY UPDATE query, return whether an insert operation took place
 */
 	{
-		return (qa_db_affected_rows()==1);
+		return (as_db_affected_rows()==1);
 	}
 
 	
-	function qa_db_random_bigint()
+	function as_db_random_bigint()
 /*
 	Return a random integer (as a string) for use in a BIGINT column.
 	Actual limit is 18,446,744,073,709,551,615 - we aim for 18,446,743,999,999,999,999
@@ -393,28 +393,28 @@
 	}
 	
 	
-	function qa_db_list_tables_lc()
+	function as_db_list_tables_lc()
 /*
 	Return an array of the names of all tables in the Q2A database, converted to lower case
 */
 	{
-		return array_map('strtolower', qa_db_list_tables());
+		return array_map('strtolower', as_db_list_tables());
 	}
 	
 	
-	function qa_db_list_tables()
+	function as_db_list_tables()
 /*
 	Return an array of the names of all tables in the Q2A database
 */
 	{
-		return qa_db_read_all_values(qa_db_query_raw('SHOW TABLES'));
+		return as_db_read_all_values(as_db_query_raw('SHOW TABLES'));
 	}
 
 	
 /*
 	The selectspec array can contain the elements below. See qa-db-selects.php for lots of examples.
 
-	By default, qa_db_single_select() and qa_db_multi_select() return the data for each selectspec as a numbered
+	By default, as_db_single_select() and as_db_multi_select() return the data for each selectspec as a numbered
 	array of arrays, one per row. The array for each row has column names in the keys, and data in the values.
 	But this can be changed using the 'arraykey', 'arrayvalue' and 'single' in the selectspec.
 	
@@ -431,7 +431,7 @@
 		
 	'source' => Any SQL after FROM, including table names, JOINs, GROUP BY, ORDER BY, WHERE, etc... (required)
 	
-	'arguments' => Substitutions in order for $s and #s in the query, applied in qa_db_apply_sub() above (required)
+	'arguments' => Substitutions in order for $s and #s in the query, applied in as_db_apply_sub() above (required)
 	
 	'arraykey' => Name of column to use for keys of the outer-level returned array, instead of numbers by default
 	
@@ -444,7 +444,7 @@
 	'sortdesc' => Sort the output descending by this column
 
 
-	Why does qa_db_multi_select() combine usually unrelated SELECT statements into a single query?
+	Why does as_db_multi_select() combine usually unrelated SELECT statements into a single query?
 	
 	Because if the database and web servers are on different computers, there will be latency.
 	This way we ensure that every read pageview on the site requires only a single DB query, so
@@ -457,7 +457,7 @@
 */
 
 
-	function qa_db_single_select($selectspec)
+	function as_db_single_select($selectspec)
 /*
 	Return the data specified by a single $selectspec - see long comment above.
 */
@@ -467,18 +467,18 @@
 		foreach ($selectspec['columns'] as $columnas => $columnfrom)
 			$query.=$columnfrom.(is_int($columnas) ? '' : (' AS '.$columnas)).', ';
 		
-		$results=qa_db_read_all_assoc(qa_db_query_raw(qa_db_apply_sub(
+		$results=as_db_read_all_assoc(as_db_query_raw(as_db_apply_sub(
 			substr($query, 0, -2).(strlen(@$selectspec['source']) ? (' FROM '.$selectspec['source']) : ''),
 			@$selectspec['arguments'])
-		), @$selectspec['arraykey']); // arrayvalue is applied in qa_db_post_select()
+		), @$selectspec['arraykey']); // arrayvalue is applied in as_db_post_select()
 		
-		qa_db_post_select($results, $selectspec); // post-processing
+		as_db_post_select($results, $selectspec); // post-processing
 
 		return $results;
 	}
 
 	
-	function qa_db_multi_select($selectspecs)
+	function as_db_multi_select($selectspecs)
 /*
 	Return the data specified by each element of $selectspecs, where the keys of the
 	returned array match the keys of the supplied $selectspecs array. See long comment above.
@@ -493,7 +493,7 @@
 			$outresults=array();
 		
 			foreach ($selectspecs as $selectkey => $selectspec)
-				$outresults[$selectkey]=qa_db_single_select($selectspec);
+				$outresults[$selectkey]=as_db_single_select($selectspec);
 				
 			return $outresults;
 		}
@@ -512,18 +512,18 @@
 				}
 				
 				if (isset($selectspecs[$selectkey]['outcolumns'][$columnas]))
-					qa_fatal_error('Duplicate column name in qa_db_multi_select()');
+					as_fatal_error('Duplicate column name in as_db_multi_select()');
 				
 				$selectspecs[$selectkey]['outcolumns'][$columnas]=$columnfrom;
 			}
 			
 			if (isset($selectspec['arraykey']))
 				if (!isset($selectspecs[$selectkey]['outcolumns'][$selectspec['arraykey']]))
-					qa_fatal_error('Used arraykey not in columns in qa_db_multi_select()');
+					as_fatal_error('Used arraykey not in columns in as_db_multi_select()');
 
 			if (isset($selectspec['arrayvalue']))
 				if (!isset($selectspecs[$selectkey]['outcolumns'][$selectspec['arrayvalue']]))
-					qa_fatal_error('Used arrayvalue not in columns in qa_db_multi_select()');
+					as_fatal_error('Used arrayvalue not in columns in as_db_multi_select()');
 		}
 			
 	//	Work out the full list of columns used
@@ -536,7 +536,7 @@
 	
 		$query='';
 		foreach ($selectspecs as $selectkey => $selectspec) {
-			$subquery="(SELECT '".qa_db_escape_string($selectkey)."'".(empty($query) ? ' AS selectkey' : '');
+			$subquery="(SELECT '".as_db_escape_string($selectkey)."'".(empty($query) ? ' AS selectkey' : '');
 			
 			foreach ($outcolumns as $columnas) {
 				$subquery.=', '.(isset($selectspec['outcolumns'][$columnas]) ? $selectspec['outcolumns'][$columnas] : 'NULL');
@@ -553,12 +553,12 @@
 			if (strlen($query))
 				$query.=' UNION ALL ';
 				
-			$query.=qa_db_apply_sub($subquery, @$selectspec['arguments']);
+			$query.=as_db_apply_sub($subquery, @$selectspec['arguments']);
 		}
 		
 	//	Perform query and extract results
 		
-		$rawresults=qa_db_read_all_assoc(qa_db_query_raw($query));
+		$rawresults=as_db_read_all_assoc(as_db_query_raw($query));
 
 		$outresults=array();
 		foreach ($selectspecs as $selectkey => $selectspec)
@@ -581,7 +581,7 @@
 	//	Post-processing to apply various stuff include sorting request, since we can't rely on ORDER BY due to UNION
 		
 		foreach ($selectspecs as $selectkey => $selectspec)
-			qa_db_post_select($outresults[$selectkey], $selectspec);
+			as_db_post_select($outresults[$selectkey], $selectspec);
 			
 	//	Return results
 	
@@ -589,7 +589,7 @@
 	}
 	
 
-	function qa_db_post_select(&$outresult, $selectspec)
+	function as_db_post_select(&$outresult, $selectspec)
 /*
 	Post-process $outresult according to $selectspec, applying 'sortasc', 'sortdesc', 'arrayvalue' and 'single'
 */
@@ -604,20 +604,20 @@
 			foreach ($outresult as $key => $value)
 				$outresult[$key]['_order_']=$index++;
 				
-			qa_sort_by($outresult, $selectspec['sortasc'], '_order_');
+			as_sort_by($outresult, $selectspec['sortasc'], '_order_');
 
 		} elseif (isset($selectspec['sortdesc'])) {
 			require_once QA_INCLUDE_DIR.'qa-util-sort.php';
 			
 			if (isset($selectspec['sortdesc_2']))
-				qa_sort_by($outresult, $selectspec['sortdesc'], $selectspec['sortdesc_2']);
+				as_sort_by($outresult, $selectspec['sortdesc'], $selectspec['sortdesc_2']);
 				
 			else {
 				$index=count($outresult);
 				foreach ($outresult as $key => $value)
 					$outresult[$key]['_order_']=$index--;
 					
-				qa_sort_by($outresult, $selectspec['sortdesc'], '_order_');
+				as_sort_by($outresult, $selectspec['sortdesc'], '_order_');
 			}
 			
 			$outresult=array_reverse($outresult, true);
@@ -632,7 +632,7 @@
 	}
 
 	
-	function qa_db_read_all_assoc($result, $key=null, $value=null)
+	function as_db_read_all_assoc($result, $key=null, $value=null)
 /*
 	Return the full results from the $result resource as an array. The key of each element in the returned array
 	is from column $key if specified, otherwise it's integer. The value of each element in the returned array
@@ -640,7 +640,7 @@
 */
 	{
 		if (!is_resource($result))
-			qa_fatal_error('Reading all assoc from invalid result');
+			as_fatal_error('Reading all assoc from invalid result');
 			
 		$assocs=array();
 		
@@ -655,14 +655,14 @@
 	}
 	
 
-	function qa_db_read_one_assoc($result, $allowempty=false)
+	function as_db_read_one_assoc($result, $allowempty=false)
 /*
 	Return the first row from the $result resource as an array of [column name] => [column value].
 	If there's no first row, throw a fatal error unless $allowempty is true.
 */
 	{
 		if (!is_resource($result))
-			qa_fatal_error('Reading one assoc from invalid result');
+			as_fatal_error('Reading one assoc from invalid result');
 
 		$assoc=mysql_fetch_assoc($result);
 		
@@ -670,20 +670,20 @@
 			if ($allowempty)
 				return null;
 			else
-				qa_fatal_error('Reading one assoc from empty results');
+				as_fatal_error('Reading one assoc from empty results');
 		}
 		
 		return $assoc;
 	}
 
 	
-	function qa_db_read_all_values($result)
+	function as_db_read_all_values($result)
 /*
 	Return a numbered array containing the first (and presumably only) column from the $result resource
 */
 	{
 		if (!is_resource($result))
-			qa_fatal_error('Reading column from invalid result');
+			as_fatal_error('Reading column from invalid result');
 			
 		$output=array();
 		
@@ -694,14 +694,14 @@
 	}
 
 	
-	function qa_db_read_one_value($result, $allowempty=false)
+	function as_db_read_one_value($result, $allowempty=false)
 /*
 	Return the first column of the first row (and presumably only cell) from the $result resource.
 	If there's no first row, throw a fatal error unless $allowempty is true.
 */
 	{
 		if (!is_resource($result))
-			qa_fatal_error('Reading one value from invalid result');
+			as_fatal_error('Reading one value from invalid result');
 
 		$row=mysql_fetch_row($result);
 		
@@ -709,33 +709,33 @@
 			if ($allowempty)
 				return null;
 			else
-				qa_fatal_error('Reading one value from empty results');
+				as_fatal_error('Reading one value from empty results');
 		}
 			
 		return $row[0];
 	}
 	
 	
-	function qa_suspend_update_counts($suspend=true)
+	function as_suspend_update_counts($suspend=true)
 /*
 	Suspend the updating of counts (of many different types) in the database, to save time when making a lot of changes
 	if $suspend is true, otherwise reinstate it. A counter is kept to allow multiple calls.
 */
 	{
-		global $qa_update_counts_suspended;
+		global $as_update_counts_suspended;
 		
-		$qa_update_counts_suspended+=($suspend ? 1 : -1);
+		$as_update_counts_suspended+=($suspend ? 1 : -1);
 	}
 
 	
-	function qa_should_update_counts()
+	function as_should_update_counts()
 /*
 	Returns whether counts should currently be updated (i.e. if count updating has not been suspended)
 */
 	{
-		global $qa_update_counts_suspended;
+		global $as_update_counts_suspended;
 		
-		return ($qa_update_counts_suspended<=0);
+		return ($as_update_counts_suspended<=0);
 	}
 
 

@@ -45,25 +45,25 @@
 	define('QA_PERMIT_SUPERS', 0);
 
 	
-	function qa_get_options($names)
+	function as_get_options($names)
 /*
 	Return an array [name] => [value] of settings for each option in $names.
 	If any options are missing from the database, set them to their defaults
 */
 	{
-		global $qa_options_cache, $qa_options_loaded;
+		global $as_options_cache, $as_options_loaded;
 		
 	//	If any options not cached, retrieve them from database via standard pending mechanism
 
-		if (!$qa_options_loaded)
-			qa_preload_options();
+		if (!$as_options_loaded)
+			as_preload_options();
 			
-		if (!$qa_options_loaded) {
+		if (!$as_options_loaded) {
 			require_once QA_INCLUDE_DIR.'qa-db-selects.php';
 			
-			qa_load_options_results(array(
-				qa_db_get_pending_result('options'),
-				qa_db_get_pending_result('time'),
+			as_load_options_results(array(
+				as_db_get_pending_result('options'),
+				as_db_get_pending_result('time'),
 			));
 		}
 		
@@ -71,7 +71,7 @@
 
 		$options=array();
 		foreach ($names as $name) {
-			if (!isset($qa_options_cache[$name])) {
+			if (!isset($as_options_cache[$name])) {
 				$todatabase=true;
 				
 				switch ($name) { // don't write default to database if option was deprecated, or depends on site language (which could be changed)
@@ -86,29 +86,29 @@
 						break;
 				}
 				
-				qa_set_option($name, qa_default_option($name), $todatabase);
+				as_set_option($name, as_default_option($name), $todatabase);
 			}
 			
-			$options[$name]=$qa_options_cache[$name];
+			$options[$name]=$as_options_cache[$name];
 		}
 		
 		return $options;
 	}
 
 	
-	function qa_opt_if_loaded($name)
+	function as_opt_if_loaded($name)
 /*
 	Return the value of option $name if it has already been loaded, otherwise return null
 	(used to prevent a database query if it's not essential for us to know the option value)
 */
 	{
-		global $qa_options_cache;
+		global $as_options_cache;
 		
-		return @$qa_options_cache[$name];
+		return @$as_options_cache[$name];
 	}
 	
 	
-	function qa_options_set_pending($names)
+	function as_options_set_pending($names)
 /*
 	This is deprecated since Q2A 1.3 now that all options are retrieved together.
 	Function kept for backwards compatibility with modified Q2A code bases.
@@ -116,15 +116,15 @@
 	{}
 
 	
-	function qa_preload_options()
+	function as_preload_options()
 /*
 	Load all of the Q2A options from the database, unless QA_OPTIMIZE_DISTANT_DB is set in qa-config.php,
 	in which case queue the options for later retrieval
 */
 	{
-		global $qa_options_loaded;
+		global $as_options_loaded;
 		
-		if (!@$qa_options_loaded) {
+		if (!@$as_options_loaded) {
 			$selectspecs=array(
 				'options' => array(
 					'columns' => array('title', 'content'),
@@ -144,66 +144,66 @@
 				require_once QA_INCLUDE_DIR.'qa-db-selects.php';
 				
 				foreach ($selectspecs as $pendingid => $selectspec)
-					qa_db_queue_pending_select($pendingid, $selectspec);
+					as_db_queue_pending_select($pendingid, $selectspec);
 				
 			} else
-				qa_load_options_results(qa_db_multi_select($selectspecs));
+				as_load_options_results(as_db_multi_select($selectspecs));
 		}
 	}
 	
 	
-	function qa_load_options_results($results)
+	function as_load_options_results($results)
 /*
-	Load the options from the $results of the database selectspecs defined in qa_preload_options()
+	Load the options from the $results of the database selectspecs defined in as_preload_options()
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_options_cache, $qa_options_loaded;
+		global $as_options_cache, $as_options_loaded;
 	
 		foreach ($results as $result)
 			foreach ($result as $name => $value)
-				$qa_options_cache[$name]=$value;
+				$as_options_cache[$name]=$value;
 			
-		$qa_options_loaded=true;
+		$as_options_loaded=true;
 	}
 
 	
-	function qa_set_option($name, $value, $todatabase=true)
+	function as_set_option($name, $value, $todatabase=true)
 /*
 	Set an option $name to $value (application level) in both cache and database, unless
 	$todatabase=false, in which case set it in the cache only
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_options_cache;
+		global $as_options_cache;
 		
 		if ($todatabase && isset($value))
-			qa_db_set_option($name, $value);
+			as_db_set_option($name, $value);
 
-		$qa_options_cache[$name]=$value;
+		$as_options_cache[$name]=$value;
 	}
 
 	
-	function qa_reset_options($names)
+	function as_reset_options($names)
 /*
 	Reset the options in $names to their defaults
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		foreach ($names as $name)
-			qa_set_option($name, qa_default_option($name));
+			as_set_option($name, as_default_option($name));
 	}
 
 	
-	function qa_default_option($name)
+	function as_default_option($name)
 /*
 	Return the default value for option $name
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		$fixed_defaults=array(
 			'allow_change_usernames' => 1,
@@ -288,7 +288,7 @@
 			'moderate_points_limit' => 150,
 			'moderate_update_time' => 1,
 			'nav_ask' => 1,
-			'nav_qa_not_home' => 1,
+			'nav_as_not_home' => 1,
 			'nav_questions' => 1,
 			'nav_tags' => 1,
 			'nav_unanswered' => 1,
@@ -369,11 +369,11 @@
 					break;
 					
 				case 'site_title':
-					$value=qa_default_site_title();
+					$value=as_default_site_title();
 					break;
 					
 				case 'site_theme_mobile':
-					$value=qa_opt('site_theme');
+					$value=as_opt('site_theme');
 					break;
 					
 				case 'from_email': // heuristic to remove short prefix (e.g. www. or qa.)
@@ -386,27 +386,27 @@
 					break;
 					
 				case 'email_privacy':
-					$value=qa_lang_html('options/default_privacy');
+					$value=as_lang_html('options/default_privacy');
 					break;
 				
 				case 'show_custom_sidebar':
-					$value=strlen(qa_opt('custom_sidebar')) ? true : false;
+					$value=strlen(as_opt('custom_sidebar')) ? true : false;
 					break;
 					
 				case 'show_custom_header':
-					$value=strlen(qa_opt('custom_header')) ? true : false;
+					$value=strlen(as_opt('custom_header')) ? true : false;
 					break;
 					
 				case 'show_custom_footer':
-					$value=strlen(qa_opt('custom_footer')) ? true : false;
+					$value=strlen(as_opt('custom_footer')) ? true : false;
 					break;
 					
 				case 'show_custom_in_head':
-					$value=strlen(qa_opt('custom_in_head')) ? true : false;
+					$value=strlen(as_opt('custom_in_head')) ? true : false;
 					break;
 					
 				case 'custom_sidebar':
-					$value=qa_lang_html_sub('options/default_sidebar', qa_html(qa_opt('site_title')));
+					$value=as_lang_html_sub('options/default_sidebar', as_html(as_opt('site_title')));
 					break;
 					
 				case 'editor_for_qs':
@@ -414,51 +414,51 @@
 					require_once QA_INCLUDE_DIR.'qa-app-format.php';
 					
 					$value='-'; // to match none by default, i.e. choose based on who is best at editing HTML
-					qa_load_editor('', 'html', $value);
+					as_load_editor('', 'html', $value);
 					break;
 				
 				case 'permit_post_q': // convert from deprecated option if available
-					$value=qa_opt('ask_needs_login') ? QA_PERMIT_USERS : QA_PERMIT_ALL;
+					$value=as_opt('ask_needs_login') ? QA_PERMIT_USERS : QA_PERMIT_ALL;
 					break;
 					
 				case 'permit_post_a': // convert from deprecated option if available
-					$value=qa_opt('answer_needs_login') ? QA_PERMIT_USERS : QA_PERMIT_ALL;
+					$value=as_opt('answer_needs_login') ? QA_PERMIT_USERS : QA_PERMIT_ALL;
 					break;
 				
 				case 'permit_post_c': // convert from deprecated option if available
-					$value=qa_opt('comment_needs_login') ? QA_PERMIT_USERS : QA_PERMIT_ALL;
+					$value=as_opt('comment_needs_login') ? QA_PERMIT_USERS : QA_PERMIT_ALL;
 					break;
 					
 				case 'permit_retag_cat': // convert from previous option that used to contain it too
-					$value=qa_opt('permit_edit_q');
+					$value=as_opt('permit_edit_q');
 					break;
 					
 				case 'points_vote_up_q':
 				case 'points_vote_down_q':
-					$oldvalue=qa_opt('points_vote_on_q');
+					$oldvalue=as_opt('points_vote_on_q');
 					$value=is_numeric($oldvalue) ? $oldvalue : 1;
 					break;
 					
 				case 'points_vote_up_a':
 				case 'points_vote_down_a':
-					$oldvalue=qa_opt('points_vote_on_a');
+					$oldvalue=as_opt('points_vote_on_a');
 					$value=is_numeric($oldvalue) ? $oldvalue : 1;
 					break;
 					
 				case 'points_per_q_voted_up':
 				case 'points_per_q_voted_down':
-					$oldvalue=qa_opt('points_per_q_voted');
+					$oldvalue=as_opt('points_per_q_voted');
 					$value=is_numeric($oldvalue) ? $oldvalue : 1;
 					break;
 					
 				case 'points_per_a_voted_up':
 				case 'points_per_a_voted_down':
-					$oldvalue=qa_opt('points_per_a_voted');
+					$oldvalue=as_opt('points_per_a_voted');
 					$value=is_numeric($oldvalue) ? $oldvalue : 2;
 					break;
 					
 				case 'captcha_module':
-					$captchamodules=qa_list_modules('captcha');
+					$captchamodules=as_list_modules('captcha');
 					if (count($captchamodules))
 						$value=reset($captchamodules);
 					else
@@ -466,31 +466,31 @@
 					break;
 				
 				case 'mailing_from_name':
-					$value=qa_opt('site_title');
+					$value=as_opt('site_title');
 					break;
 					
 				case 'mailing_from_email':
-					$value=qa_opt('from_email');
+					$value=as_opt('from_email');
 					break;
 				
 				case 'mailing_subject':
-					$value=qa_lang_sub('options/default_subject', qa_opt('site_title'));
+					$value=as_lang_sub('options/default_subject', as_opt('site_title'));
 					break;
 				
 				case 'mailing_body':
-					$value="\n\n\n--\n".qa_opt('site_title')."\n".qa_opt('site_url');
+					$value="\n\n\n--\n".as_opt('site_title')."\n".as_opt('site_url');
 					break;
 					
 				case 'form_security_salt':
 					require_once QA_INCLUDE_DIR.'qa-util-string.php';
-					$value=qa_random_alphanum(32);
+					$value=as_random_alphanum(32);
 					break;
 				
 				default: // call option_default method in any registered modules
-					$moduletypes=qa_list_module_types();
+					$moduletypes=as_list_module_types();
 					
 					foreach ($moduletypes as $moduletype) {
-						$modules=qa_load_modules_with($moduletype, 'option_default');
+						$modules=as_load_modules_with($moduletype, 'option_default');
 						
 						foreach ($modules as $module) {
 							$value=$module->option_default($name);
@@ -507,7 +507,7 @@
 	}
 
 	
-	function qa_default_site_title()
+	function as_default_site_title()
 /*
 	Return a heuristic guess at the name of the site from the HTTP HOST
 */
@@ -519,96 +519,96 @@
 			if (strlen($part)>strlen($longestpart))
 				$longestpart=$part;
 			
-		return ((strlen($longestpart)>3) ? (ucfirst($longestpart).' ') : '').qa_lang('options/default_suffix');
+		return ((strlen($longestpart)>3) ? (ucfirst($longestpart).' ') : '').as_lang('options/default_suffix');
 	}
 
 	
-	function qa_post_html_defaults($basetype, $full=false)
+	function as_post_html_defaults($basetype, $full=false)
 /*
-	Return an array of defaults for the $options parameter passed to qa_post_html_fields() and its ilk for posts of $basetype='Q'/'A'/'C'
+	Return an array of defaults for the $options parameter passed to as_post_html_fields() and its ilk for posts of $basetype='Q'/'A'/'C'
 	Set $full to true if these posts will be viewed in full, i.e. on a question page rather than a question listing
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		require_once QA_INCLUDE_DIR.'qa-app-users.php';
 		
 		return array(
-			'tagsview' => ($basetype=='Q') && qa_using_tags(),
-			'categoryview' => ($basetype=='Q') && qa_using_categories(),
+			'tagsview' => ($basetype=='Q') && as_using_tags(),
+			'categoryview' => ($basetype=='Q') && as_using_categories(),
 			'contentview' => $full,
-			'voteview' => qa_get_vote_view($basetype, $full),
-			'flagsview' => qa_opt('flagging_of_posts') && $full,
+			'voteview' => as_get_vote_view($basetype, $full),
+			'flagsview' => as_opt('flagging_of_posts') && $full,
 			'favoritedview' => true,
 			'answersview' => $basetype=='Q',
-			'viewsview' => ($basetype=='Q') && qa_opt('do_count_q_views') && ($full ? qa_opt('show_view_count_q_page') : qa_opt('show_view_counts')),
+			'viewsview' => ($basetype=='Q') && as_opt('do_count_q_views') && ($full ? as_opt('show_view_count_q_page') : as_opt('show_view_counts')),
 			'whatview' => true,
-			'whatlink' => qa_opt('show_a_c_links'),
-			'whenview' => qa_opt('show_when_created'),
-			'ipview' => !qa_user_permit_error('permit_anon_view_ips'),
+			'whatlink' => as_opt('show_a_c_links'),
+			'whenview' => as_opt('show_when_created'),
+			'ipview' => !as_user_permit_error('permit_anon_view_ips'),
 			'whoview' => true,
-			'avatarsize' => qa_opt('avatar_q_list_size'),
-			'pointsview' => qa_opt('show_user_points'),
-			'pointstitle' => qa_opt('show_user_titles') ? qa_get_points_to_titles() : array(),
+			'avatarsize' => as_opt('avatar_q_list_size'),
+			'pointsview' => as_opt('show_user_points'),
+			'pointstitle' => as_opt('show_user_titles') ? as_get_points_to_titles() : array(),
 			'updateview' => true,
-			'blockwordspreg' => qa_get_block_words_preg(),
-			'showurllinks' => qa_opt('show_url_links'),
-			'linksnewwindow' => qa_opt('links_in_new_window'),
+			'blockwordspreg' => as_get_block_words_preg(),
+			'showurllinks' => as_opt('show_url_links'),
+			'linksnewwindow' => as_opt('links_in_new_window'),
 			'microformats' => $full,
-			'fulldatedays' => qa_opt('show_full_date_days'),
+			'fulldatedays' => as_opt('show_full_date_days'),
 		);
 	}
 	
 	
-	function qa_post_html_options($post, $defaults=null, $full=false)
+	function as_post_html_options($post, $defaults=null, $full=false)
 /*
-	Return an array of options for post $post to pass in the $options parameter to qa_post_html_fields() and its ilk. Preferably,
-	call qa_post_html_defaults() previously and pass its output in $defaults, to save excessive recalculation for each item in a
+	Return an array of options for post $post to pass in the $options parameter to as_post_html_fields() and its ilk. Preferably,
+	call as_post_html_defaults() previously and pass its output in $defaults, to save excessive recalculation for each item in a
 	list. Set $full to true if these posts will be viewed in full, i.e. on a question page rather than a question listing.	
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		if (!isset($defaults))
-			$defaults=qa_post_html_defaults($post['basetype'], $full);
+			$defaults=as_post_html_defaults($post['basetype'], $full);
 			
-		$defaults['voteview']=qa_get_vote_view($post, $full);
-		$defaults['ipview']=!qa_user_post_permit_error('permit_anon_view_ips', $post);
+		$defaults['voteview']=as_get_vote_view($post, $full);
+		$defaults['ipview']=!as_user_post_permit_error('permit_anon_view_ips', $post);
 		
 		return $defaults;
 	}
 	
 	
-	function qa_message_html_defaults()
+	function as_message_html_defaults()
 /*
-	Return an array of defaults for the $options parameter passed to qa_message_html_fields()
+	Return an array of defaults for the $options parameter passed to as_message_html_fields()
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		return array(
-			'whenview' => qa_opt('show_when_created'),
+			'whenview' => as_opt('show_when_created'),
 			'whoview' => true,
-			'avatarsize' => qa_opt('avatar_message_list_size'),
-			'blockwordspreg' => qa_get_block_words_preg(),
-			'showurllinks' => qa_opt('show_url_links'),
-			'linksnewwindow' => qa_opt('links_in_new_window'),
-			'fulldatedays' => qa_opt('show_full_date_days'),
+			'avatarsize' => as_opt('avatar_message_list_size'),
+			'blockwordspreg' => as_get_block_words_preg(),
+			'showurllinks' => as_opt('show_url_links'),
+			'linksnewwindow' => as_opt('links_in_new_window'),
+			'fulldatedays' => as_opt('show_full_date_days'),
 		);
 	}
 	
 
-	function qa_get_vote_view($postorbasetype, $full=false, $enabledif=true)
+	function as_get_vote_view($postorbasetype, $full=false, $enabledif=true)
 /*
-	Return $voteview parameter to pass to qa_post_html_fields() in qa-app-format.php for the post in $postorbasetype
+	Return $voteview parameter to pass to as_post_html_fields() in qa-app-format.php for the post in $postorbasetype
 	with buttons enabled if appropriate (based on whether $full post shown) unless $enabledif is false.
 	For compatibility $postorbasetype can also just be a basetype, i.e. 'Q', 'A' or 'C'
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		// The 'level' and 'approve' permission errors are taken care of by disabling the voting buttons.
-		// Others are reported to the user after they click, in qa_vote_error_html(...)
+		// Others are reported to the user after they click, in as_vote_error_html(...)
 		
 		if (is_array($postorbasetype)) { // deal with dual-use parameter
 			$basetype=$postorbasetype['basetype'];
@@ -622,16 +622,16 @@
 		$disabledsuffix='';
 		
 		if (($basetype=='Q') || ($basetype=='A')) {
-			$view=($basetype=='A') ? qa_opt('voting_on_as') : qa_opt('voting_on_qs');
+			$view=($basetype=='A') ? as_opt('voting_on_as') : as_opt('voting_on_qs');
 			
-			if (!($enabledif && (($basetype=='A') || $full || !qa_opt('voting_on_q_page_only'))))
+			if (!($enabledif && (($basetype=='A') || $full || !as_opt('voting_on_q_page_only'))))
 				$disabledsuffix='-disabled-page';
 			
 			else {
 				if ($basetype=='A')
-					$permiterror=isset($post) ? qa_user_post_permit_error('permit_vote_a', $post) : qa_user_permit_error('permit_vote_a');
+					$permiterror=isset($post) ? as_user_post_permit_error('permit_vote_a', $post) : as_user_permit_error('permit_vote_a');
 				else
-					$permiterror=isset($post) ? qa_user_post_permit_error('permit_vote_q', $post) : qa_user_permit_error('permit_vote_q');
+					$permiterror=isset($post) ? as_user_post_permit_error('permit_vote_q', $post) : as_user_permit_error('permit_vote_q');
 				
 				if ($permiterror=='level')
 					$disabledsuffix='-disabled-level';
@@ -639,7 +639,7 @@
 					$disabledsuffix='-disabled-approve';
 
 				else {
-					$permiterrordown=isset($post) ? qa_user_post_permit_error('permit_vote_down', $post) : qa_user_permit_error('permit_vote_down');
+					$permiterrordown=isset($post) ? as_user_post_permit_error('permit_vote_down', $post) : as_user_permit_error('permit_vote_down');
 				
 					if ($permiterrordown=='level')
 						$disabledsuffix='-uponly-level';
@@ -651,74 +651,74 @@
 		} else
 			$view=false;
 		
-		return $view ? ( (qa_opt('votes_separated') ? 'updown' : 'net').$disabledsuffix ) : false;
+		return $view ? ( (as_opt('votes_separated') ? 'updown' : 'net').$disabledsuffix ) : false;
 	}
 	
 	
-	function qa_has_custom_home()
+	function as_has_custom_home()
 /*
 	Returns true if the home page has been customized, either due to admin setting, or $QA_CONST_PATH_MAP
 */
 	{
-		return qa_opt('show_custom_home') || (array_search('', qa_get_request_map())!==false);
+		return as_opt('show_custom_home') || (array_search('', as_get_request_map())!==false);
 	}
 	
 	
-	function qa_using_tags()
+	function as_using_tags()
 /*
 	Return whether the option is set to classify questions by tags
 */
 	{
-		return strpos(qa_opt('tags_or_categories'), 't')!==false;
+		return strpos(as_opt('tags_or_categories'), 't')!==false;
 	}
 	
 	
-	function qa_using_categories()
+	function as_using_categories()
 /*
 	Return whether the option is set to classify questions by categories
 */
 	{
-		return strpos(qa_opt('tags_or_categories'), 'c')!==false;
+		return strpos(as_opt('tags_or_categories'), 'c')!==false;
 	}
 	
 	
-	function qa_get_block_words_preg()
+	function as_get_block_words_preg()
 /*
 	Return the regular expression fragment to match the blocked words options set in the database
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_blockwordspreg, $qa_blockwordspreg_set;
+		global $as_blockwordspreg, $as_blockwordspreg_set;
 		
-		if (!@$qa_blockwordspreg_set) {
-			$blockwordstring=qa_opt('block_bad_words');
+		if (!@$as_blockwordspreg_set) {
+			$blockwordstring=as_opt('block_bad_words');
 			
 			if (strlen($blockwordstring)) {
 				require_once QA_INCLUDE_DIR.'qa-util-string.php';
-				$qa_blockwordspreg=qa_block_words_to_preg($blockwordstring);
+				$as_blockwordspreg=as_block_words_to_preg($blockwordstring);
 
 			} else
-				$qa_blockwordspreg=null;
+				$as_blockwordspreg=null;
 			
-			$qa_blockwordspreg_set=true;
+			$as_blockwordspreg_set=true;
 		}
 		
-		return $qa_blockwordspreg;
+		return $as_blockwordspreg;
 	}
 	
 	
-	function qa_get_points_to_titles()
+	function as_get_points_to_titles()
 /*
-	Return an array of [points] => [user title] from the 'points_to_titles' option, to pass to qa_get_points_title_html()
+	Return an array of [points] => [user title] from the 'points_to_titles' option, to pass to as_get_points_title_html()
 */
 	{
-		global $qa_points_title_cache;
+		global $as_points_title_cache;
 		
-		if (!is_array($qa_points_title_cache)) {
-			$qa_points_title_cache=array();
+		if (!is_array($as_points_title_cache)) {
+			$as_points_title_cache=array();
 	
-			$pairs=explode(',', qa_opt('points_to_titles'));
+			$pairs=explode(',', as_opt('points_to_titles'));
 			foreach ($pairs as $pair) {
 				$spacepos=strpos($pair, ' ');
 				if (is_numeric($spacepos)) {
@@ -726,64 +726,64 @@
 					$title=trim(substr($pair, $spacepos));
 	
 					if (is_numeric($points) && strlen($title))
-						$qa_points_title_cache[(int)$points]=$title;
+						$as_points_title_cache[(int)$points]=$title;
 				}
 			}
 			
-			krsort($qa_points_title_cache, SORT_NUMERIC);
+			krsort($as_points_title_cache, SORT_NUMERIC);
 		}
 		
-		return $qa_points_title_cache;
+		return $as_points_title_cache;
 	}
 	
 	
-	function qa_get_permit_options()
+	function as_get_permit_options()
 /*
 	Return an array of relevant permissions settings, based on other options
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		$permits=array('permit_view_q_page', 'permit_post_q', 'permit_post_a');
 		
-		if (qa_opt('comment_on_qs') || qa_opt('comment_on_as'))
+		if (as_opt('comment_on_qs') || as_opt('comment_on_as'))
 			$permits[]='permit_post_c';
 		
-		if (qa_opt('voting_on_qs'))
+		if (as_opt('voting_on_qs'))
 			$permits[]='permit_vote_q';
 			
-		if (qa_opt('voting_on_as'))
+		if (as_opt('voting_on_as'))
 			$permits[]='permit_vote_a';
 			
-		if (qa_opt('voting_on_qs') || qa_opt('voting_on_as'))
+		if (as_opt('voting_on_qs') || as_opt('voting_on_as'))
 			$permits[]='permit_vote_down';
 			
-		if (qa_using_tags() || qa_using_categories())
+		if (as_using_tags() || as_using_categories())
 			$permits[]='permit_retag_cat';
 		
 		array_push($permits, 'permit_edit_q', 'permit_edit_a');
 		
-		if (qa_opt('comment_on_qs') || qa_opt('comment_on_as'))
+		if (as_opt('comment_on_qs') || as_opt('comment_on_as'))
 			$permits[]='permit_edit_c';
 			
 		$permits[]='permit_edit_silent';
 		
-		if (qa_opt('allow_close_questions'))
+		if (as_opt('allow_close_questions'))
 			$permits[]='permit_close_q';
 		
 		array_push($permits, 'permit_select_a', 'permit_anon_view_ips');
 		
-		if (qa_opt('voting_on_qs') || qa_opt('voting_on_as') || qa_opt('flagging_of_posts'))
+		if (as_opt('voting_on_qs') || as_opt('voting_on_as') || as_opt('flagging_of_posts'))
 			$permits[]='permit_view_voters_flaggers';
 		
-		if (qa_opt('flagging_of_posts'))
+		if (as_opt('flagging_of_posts'))
 			$permits[]='permit_flag';
 		
 		$permits[]='permit_moderate';
 
 		array_push($permits, 'permit_hide_show', 'permit_delete_hidden');
 		
-		if (qa_opt('allow_user_walls'))
+		if (as_opt('allow_user_walls'))
 			$permits[]='permit_post_wall';
 		
 		return $permits;

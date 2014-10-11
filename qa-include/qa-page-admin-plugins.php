@@ -34,25 +34,25 @@
 	
 //	Check admin privileges
 
-	if (!qa_admin_check_privileges($qa_content))
-		return $qa_content;
+	if (!as_admin_check_privileges($as_content))
+		return $as_content;
 		
 		
 //	Map modules with options to their containing plugins
 	
 	$pluginoptionmodules=array();
 	
-	$tables=qa_db_list_tables_lc();
-	$moduletypes=qa_list_module_types();
+	$tables=as_db_list_tables_lc();
+	$moduletypes=as_list_module_types();
 	
 	foreach ($moduletypes as $type) {
-		$modules=qa_list_modules($type);
+		$modules=as_list_modules($type);
 		
 		foreach ($modules as $name) {
-			$module=qa_load_module($type, $name);
+			$module=as_load_module($type, $name);
 			
 			if (method_exists($module, 'admin_form')) {
-				$info=qa_get_module_info($type, $name);
+				$info=as_get_module_info($type, $name);
 				$pluginoptionmodules[$info['directory']][]=array(
 					'type' => $type,
 					'name' => $name,
@@ -64,39 +64,39 @@
 
 //	Prepare content for theme
 	
-	$qa_content=qa_content_prepare();
+	$as_content=as_content_prepare();
 
-	$qa_content['title']=qa_lang_html('admin/admin_title').' - '.qa_lang_html('admin/plugins_title');
+	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/plugins_title');
 	
-	$qa_content['error']=qa_admin_page_error();
+	$as_content['error']=as_admin_page_error();
 	
-	$qa_content['script_rel'][]='qa-content/qa-admin.js?'.QA_VERSION;
+	$as_content['script_rel'][]='qa-content/qa-admin.js?'.QA_VERSION;
 
 	$pluginfiles=glob(QA_PLUGIN_DIR.'*/qa-plugin.php');
 	
 	foreach ($moduletypes as $type) {
-		$modules=qa_load_modules_with($type, 'init_queries');
+		$modules=as_load_modules_with($type, 'init_queries');
 
 		foreach ($modules as $name => $module) {
 			$queries=$module->init_queries($tables);
 		
 			if (!empty($queries)) {
-				if (qa_is_http_post())
-					qa_redirect('install');
+				if (as_is_http_post())
+					as_redirect('install');
 				
 				else
-					$qa_content['error']=strtr(qa_lang_html('admin/module_x_database_init'), array(
-						'^1' => qa_html($name),
-						'^2' => qa_html($type),
-						'^3' => '<a href="'.qa_path_html('install').'">',
+					$as_content['error']=strtr(as_lang_html('admin/module_x_database_init'), array(
+						'^1' => as_html($name),
+						'^2' => as_html($type),
+						'^3' => '<a href="'.as_path_html('install').'">',
 						'^4' => '</a>',
 					));
 			}
 		}
 	}
 	
-	if ( qa_is_http_post() && !qa_check_form_security_code('admin/plugins', qa_post_text('qa_form_security_code')) ) {
-		$qa_content['error']=qa_lang_html('misc/form_security_reload');
+	if ( as_is_http_post() && !as_check_form_security_code('admin/plugins', as_post_text('as_form_security_code')) ) {
+		$as_content['error']=as_lang_html('misc/form_security_reload');
 		$showpluginforms=false;
 	} else
 		$showpluginforms=true;
@@ -104,12 +104,12 @@
 	if (count($pluginfiles)) {
 		foreach ($pluginfiles as $pluginindex => $pluginfile) {
 			$plugindirectory=dirname($pluginfile).'/';
-			$hash=qa_admin_plugin_directory_hash($plugindirectory);
-			$showthisform=$showpluginforms && (qa_get('show')==$hash);
+			$hash=as_admin_plugin_directory_hash($plugindirectory);
+			$showthisform=$showpluginforms && (as_get('show')==$hash);
 			
 			$contents=file_get_contents($pluginfile);
 			
-			$metadata=qa_admin_addon_metadata($contents, array(
+			$metadata=as_admin_addon_metadata($contents, array(
 				'name' => 'Plugin Name',
 				'uri' => 'Plugin URI',
 				'description' => 'Plugin Description',
@@ -124,25 +124,25 @@
 			));
 			
 			if (strlen(@$metadata['name']))
-				$namehtml=qa_html($metadata['name']);
+				$namehtml=as_html($metadata['name']);
 			else
-				$namehtml=qa_lang_html('admin/unnamed_plugin');
+				$namehtml=as_lang_html('admin/unnamed_plugin');
 				
 			if (strlen(@$metadata['uri']))
-				$namehtml='<a href="'.qa_html($metadata['uri']).'">'.$namehtml.'</a>';
+				$namehtml='<a href="'.as_html($metadata['uri']).'">'.$namehtml.'</a>';
 			
 			$namehtml='<b>'.$namehtml.'</b>';
 				
 			if (strlen(@$metadata['version']))
-				$namehtml.=' v'.qa_html($metadata['version']);
+				$namehtml.=' v'.as_html($metadata['version']);
 				
 			if (strlen(@$metadata['author'])) {
-				$authorhtml=qa_html($metadata['author']);
+				$authorhtml=as_html($metadata['author']);
 				
 				if (strlen(@$metadata['author_uri']))
-					$authorhtml='<a href="'.qa_html($metadata['author_uri']).'">'.$authorhtml.'</a>';
+					$authorhtml='<a href="'.as_html($metadata['author_uri']).'">'.$authorhtml.'</a>';
 					
-				$authorhtml=qa_lang_html_sub('main/by_x', $authorhtml);
+				$authorhtml=as_lang_html_sub('main/by_x', $authorhtml);
 				
 			} else
 				$authorhtml='';
@@ -152,35 +152,35 @@
 				
 				$updatehtml='(<span id="'.$elementid.'">...</span>)';
 				
-				$qa_content['script_onloads'][]=array(
-					"qa_version_check(".qa_js($metadata['update']).", 'Plugin Version', ".qa_js($metadata['version'], true).", 'Plugin URI', ".qa_js($elementid).");"
+				$as_content['script_onloads'][]=array(
+					"as_version_check(".as_js($metadata['update']).", 'Plugin Version', ".as_js($metadata['version'], true).", 'Plugin URI', ".as_js($elementid).");"
 				);
 
 			} else
 				$updatehtml='';
 			
 			if (strlen(@$metadata['description']))
-				$deschtml=qa_html($metadata['description']);
+				$deschtml=as_html($metadata['description']);
 			else
 				$deschtml='';
 			
 			if (isset($pluginoptionmodules[$plugindirectory]) && !$showthisform)
 				$deschtml.=(strlen($deschtml) ? ' - ' : '').'<a href="'.
-					qa_admin_plugin_options_path($plugindirectory).'">'.qa_lang_html('admin/options').'</a>';
+					as_admin_plugin_options_path($plugindirectory).'">'.as_lang_html('admin/options').'</a>';
 				
 			$pluginhtml=$namehtml.' '.$authorhtml.' '.$updatehtml.'<br>'.$deschtml.(strlen($deschtml) ? '<br>' : '').
-				'<small style="color:#666">'.qa_html($plugindirectory).'</small>';
+				'<small style="color:#666">'.as_html($plugindirectory).'</small>';
 				
-			if (qa_qa_version_below(@$metadata['min_q2a']))
+			if (as_as_version_below(@$metadata['min_q2a']))
 				$pluginhtml='<strike style="color:#999">'.$pluginhtml.'</strike><br><span style="color:#f00">'.
-					qa_lang_html_sub('admin/requires_q2a_version', qa_html($metadata['min_q2a'])).'</span>';
+					as_lang_html_sub('admin/requires_q2a_version', as_html($metadata['min_q2a'])).'</span>';
 					
-			elseif (qa_php_version_below(@$metadata['min_php']))
+			elseif (as_php_version_below(@$metadata['min_php']))
 				$pluginhtml='<strike style="color:#999">'.$pluginhtml.'</strike><br><span style="color:#f00">'.
-					qa_lang_html_sub('admin/requires_php_version', qa_html($metadata['min_php'])).'</span>';
+					as_lang_html_sub('admin/requires_php_version', as_html($metadata['min_php'])).'</span>';
 				
-			$qa_content['form_plugin_'.$pluginindex]=array(
-				'tags' => 'id="'.qa_html($hash).'"',
+			$as_content['form_plugin_'.$pluginindex]=array(
+				'tags' => 'id="'.as_html($hash).'"',
 				'style' => 'tall',
 				'fields' => array(
 					array(
@@ -195,30 +195,30 @@
 					$type=$pluginoptionmodule['type'];
 					$name=$pluginoptionmodule['name'];
 				
-					$module=qa_load_module($type, $name);
+					$module=as_load_module($type, $name);
 				
-					$form=$module->admin_form($qa_content);
+					$form=$module->admin_form($as_content);
 
 					if (!isset($form['tags']))
-						$form['tags']='method="post" action="'.qa_admin_plugin_options_path($plugindirectory).'"';
+						$form['tags']='method="post" action="'.as_admin_plugin_options_path($plugindirectory).'"';
 					
 					if (!isset($form['style']))
 						$form['style']='tall';
 						
 					$form['boxed']=true;
 			
-					$form['hidden']['qa_form_security_code']=qa_get_form_security_code('admin/plugins');
+					$form['hidden']['as_form_security_code']=as_get_form_security_code('admin/plugins');
 			
-					$qa_content['form_plugin_options']=$form;
+					$as_content['form_plugin_options']=$form;
 				}
 
 		}
 	}
 	
-	$qa_content['navigation']['sub']=qa_admin_sub_navigation();
+	$as_content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $qa_content;
+	return $as_content;
 	
 
 /*

@@ -30,7 +30,7 @@
 	}
 
 
-	class qa_editor_basic {
+	class as_editor_basic {
 		
 		function load_module($localdir, $htmldir)
 		{
@@ -48,12 +48,12 @@
 		}
 
 
-		function get_field(&$qa_content, $content, $format, $fieldname, $rows /* $autofocus parameter deprecated */)
+		function get_field(&$as_content, $content, $format, $fieldname, $rows /* $autofocus parameter deprecated */)
 		{
 			return array(
 				'type' => 'textarea',
 				'tags' => 'name="'.$fieldname.'" id="'.$fieldname.'"',
-				'value' => qa_html($content),
+				'value' => as_html($content),
 				'rows' => $rows,
 			);
 		}
@@ -68,7 +68,7 @@
 		{
 			return array(
 				'format' => '',
-				'content' => qa_post_text($fieldname),
+				'content' => as_post_text($fieldname),
 			);
 		}
 	

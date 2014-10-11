@@ -30,7 +30,7 @@
 	}
 
 
-	function qa_has_gd_image()
+	function as_has_gd_image()
 /*
 	Return true if PHP has the GD extension installed and it appears to be usable
 */
@@ -39,7 +39,7 @@
 	}
 
 
-	function qa_image_file_too_big($imagefile, $size=null)
+	function as_image_file_too_big($imagefile, $size=null)
 /*
 	Check if the image in $imagefile will be too big for PHP/GD to process given memory usage and limits
 	Pass the width and height limit beyond which the image will require scaling in $size (if any)
@@ -73,7 +73,7 @@
 					
 					$needbytes+=$width*$height*$bits*$channels/8*2; // memory to load original image
 					
-					if (isset($size) && qa_image_constrain($width, $height, $size)) // memory for constrained image
+					if (isset($size) && as_image_constrain($width, $height, $size)) // memory for constrained image
 						$needbytes+=$width*$height*3*2; // *2 here and above based on empirical tests
 				}
 				
@@ -86,7 +86,7 @@
 	}
 	
 	
-	function qa_image_constrain_data($imagedata, &$width, &$height, $maxwidth, $maxheight=null)
+	function as_image_constrain_data($imagedata, &$width, &$height, $maxwidth, $maxheight=null)
 /*
 	Given $imagedata containing JPEG/GIF/PNG data, constrain it proportionally to fit in $maxwidth x $maxheight.
 	Return the new image data (will always be a JPEG), and set the $width and $height variables.
@@ -99,13 +99,13 @@
 			$width=imagesx($inimage);
 			$height=imagesy($inimage);
 			
-			// always call qa_gd_image_resize(), even if the size is the same, to take care of possible PNG transparency
-			qa_image_constrain($width, $height, $maxwidth, $maxheight);
-			qa_gd_image_resize($inimage, $width, $height);
+			// always call as_gd_image_resize(), even if the size is the same, to take care of possible PNG transparency
+			as_image_constrain($width, $height, $maxwidth, $maxheight);
+			as_gd_image_resize($inimage, $width, $height);
 		}
 		
 		if (is_resource($inimage)) {
-			$imagedata=qa_gd_image_jpeg($inimage);
+			$imagedata=as_gd_image_jpeg($inimage);
 			imagedestroy($inimage);
 			return $imagedata;
 		}
@@ -114,7 +114,7 @@
 	}
 	
 	
-	function qa_image_constrain(&$width, &$height, $maxwidth, $maxheight=null)
+	function as_image_constrain(&$width, &$height, $maxwidth, $maxheight=null)
 /*
 	Given and $width and $height, return true if those need to be contrained to fit in $maxwidth x $maxheight.
 	If so, also set $width and $height to the new proportionally constrained values.
@@ -136,7 +136,7 @@
 	}
 	
 	
-	function qa_gd_image_resize(&$image, $width, $height)
+	function as_gd_image_resize(&$image, $width, $height)
 /*
 	Resize the GD $image to $width and $height, setting it to null if the resize failed
 */
@@ -159,7 +159,7 @@
 	}
 	
 	
-	function qa_gd_image_jpeg($image, $output=false)
+	function as_gd_image_jpeg($image, $output=false)
 /*
 	Return the JPEG data for GD $image, also echoing it to browser if $output is true
 */
@@ -170,7 +170,7 @@
 	}
 	
 	
-	function qa_gd_image_formats()
+	function as_gd_image_formats()
 /*
 	Return an array of strings listing the image formats that are supported
 */

@@ -32,16 +32,16 @@
 
 //	Functions	
 
-	function qa_string_initialize()
+	function as_string_initialize()
 /*
 	Set up some global tables to be used by other functions in this file
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_utf8punctuation, $qa_utf8removeaccents;
+		global $as_utf8punctuation, $as_utf8removeaccents;
 		
-		$qa_utf8punctuation=array( // converts UTF-8 punctuation characters to spaces (or in some cases, hyphens)
+		$as_utf8punctuation=array( // converts UTF-8 punctuation characters to spaces (or in some cases, hyphens)
 			"\xC2\xA1" => ' ', // INVERTED EXCLAMATION MARK
 			"\xC2\xA6" => ' ', // BROKEN BAR
 			"\xC2\xAB" => ' ', // LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
@@ -101,7 +101,7 @@
 			"\xE3\x80\x82" => ' ', // IDEOGRAPHIC FULL STOP
 		);
 		
-		$qa_utf8removeaccents=array( // convert UTF-8 accented characters to basic Roman characters
+		$as_utf8removeaccents=array( // convert UTF-8 accented characters to basic Roman characters
 			"\xC3\x80" => 'A', // LATIN CAPITAL LETTER A WITH GRAVE
 			"\xC3\x81" => 'A', // LATIN CAPITAL LETTER A WITH ACUTE
 			"\xC3\x82" => 'A', // LATIN CAPITAL LETTER A WITH CIRCUMFLEX
@@ -419,21 +419,21 @@
 	}
 	
 	
-	function qa_string_to_words($string, $tolowercase=true, $delimiters=false, $splitideographs=true, $splithyphens=true)
+	function as_string_to_words($string, $tolowercase=true, $delimiters=false, $splitideographs=true, $splithyphens=true)
 /*
 	Return the UTF-8 input string converted into an array of words, changed $tolowercase (or not).
 	Set $delimiters to true to keep the delimiters after each word and tweak what we used for word
 	splitting with $splitideographs and $splithyphens.
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_utf8punctuation;
+		global $as_utf8punctuation;
 		
 		if ($tolowercase)
-			$string=qa_strtolower($string);
+			$string=as_strtolower($string);
 		
-		$string=strtr($string, $qa_utf8punctuation);
+		$string=strtr($string, $as_utf8punctuation);
 		
 		$separator=QA_PREG_INDEX_WORD_SEPARATOR;
 		if ($splithyphens)
@@ -454,55 +454,55 @@
 	}
 	
 	
-	function qa_string_remove_accents($string)
+	function as_string_remove_accents($string)
 /*
 	Return UTF-8 input $string with all accents (on Roman characters) removed
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_utf8removeaccents;
+		global $as_utf8removeaccents;
 		
-		return strtr($string, $qa_utf8removeaccents);
+		return strtr($string, $as_utf8removeaccents);
 	}
 
 	
-	function qa_tags_to_tagstring($tags)
+	function as_tags_to_tagstring($tags)
 /*
 	Convert an array of tags into a string for storage in the database
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		return implode(',', $tags);
 	}
 
 	
-	function qa_tagstring_to_tags($tagstring)
+	function as_tagstring_to_tags($tagstring)
 /*
 	Convert a tag string as stored in the database into an array of tags
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		return empty($tagstring) ? array() : explode(',', $tagstring);
 	}
 	
 
-	function qa_shorten_string_line($string, $length)
+	function as_shorten_string_line($string, $length)
 /*
 	Return no more than $length characters from $string after converting it to a single line, by
 	removing words from the middle (and especially towards the end)
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		$string=strtr($string, "\r\n\t", '   ');
 		
-		if (qa_strlen($string)>$length) {
+		if (as_strlen($string)>$length) {
 			$remaining=$length-5;
 			
-			$words=qa_string_to_words($string, false, true);
+			$words=as_string_to_words($string, false, true);
 			$countwords=count($words);
 			
 			$prefix='';
@@ -516,7 +516,7 @@
 				else
 					$word=array_shift($words);
 				
-				if (qa_strlen($word)>$remaining)
+				if (as_strlen($word)>$remaining)
 					break;
 				
 				if ($tosuffix)
@@ -524,7 +524,7 @@
 				else
 					$prefix.=$word;
 				
-				$remaining-=qa_strlen($word);
+				$remaining-=as_strlen($word);
 			}
 			
 			$string=$prefix.' ... '.$suffix;
@@ -534,29 +534,29 @@
 	}
 
 	
-	function qa_block_words_explode($wordstring)
+	function as_block_words_explode($wordstring)
 /*
 	Return an array of the words within $wordstring, each of which can contain asterisks
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		return preg_split('/'.QA_PREG_BLOCK_WORD_SEPARATOR.'+/', $wordstring, -1, PREG_SPLIT_NO_EMPTY);
 	}
 	
 	
-	function qa_block_words_to_preg($wordsstring)
+	function as_block_words_to_preg($wordsstring)
 /*
 	Return a regular expression fragment corresponding to the block words $wordstring
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		$blockwords=qa_block_words_explode($wordsstring);
+		$blockwords=as_block_words_explode($wordsstring);
 		$patterns=array();
 		
 		foreach ($blockwords as $blockword) { // * in rule maps to [^ ]* in regular expression
-			$pattern=str_replace('\\*', '[^ ]*', preg_quote(qa_strtolower($blockword), '/'));
+			$pattern=str_replace('\\*', '[^ ]*', preg_quote(as_strtolower($blockword), '/'));
 			
 			if (!preg_match('/^('.QA_PREG_CJK_IDEOGRAPHS_UTF8.')/', $blockword))
 				$pattern='(?<= )'.$pattern; // assert leading word delimiter if pattern does not start with CJK
@@ -571,26 +571,26 @@
 	}
 
 	
-	function qa_block_words_match_all($string, $wordspreg)
+	function as_block_words_match_all($string, $wordspreg)
 /*
 	Return an array of matches of the regular expression fragment $wordspreg in $string, [offset] => [length]
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		global $qa_utf8punctuation, $qa_utf8punctuation_keeplength;
+		global $as_utf8punctuation, $as_utf8punctuation_keeplength;
 		
 		if (strlen($wordspreg)) {
 			// replace all word separators with spaces of same length
 			
-			if (!is_array($qa_utf8punctuation_keeplength)) {
-				$qa_utf8punctuation_keeplength=array();
-				foreach ($qa_utf8punctuation as $key => $value)
-					$qa_utf8punctuation_keeplength[$key]=str_repeat(' ', strlen($key));
+			if (!is_array($as_utf8punctuation_keeplength)) {
+				$as_utf8punctuation_keeplength=array();
+				foreach ($as_utf8punctuation as $key => $value)
+					$as_utf8punctuation_keeplength[$key]=str_repeat(' ', strlen($key));
 			}
 			
-			$string=strtr(qa_strtolower($string), $qa_utf8punctuation_keeplength);
-				// assumes UTF-8 case conversion in qa_strtolower does not change byte length
+			$string=strtr(as_strtolower($string), $as_utf8punctuation_keeplength);
+				// assumes UTF-8 case conversion in as_strtolower does not change byte length
 			$string=preg_replace('/'.QA_PREG_BLOCK_WORD_SEPARATOR.'/', ' ', $string);
 			
 			preg_match_all('/'.$wordspreg.'/', ' '.$string.' ', $pregmatches, PREG_OFFSET_CAPTURE);
@@ -606,26 +606,26 @@
 	}
 	
 	
-	function qa_block_words_replace($string, $wordspreg, $character='*')
+	function as_block_words_replace($string, $wordspreg, $character='*')
 /*
 	Return $string with any words matching the regular expression fragment $wordspreg replaced with repeated $character
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		if (strlen($wordspreg)) {
-			$matches=qa_block_words_match_all($string, $wordspreg);
+			$matches=as_block_words_match_all($string, $wordspreg);
 			krsort($matches, SORT_NUMERIC);
 			
 			foreach ($matches as $start => $length) // get length again below to deal with multi-byte characters
-				$string=substr_replace($string, str_repeat($character, qa_strlen(substr($string, $start, $length))), $start, $length);
+				$string=substr_replace($string, str_repeat($character, as_strlen(substr($string, $start, $length))), $start, $length);
 		}
 			
 		return $string;
 	}
 	
 	
-	function qa_random_alphanum($length)
+	function as_random_alphanum($length)
 /*
 	Return a random alphanumeric string (base 36) of $length
 */
@@ -639,51 +639,51 @@
 	}
 
 	
-	function qa_email_validate($email)
+	function as_email_validate($email)
 /*
 	Return true or false to indicate whether $email is a valid email (this is pretty flexible compared to most real emails out there)
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		return preg_match("/^[\-\!\#\$\%\&\'\*\+\/\=\?\_\`\{\|\}\~a-zA-Z0-9\.\^]+\@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\.\-]+$/", $email) ? true : false;
 	}
 	
 	
-	function qa_strlen($string)
+	function as_strlen($string)
 /*
 	Return the number of characters in $string, preferably using PHP's multibyte string functions
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		return function_exists('mb_strlen') ? mb_strlen($string, 'UTF-8') : strlen($string);
 	}
 
 
-	function qa_strtolower($string)
+	function as_strtolower($string)
 /*
 	Return a lower case version of $string, preferably using PHP's multibyte string functions
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		return function_exists('mb_strtolower') ? mb_strtolower($string, 'UTF-8') : strtolower($string);
 	}
 	
 	
-	function qa_substr($string, $start, $length=2147483647)
+	function as_substr($string, $start, $length=2147483647)
 /*
 	Return $length characters from $string, starting from $start, preferably using PHP's multibyte string functions
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		return function_exists('mb_substr') ? mb_substr($string, $start, $length, 'UTF-8') : substr($string, $start, $length);
 	}
 	
 
-	function qa_has_multibyte()
+	function as_has_multibyte()
 /*
 	Return whether this version of PHP has been compiled with multibyte string support
 */
@@ -692,7 +692,7 @@
 	}
 
 
-	function qa_string_matches_one($string, $matches)
+	function as_string_matches_one($string, $matches)
 /*
 	Return true if one of the elements in $matches is contained within $string
 */
@@ -717,7 +717,7 @@
 	@define('QA_PREG_CJK_IDEOGRAPHS_UTF8', '\xE2[\xBA-\xBF][\x80-\xBF]|\xE3[\x80\x88-\xBF][\x80-\xBF]|[\xE4-\xE9][\x80-\xBF][\x80-\xBF]|\xEF[\xA4-\xAB][\x80-\xBF]|\xF0[\xA0-\xAF][\x80-\xBF][\x80-\xBF]');
 		// Pattern to match Chinese/Japanese/Korean ideographic symbols in UTF-8 encoding
 	
-	qa_string_initialize();
+	as_string_initialize();
 
 
 /*

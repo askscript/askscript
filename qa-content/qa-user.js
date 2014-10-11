@@ -22,7 +22,7 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-function qa_submit_wall_post(elem, morelink)
+function as_submit_wall_post(elem, morelink)
 {
 	var params={};
 	
@@ -32,7 +32,7 @@ function qa_submit_wall_post(elem, morelink)
 	params.code=document.forms.wallpost.code.value;
 	params.morelink=morelink ? 1 : 0;
 	
-	qa_ajax_post('wallpost', params,
+	as_ajax_post('wallpost', params,
 		function(lines) {
 			
 			if (lines[0]=='1') {
@@ -42,29 +42,29 @@ function qa_submit_wall_post(elem, morelink)
 				var c=document.getElementById(lines[1]); // id of new message
 				if (c) {
 					c.style.display='none';
-					qa_reveal(c, 'wallpost');
+					as_reveal(c, 'wallpost');
 				}
 
 				document.forms.wallpost.message.value='';
-				qa_hide_waiting(elem);
+				as_hide_waiting(elem);
 				
 			} else if (lines[0]=='0') {
-				document.forms.wallpost.qa_click.value=elem.name;
+				document.forms.wallpost.as_click.value=elem.name;
 				document.forms.wallpost.submit();
 				
 			} else {
-				qa_ajax_error();
+				as_ajax_error();
 			}
 		}
 	);
 	
-	qa_show_waiting_after(elem, false);
+	as_show_waiting_after(elem, false);
 	
 	return false;
 }
 
 
-function qa_wall_post_click(messageid, target)
+function as_wall_post_click(messageid, target)
 {
 	var params={};
 	
@@ -74,25 +74,25 @@ function qa_wall_post_click(messageid, target)
 
 	params[target.name]=target.value;
 
-	qa_ajax_post('click_wall', params,
+	as_ajax_post('click_wall', params,
 		function (lines) {
 			if (lines[0]=='1') {
 				var l=document.getElementById('m'+messageid);
 				var h=lines.slice(1).join("\n");
 				
 				if (h.length)
-					qa_set_outer_html(l, 'wallpost', h)
+					as_set_outer_html(l, 'wallpost', h)
 				else
-					qa_conceal(l, 'wallpost');
+					as_conceal(l, 'wallpost');
 			
 			} else {
-				document.forms.wallpost.qa_click.value=target.name;
+				document.forms.wallpost.as_click.value=target.name;
 				document.forms.wallpost.submit();
 			}
 		}
 	);
 	
-	qa_show_waiting_after(target, false);
+	as_show_waiting_after(target, false);
 	
 	return false;
 }

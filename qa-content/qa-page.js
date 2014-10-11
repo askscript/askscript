@@ -22,25 +22,25 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-function qa_reveal(elem, type, callback)
+function as_reveal(elem, type, callback)
 {
 	if (elem)
 		$(elem).slideDown(400, callback);
 }
 
-function qa_conceal(elem, type, callback)
+function as_conceal(elem, type, callback)
 {
 	if (elem)
 		$(elem).slideUp(400);
 }
 
-function qa_set_inner_html(elem, type, html)
+function as_set_inner_html(elem, type, html)
 {
 	if (elem)
 		elem.innerHTML=html;
 }
 
-function qa_set_outer_html(elem, type, html)
+function as_set_outer_html(elem, type, html)
 {
 	if (elem) {
 		var e=document.createElement('div');
@@ -49,9 +49,9 @@ function qa_set_outer_html(elem, type, html)
 	}
 }
 
-function qa_show_waiting_after(elem, inside)
+function as_show_waiting_after(elem, inside)
 {
-	if (elem && !elem.qa_waiting_shown) {
+	if (elem && !elem.as_waiting_shown) {
 		var w=document.getElementById('qa-waiting-template');
 	
 		if (w) {
@@ -63,22 +63,22 @@ function qa_show_waiting_after(elem, inside)
 			else
 				elem.parentNode.insertBefore(c, elem.nextSibling);
 
-			elem.qa_waiting_shown=c;
+			elem.as_waiting_shown=c;
 		}
 	}
 }
 
-function qa_hide_waiting(elem)
+function as_hide_waiting(elem)
 {
-	var c=elem.qa_waiting_shown;
+	var c=elem.as_waiting_shown;
 
 	if (c) {
 		c.parentNode.removeChild(c);
-		elem.qa_waiting_shown=null;
+		elem.as_waiting_shown=null;
 	}
 }
 
-function qa_vote_click(elem)
+function as_vote_click(elem)
 {
 	var ens=elem.name.split('_');
 	var postid=ens[1];
@@ -86,10 +86,10 @@ function qa_vote_click(elem)
 	var code=elem.form.elements.code.value;
 	var anchor=ens[3];
 	
-	qa_ajax_post('vote', {postid:postid, vote:vote, code:code},
+	as_ajax_post('vote', {postid:postid, vote:vote, code:code},
 		function(lines) {
 			if (lines[0]=='1') {
-				qa_set_inner_html(document.getElementById('voting_'+postid), 'voting', lines.slice(1).join("\n"));
+				as_set_inner_html(document.getElementById('voting_'+postid), 'voting', lines.slice(1).join("\n"));
 
 			} else if (lines[0]=='0') {
 				var mess=document.getElementById('errorbox');
@@ -104,62 +104,62 @@ function qa_vote_click(elem)
 				
 				var postelem=document.getElementById(anchor);
 				var e=postelem.parentNode.insertBefore(mess, postelem);
-				qa_reveal(e);
+				as_reveal(e);
 			
 			} else
-				qa_ajax_error();
+				as_ajax_error();
 		}
 	);
 	
 	return false;
 }
 
-function qa_notice_click(elem)
+function as_notice_click(elem)
 {
 	var ens=elem.name.split('_');
 	var code=elem.form.elements.code.value;
 	
-	qa_ajax_post('notice', {noticeid:ens[1], code:code},
+	as_ajax_post('notice', {noticeid:ens[1], code:code},
 		function(lines) {
 			if (lines[0]=='1')
-				qa_conceal(document.getElementById('notice_'+ens[1]), 'notice');
+				as_conceal(document.getElementById('notice_'+ens[1]), 'notice');
 			else if (lines[0]=='0')
 				alert(lines[1]);
 			else
-				qa_ajax_error();
+				as_ajax_error();
 		}
 	);
 	
 	return false;
 }
 
-function qa_favorite_click(elem)
+function as_favorite_click(elem)
 {
 	var ens=elem.name.split('_');
 	var code=elem.form.elements.code.value;
 	
-	qa_ajax_post('favorite', {entitytype:ens[1], entityid:ens[2], favorite:parseInt(ens[3]), code:code},
+	as_ajax_post('favorite', {entitytype:ens[1], entityid:ens[2], favorite:parseInt(ens[3]), code:code},
 		function (lines) {
 			if (lines[0]=='1')
-				qa_set_inner_html(document.getElementById('favoriting'), 'favoriting', lines.slice(1).join("\n"));
+				as_set_inner_html(document.getElementById('favoriting'), 'favoriting', lines.slice(1).join("\n"));
 			else if (lines[0]=='0') {
 				alert(lines[1]);
-				qa_hide_waiting(elem);
+				as_hide_waiting(elem);
 			} else
-				qa_ajax_error();
+				as_ajax_error();
 		}
 	);
 	
-	qa_show_waiting_after(elem, false);
+	as_show_waiting_after(elem, false);
 	
 	return false;
 }
 
-function qa_ajax_post(operation, params, callback)
+function as_ajax_post(operation, params, callback)
 {
-	jQuery.extend(params, {qa:'ajax', qa_operation:operation, qa_root:qa_root, qa_request:qa_request});
+	jQuery.extend(params, {qa:'ajax', as_operation:operation, as_root:as_root, as_request:as_request});
 	
-	jQuery.post(qa_root, params, function(response) {
+	jQuery.post(as_root, params, function(response) {
 		var header='QA_AJAX_RESPONSE';
 		var headerpos=response.indexOf(header);
 		
@@ -171,7 +171,7 @@ function qa_ajax_post(operation, params, callback)
 	}, 'text').error(function(jqXHR) { if (jqXHR.readyState>0) callback([]) });
 }
 
-function qa_ajax_error()
+function as_ajax_error()
 {
 	alert('Unexpected response from server - please try again or switch off Javascript.');
 }

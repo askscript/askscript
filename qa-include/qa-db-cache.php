@@ -32,39 +32,39 @@
 	require_once QA_INCLUDE_DIR.'qa-db-maxima.php';
 
 
-	function qa_db_cache_set($type, $cacheid, $content)
+	function as_db_cache_set($type, $cacheid, $content)
 /*
 	Create (or replace) the item ($type, $cacheid) in the database cache table with $content
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		qa_db_query_sub(
+		as_db_query_sub(
 			'DELETE FROM ^cache WHERE lastread<NOW()-INTERVAL # SECOND',
 			QA_DB_MAX_CACHE_AGE
 		);
 
-		qa_db_query_sub(
+		as_db_query_sub(
 			'REPLACE ^cache (type, cacheid, content, created, lastread) VALUES ($, #, $, NOW(), NOW())',
 			$type, $cacheid, $content
 		);
 	}
 	
 	
-	function qa_db_cache_get($type, $cacheid)
+	function as_db_cache_get($type, $cacheid)
 /*
 	Retrieve the item ($type, $cacheid) from the database cache table
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		$content=qa_db_read_one_value(qa_db_query_sub(
+		$content=as_db_read_one_value(as_db_query_sub(
 			'SELECT content FROM ^cache WHERE type=$ AND cacheid=#',
 			$type, $cacheid
 		), true);
 		
 		if (isset($content))
-			qa_db_query_sub(
+			as_db_query_sub(
 				'UPDATE ^cache SET lastread=NOW() WHERE type=$ AND cacheid=#',
 				$type, $cacheid
 			);

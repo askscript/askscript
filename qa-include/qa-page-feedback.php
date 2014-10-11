@@ -35,26 +35,26 @@
 
 //	Get useful information on the logged in user
 
-	$userid=qa_get_logged_in_userid();
+	$userid=as_get_logged_in_userid();
 
 	if (isset($userid) && !QA_FINAL_EXTERNAL_USERS)
-		list($useraccount, $userprofile)=qa_db_select_with_pending(
-			qa_db_user_account_selectspec($userid, true),
-			qa_db_user_profile_selectspec($userid, true)
+		list($useraccount, $userprofile)=as_db_select_with_pending(
+			as_db_user_account_selectspec($userid, true),
+			as_db_user_profile_selectspec($userid, true)
 		);
 
-	$usecaptcha=qa_opt('captcha_on_feedback') && qa_user_use_captcha();
+	$usecaptcha=as_opt('captcha_on_feedback') && as_user_use_captcha();
 
 
 //	Check feedback is enabled and the person isn't blocked
 
-	if (!qa_opt('feedback_enabled'))
+	if (!as_opt('feedback_enabled'))
 		return include QA_INCLUDE_DIR.'qa-page-not-found.php';
 
-	if (qa_user_permit_error()) {
-		$qa_content=qa_content_prepare();
-		$qa_content['error']=qa_lang_html('users/no_permission');
-		return $qa_content;
+	if (as_user_permit_error()) {
+		$as_content=as_content_prepare();
+		$as_content['error']=as_lang_html('users/no_permission');
+		return $as_content;
 	}
 
 
@@ -62,24 +62,24 @@
 	
 	$feedbacksent=false;
 	
-	if (qa_clicked('dofeedback')) {
+	if (as_clicked('dofeedback')) {
 		require_once QA_INCLUDE_DIR.'qa-app-emails.php';
 		require_once QA_INCLUDE_DIR.'qa-util-string.php';
 		
-		$inmessage=qa_post_text('message');
-		$inname=qa_post_text('name');
-		$inemail=qa_post_text('email');
-		$inreferer=qa_post_text('referer');
+		$inmessage=as_post_text('message');
+		$inname=as_post_text('name');
+		$inemail=as_post_text('email');
+		$inreferer=as_post_text('referer');
 		
-		if (!qa_check_form_security_code('feedback', qa_post_text('code')))
-			$pageerror=qa_lang_html('misc/form_security_again');
+		if (!as_check_form_security_code('feedback', as_post_text('code')))
+			$pageerror=as_lang_html('misc/form_security_again');
 		
 		else {
 			if (empty($inmessage))
-				$errors['message']=qa_lang('misc/feedback_empty');
+				$errors['message']=as_lang('misc/feedback_empty');
 			
 			if ($usecaptcha)
-				qa_captcha_validate_post($errors);
+				as_captcha_validate_post($errors);
 	
 			if (empty($errors)) {
 				$subs=array(
@@ -87,25 +87,25 @@
 					'^name' => empty($inname) ? '-' : $inname,
 					'^email' => empty($inemail) ? '-' : $inemail,
 					'^previous' => empty($inreferer) ? '-' : $inreferer,
-					'^url' => isset($userid) ? qa_path_absolute('user/'.qa_get_logged_in_handle()) : '-',
-					'^ip' => qa_remote_ip_address(),
+					'^url' => isset($userid) ? as_path_absolute('user/'.as_get_logged_in_handle()) : '-',
+					'^ip' => as_remote_ip_address(),
 					'^browser' => @$_SERVER['HTTP_USER_AGENT'],
 				);
 				
-				if (qa_send_email(array(
-					'fromemail' => qa_email_validate(@$inemail) ? $inemail : qa_opt('from_email'),
+				if (as_send_email(array(
+					'fromemail' => as_email_validate(@$inemail) ? $inemail : as_opt('from_email'),
 					'fromname' => $inname,
-					'toemail' => qa_opt('feedback_email'),
-					'toname' => qa_opt('site_title'),
-					'subject' => qa_lang_sub('emails/feedback_subject', qa_opt('site_title')),
-					'body' => strtr(qa_lang('emails/feedback_body'), $subs),
+					'toemail' => as_opt('feedback_email'),
+					'toname' => as_opt('site_title'),
+					'subject' => as_lang_sub('emails/feedback_subject', as_opt('site_title')),
+					'body' => strtr(as_lang('emails/feedback_body'), $subs),
 					'html' => false,
 				)))
 					$feedbacksent=true;
 				else
-					$pageerror=qa_lang_html('main/general_error');
+					$pageerror=as_lang_html('main/general_error');
 					
-				qa_report_event('feedback', $userid, qa_get_logged_in_handle(), qa_cookie_get(), array(
+				as_report_event('feedback', $userid, as_get_logged_in_handle(), as_cookie_get(), array(
 					'email' => $inemail,
 					'name' => $inname,
 					'message' => $inmessage,
@@ -119,69 +119,69 @@
 	
 //	Prepare content for theme
 
-	$qa_content=qa_content_prepare();
+	$as_content=as_content_prepare();
 
-	$qa_content['title']=qa_lang_html('misc/feedback_title');
+	$as_content['title']=as_lang_html('misc/feedback_title');
 	
-	$qa_content['error']=@$pageerror;
+	$as_content['error']=@$pageerror;
 
-	$qa_content['form']=array(
-		'tags' => 'method="post" action="'.qa_self_html().'"',
+	$as_content['form']=array(
+		'tags' => 'method="post" action="'.as_self_html().'"',
 		
 		'style' => 'tall',
 		
 		'fields' => array(
 			'message' => array(
 				'type' => $feedbacksent ? 'static' : '',
-				'label' => qa_lang_html_sub('misc/feedback_message', qa_opt('site_title')),
+				'label' => as_lang_html_sub('misc/feedback_message', as_opt('site_title')),
 				'tags' => 'name="message" id="message"',
-				'value' => qa_html(@$inmessage),
+				'value' => as_html(@$inmessage),
 				'rows' => 8,
-				'error' => qa_html(@$errors['message']),
+				'error' => as_html(@$errors['message']),
 			),
 
 			'name' => array(
 				'type' => $feedbacksent ? 'static' : '',
-				'label' => qa_lang_html('misc/feedback_name'),
+				'label' => as_lang_html('misc/feedback_name'),
 				'tags' => 'name="name"',
-				'value' => qa_html(isset($inname) ? $inname : @$userprofile['name']),
+				'value' => as_html(isset($inname) ? $inname : @$userprofile['name']),
 			),
 
 			'email' => array(
 				'type' => $feedbacksent ? 'static' : '',
-				'label' => qa_lang_html('misc/feedback_email'),
+				'label' => as_lang_html('misc/feedback_email'),
 				'tags' => 'name="email"',
-				'value' => qa_html(isset($inemail) ? $inemail : qa_get_logged_in_email()),
-				'note' => $feedbacksent ? null : qa_opt('email_privacy'),
+				'value' => as_html(isset($inemail) ? $inemail : as_get_logged_in_email()),
+				'note' => $feedbacksent ? null : as_opt('email_privacy'),
 			),
 		),
 		
 		'buttons' => array(
 			'send' => array(
-				'label' => qa_lang_html('main/send_button'),
+				'label' => as_lang_html('main/send_button'),
 			),
 		),
 		
 		'hidden' => array(
 			'dofeedback' => '1',
-			'code' => qa_get_form_security_code('feedback'),
-			'referer' => qa_html(isset($inreferer) ? $inreferer : @$_SERVER['HTTP_REFERER']),
+			'code' => as_get_form_security_code('feedback'),
+			'referer' => as_html(isset($inreferer) ? $inreferer : @$_SERVER['HTTP_REFERER']),
 		),
 	);
 	
 	if ($usecaptcha && !$feedbacksent)
-		qa_set_up_captcha_field($qa_content, $qa_content['form']['fields'], @$errors);
+		as_set_up_captcha_field($as_content, $as_content['form']['fields'], @$errors);
 
 
-	$qa_content['focusid']='message';
+	$as_content['focusid']='message';
 	
 	if ($feedbacksent) {
-		$qa_content['form']['ok']=qa_lang_html('misc/feedback_sent');
-		unset($qa_content['form']['buttons']);
+		$as_content['form']['ok']=as_lang_html('misc/feedback_sent');
+		unset($as_content['form']['buttons']);
 	}
 
 	
-	return $qa_content;
+	return $as_content;
 	
 
 /*

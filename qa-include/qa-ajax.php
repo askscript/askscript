@@ -38,22 +38,22 @@
 
 	require 'qa-base.php';
 
-	qa_report_process_stage('init_ajax');
+	as_report_process_stage('init_ajax');
 		
 
 //	Get general Ajax parameters from the POST payload, and clear $_GET
 
-	qa_set_request(qa_post_text('qa_request'), qa_post_text('qa_root'));
+	as_set_request(as_post_text('as_request'), as_post_text('as_root'));
 
-	$_GET=array(); // for qa_self_html()
+	$_GET=array(); // for as_self_html()
 	
 
 //	Database failure handler
 
-	function qa_ajax_db_fail_handler()
+	function as_ajax_db_fail_handler()
 	{
 		echo "QA_AJAX_RESPONSE\n0\nA database error occurred.";
-		qa_exit('error');
+		as_exit('error');
 	}
 
 
@@ -78,14 +78,14 @@
 		'click_wall' => 'qa-ajax-click-wall.php',
 	);
 	
-	$operation=qa_post_text('qa_operation');
+	$operation=as_post_text('as_operation');
 	
 	if (isset($routing[$operation])) {
-		qa_db_connect('qa_ajax_db_fail_handler');
+		as_db_connect('as_ajax_db_fail_handler');
 
 		require QA_INCLUDE_DIR.$routing[$operation];
 		
-		qa_db_disconnect();
+		as_db_disconnect();
 	}
 
 

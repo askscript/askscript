@@ -27,18 +27,18 @@
 	require_once QA_INCLUDE_DIR.'qa-db-selects.php';
 	
 
-	$categoryid=qa_post_text('categoryid');
+	$categoryid=as_post_text('categoryid');
 	if (!strlen($categoryid))
 		$categoryid=null;
 	
-	list($fullcategory, $categories)=qa_db_select_with_pending(
-		qa_db_full_category_selectspec($categoryid, true),
-		qa_db_category_sub_selectspec($categoryid)
+	list($fullcategory, $categories)=as_db_select_with_pending(
+		as_db_full_category_selectspec($categoryid, true),
+		as_db_category_sub_selectspec($categoryid)
 	);
 	
 	echo "QA_AJAX_RESPONSE\n1\n";
 	
-	echo qa_html(strtr(@$fullcategory['content'], "\r\n", '  ')); // category description
+	echo as_html(strtr(@$fullcategory['content'], "\r\n", '  ')); // category description
 	
 	foreach ($categories as $category)
 		echo "\n".$category['categoryid'].'/'.$category['title']; // subcategory information

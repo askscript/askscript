@@ -30,40 +30,40 @@
 	}
 
 
-	function qa_db_message_create($fromuserid, $touserid, $content, $format, $public=false)
+	function as_db_message_create($fromuserid, $touserid, $content, $format, $public=false)
 /*
 	Record a message sent from $fromuserid to $touserid with $content in $format in the database. $public sets whether
 	public (on wall) or private. Return the messageid of the row created.
 */
 	{
-		qa_db_query_sub(
+		as_db_query_sub(
 			'INSERT INTO ^messages (type, fromuserid, touserid, content, format, created) VALUES ($, #, #, $, $, NOW())',
 			$public ? 'PUBLIC' : 'PRIVATE', $fromuserid, $touserid, $content, $format
 		);
 		
-		return qa_db_last_insert_id();
+		return as_db_last_insert_id();
 	}
 	
 
-	function qa_db_message_delete($messageid)
+	function as_db_message_delete($messageid)
 /*
 	Delete the message with $messageid from the database
 */
 	{
-		qa_db_query_sub(
+		as_db_query_sub(
 			'DELETE FROM ^messages WHERE messageid=#',
 			$messageid
 		);
 	}
 
 
-	function qa_db_user_recount_posts($userid)
+	function as_db_user_recount_posts($userid)
 /*
 	Recalculate the cached count of wall posts for user $userid in the database
 */
 	{
-		if (qa_should_update_counts())
-			qa_db_query_sub(
+		if (as_should_update_counts())
+			as_db_query_sub(
 				"UPDATE ^users AS x, (SELECT COUNT(*) AS wallposts FROM ^messages WHERE touserid=# AND type='PUBLIC') AS a SET x.wallposts=a.wallposts WHERE x.userid=#",
 				$userid, $userid
 			);

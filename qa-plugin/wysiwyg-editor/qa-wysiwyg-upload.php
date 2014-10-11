@@ -25,7 +25,7 @@
 */
 
 
-	class qa_wysiwyg_upload {
+	class as_wysiwyg_upload {
 	
 		function match_request($request)
 		{
@@ -39,15 +39,15 @@
 			$url='';
 			
 			if (is_array($_FILES) && count($_FILES)) {
-				if (!qa_opt('wysiwyg_editor_upload_images'))
-					$message=qa_lang('users/no_permission');
+				if (!as_opt('wysiwyg_editor_upload_images'))
+					$message=as_lang('users/no_permission');
 					
 				require_once QA_INCLUDE_DIR.'qa-app-upload.php';
 				
-				$upload=qa_upload_file_one(
-					qa_opt('wysiwyg_editor_upload_max_size'),
-					qa_get('qa_only_image') || !qa_opt('wysiwyg_editor_upload_all'),
-					qa_get('qa_only_image') ? 600 : null, // max width if it's an image upload
+				$upload=as_upload_file_one(
+					as_opt('wysiwyg_editor_upload_max_size'),
+					as_get('as_only_image') || !as_opt('wysiwyg_editor_upload_all'),
+					as_get('as_only_image') ? 600 : null, // max width if it's an image upload
 					null // no max height
 				);
 				
@@ -55,8 +55,8 @@
 				$url=@$upload['bloburl'];
 			}
 			
-			echo "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(".qa_js(qa_get('CKEditorFuncNum')).
-				", ".qa_js($url).", ".qa_js($message).");</script>";
+			echo "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(".as_js(as_get('CKEditorFuncNum')).
+				", ".as_js($url).", ".as_js($message).");</script>";
 			
 			return null;
 		}

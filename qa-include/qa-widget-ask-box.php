@@ -24,7 +24,7 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	class qa_ask_box {
+	class as_ask_box {
 		
 		function allow_template($template)
 		{
@@ -68,19 +68,19 @@
 		}
 	
 	
-		function output_widget($region, $place, $themeobject, $template, $request, $qa_content)
+		function output_widget($region, $place, $themeobject, $template, $request, $as_content)
 		{
-			if (isset($qa_content['categoryids']))
-				$params=array('cat' => end($qa_content['categoryids']));
+			if (isset($as_content['categoryids']))
+				$params=array('cat' => end($as_content['categoryids']));
 			else
 				$params=null;
 ?>
 <div class="qa-ask-box">
-	<form method="post" action="<?php echo qa_path_html('ask', $params); ?>">
+	<form method="post" action="<?php echo as_path_html('ask', $params); ?>">
 		<table class="qa-form-tall-table" style="width:100%">
 			<tr style="vertical-align:middle;">
 				<td class="qa-form-tall-label" style="padding:8px; white-space:nowrap; <?php echo ($region=='side') ? 'padding-bottom:0;' : 'text-align:right;'?>" width="1">
-					<?php echo strtr(qa_lang_html('question/ask_title'), array(' ' => '&nbsp;'))?>:
+					<?php echo strtr(as_lang_html('question/ask_title'), array(' ' => '&nbsp;'))?>:
 				</td>
 <?php
 			if ($region=='side') {

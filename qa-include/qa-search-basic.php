@@ -30,7 +30,7 @@
 	}
 
 
-	class qa_search_basic {
+	class as_search_basic {
 	
 		function index_post($postid, $type, $questionid, $parentid, $title, $content, $format, $text, $tagstring, $categoryid)
 		{
@@ -38,20 +38,20 @@
 			
 		//	Get words from each textual element
 		
-			$titlewords=array_unique(qa_string_to_words($title));
-			$contentcount=array_count_values(qa_string_to_words($text));
-			$tagwords=array_unique(qa_string_to_words($tagstring));
-			$wholetags=array_unique(qa_tagstring_to_tags($tagstring));
+			$titlewords=array_unique(as_string_to_words($title));
+			$contentcount=array_count_values(as_string_to_words($text));
+			$tagwords=array_unique(as_string_to_words($tagstring));
+			$wholetags=array_unique(as_tagstring_to_tags($tagstring));
 			
 		//	Map all words to their word IDs
 			
 			$words=array_unique(array_merge($titlewords, array_keys($contentcount), $tagwords, $wholetags));
-			$wordtoid=qa_db_word_mapto_ids_add($words);
+			$wordtoid=as_db_word_mapto_ids_add($words);
 			
 		//	Add to title words index
 			
-			$titlewordids=qa_array_filter_by_keys($wordtoid, $titlewords);
-			qa_db_titlewords_add_post_wordids($postid, $titlewordids);
+			$titlewordids=as_array_filter_by_keys($wordtoid, $titlewords);
+			as_db_titlewords_add_post_wordids($postid, $titlewordids);
 		
 		//	Add to content words index (including word counts)
 		
@@ -60,25 +60,25 @@
 				if (isset($wordtoid[$word]))
 					$contentwordidcounts[$wordtoid[$word]]=$count;
 	
-			qa_db_contentwords_add_post_wordidcounts($postid, $type, $questionid, $contentwordidcounts);
+			as_db_contentwords_add_post_wordidcounts($postid, $type, $questionid, $contentwordidcounts);
 			
 		//	Add to tag words index
 		
-			$tagwordids=qa_array_filter_by_keys($wordtoid, $tagwords);
-			qa_db_tagwords_add_post_wordids($postid, $tagwordids);
+			$tagwordids=as_array_filter_by_keys($wordtoid, $tagwords);
+			as_db_tagwords_add_post_wordids($postid, $tagwordids);
 		
 		//	Add to whole tags index
 	
-			$wholetagids=qa_array_filter_by_keys($wordtoid, $wholetags);
-			qa_db_posttags_add_post_wordids($postid, $wholetagids);
+			$wholetagids=as_array_filter_by_keys($wordtoid, $wholetags);
+			as_db_posttags_add_post_wordids($postid, $wholetagids);
 			
-		//	Update counts cached in database (will be skipped if qa_suspend_update_counts() was called
+		//	Update counts cached in database (will be skipped if as_suspend_update_counts() was called
 			
-			qa_db_word_titlecount_update($titlewordids);
-			qa_db_word_contentcount_update(array_keys($contentwordidcounts));
-			qa_db_word_tagwordcount_update($tagwordids);
-			qa_db_word_tagcount_update($wholetagids);
-			qa_db_tagcount_update();
+			as_db_word_titlecount_update($titlewordids);
+			as_db_word_contentcount_update(array_keys($contentwordidcounts));
+			as_db_word_tagwordcount_update($tagwordids);
+			as_db_word_tagcount_update($wholetagids);
+			as_db_tagcount_update();
 		}
 		
 
@@ -86,21 +86,21 @@
 		{
 			require_once QA_INCLUDE_DIR.'qa-db-post-update.php';
 
-			$titlewordids=qa_db_titlewords_get_post_wordids($postid);
-			qa_db_titlewords_delete_post($postid);
-			qa_db_word_titlecount_update($titlewordids);
+			$titlewordids=as_db_titlewords_get_post_wordids($postid);
+			as_db_titlewords_delete_post($postid);
+			as_db_word_titlecount_update($titlewordids);
 	
-			$contentwordids=qa_db_contentwords_get_post_wordids($postid);
-			qa_db_contentwords_delete_post($postid);
-			qa_db_word_contentcount_update($contentwordids);
+			$contentwordids=as_db_contentwords_get_post_wordids($postid);
+			as_db_contentwords_delete_post($postid);
+			as_db_word_contentcount_update($contentwordids);
 			
-			$tagwordids=qa_db_tagwords_get_post_wordids($postid);
-			qa_db_tagwords_delete_post($postid);
-			qa_db_word_tagwordcount_update($tagwordids);
+			$tagwordids=as_db_tagwords_get_post_wordids($postid);
+			as_db_tagwords_delete_post($postid);
+			as_db_word_tagwordcount_update($tagwordids);
 	
-			$wholetagids=qa_db_posttags_get_post_wordids($postid);
-			qa_db_posttags_delete_post($postid);
-			qa_db_word_tagcount_update($wholetagids);
+			$wholetagids=as_db_posttags_get_post_wordids($postid);
+			as_db_posttags_delete_post($postid);
+			as_db_word_tagcount_update($wholetagids);
 		}
 
 		
@@ -127,16 +127,16 @@
 			require_once QA_INCLUDE_DIR.'qa-db-selects.php';
 			require_once QA_INCLUDE_DIR.'qa-util-string.php';
 
-			$words=qa_string_to_words($query);
+			$words=as_string_to_words($query);
 			
-			$questions=qa_db_select_with_pending(
-				qa_db_search_posts_selectspec($userid, $words, $words, $words, $words, trim($query), $start, $fullcontent, $count)
+			$questions=as_db_select_with_pending(
+				as_db_search_posts_selectspec($userid, $words, $words, $words, $words, trim($query), $start, $fullcontent, $count)
 			);
 			
 			$results=array();
 			
 			foreach ($questions as $question) {
-				qa_search_set_max_match($question, $type, $postid); // to link straight to best part
+				as_search_set_max_match($question, $type, $postid); // to link straight to best part
 
 				$results[]=array(
 					'question' => $question,

@@ -30,158 +30,158 @@
 	}
 
 
-	function qa_db_usermeta_set($userid, $key, $value)
+	function as_db_usermeta_set($userid, $key, $value)
 /*
-	Set the metadata for user $userid with $key to $value. Keys beginning qa_ are reserved for the Q2A core.
+	Set the metadata for user $userid with $key to $value. Keys beginning as_ are reserved for the Q2A core.
 */
 	{
-		qa_db_meta_set('usermetas', 'userid', $userid, $key, $value);
+		as_db_meta_set('usermetas', 'userid', $userid, $key, $value);
 	}
 
 	
-	function qa_db_usermeta_clear($userid, $key)
+	function as_db_usermeta_clear($userid, $key)
 /*
 	Clear the metadata for user $userid with $key ($key can also be an array of keys)
 */
 	{
-		qa_db_meta_clear('usermetas', 'userid', $userid, $key);
+		as_db_meta_clear('usermetas', 'userid', $userid, $key);
 	}
 
 	
-	function qa_db_usermeta_get($userid, $key)
+	function as_db_usermeta_get($userid, $key)
 /*
 	Return the metadata value for user $userid with $key ($key can also be an array of keys in which case this
 	returns an array of metadata key => value).
 */
 	{
-		return qa_db_meta_get('usermetas', 'userid', $userid, $key);
+		return as_db_meta_get('usermetas', 'userid', $userid, $key);
 	}
 	
 
-	function qa_db_postmeta_set($postid, $key, $value)
+	function as_db_postmeta_set($postid, $key, $value)
 /*
-	Set the metadata for post $postid with $key to $value. Keys beginning qa_ are reserved for the Q2A core.
+	Set the metadata for post $postid with $key to $value. Keys beginning as_ are reserved for the Q2A core.
 */
 	{
-		qa_db_meta_set('postmetas', 'postid', $postid, $key, $value);
+		as_db_meta_set('postmetas', 'postid', $postid, $key, $value);
 	}
 
 	
-	function qa_db_postmeta_clear($postid, $key)
+	function as_db_postmeta_clear($postid, $key)
 /*
 	Clear the metadata for post $postid with $key ($key can also be an array of keys)
 */
 	{
-		qa_db_meta_clear('postmetas', 'postid', $postid, $key);
+		as_db_meta_clear('postmetas', 'postid', $postid, $key);
 	}
 
 	
-	function qa_db_postmeta_get($postid, $key)
+	function as_db_postmeta_get($postid, $key)
 /*
 	Return the metadata value for post $postid with $key ($key can also be an array of keys in which case this
 	returns an array of metadata key => value).
 */
 	{
-		return qa_db_meta_get('postmetas', 'postid', $postid, $key);
+		return as_db_meta_get('postmetas', 'postid', $postid, $key);
 	}
 
 
-	function qa_db_categorymeta_set($categoryid, $key, $value)
+	function as_db_categorymeta_set($categoryid, $key, $value)
 /*
-	Set the metadata for category $categoryid with $key to $value. Keys beginning qa_ are reserved for the Q2A core.
+	Set the metadata for category $categoryid with $key to $value. Keys beginning as_ are reserved for the Q2A core.
 */
 	{
-		qa_db_meta_set('categorymetas', 'categoryid', $categoryid, $key, $value);
+		as_db_meta_set('categorymetas', 'categoryid', $categoryid, $key, $value);
 	}
 
 	
-	function qa_db_categorymeta_clear($categoryid, $key)
+	function as_db_categorymeta_clear($categoryid, $key)
 /*
 	Clear the metadata for category $categoryid with $key ($key can also be an array of keys)
 */
 	{
-		qa_db_meta_clear('categorymetas', 'categoryid', $categoryid, $key);
+		as_db_meta_clear('categorymetas', 'categoryid', $categoryid, $key);
 	}
 
 	
-	function qa_db_categorymeta_get($categoryid, $key)
+	function as_db_categorymeta_get($categoryid, $key)
 /*
 	Return the metadata value for category $categoryid with $key ($key can also be an array of keys in which
 	case this returns an array of metadata key => value).
 */
 	{
-		return qa_db_meta_get('categorymetas', 'categoryid', $categoryid, $key);
+		return as_db_meta_get('categorymetas', 'categoryid', $categoryid, $key);
 	}
 	
 
-	function qa_db_tagmeta_set($tag, $key, $value)
+	function as_db_tagmeta_set($tag, $key, $value)
 /*
-	Set the metadata for tag $tag with $key to $value. Keys beginning qa_ are reserved for the Q2A core.
+	Set the metadata for tag $tag with $key to $value. Keys beginning as_ are reserved for the Q2A core.
 */
 	{
-		qa_db_meta_set('tagmetas', 'tag', $tag, $key, $value);
+		as_db_meta_set('tagmetas', 'tag', $tag, $key, $value);
 	}
 
 	
-	function qa_db_tagmeta_clear($tag, $key)
+	function as_db_tagmeta_clear($tag, $key)
 /*
 	Clear the metadata for tag $tag with $key ($key can also be an array of keys)
 */
 	{
-		qa_db_meta_clear('tagmetas', 'tag', $tag, $key);
+		as_db_meta_clear('tagmetas', 'tag', $tag, $key);
 	}
 
 	
-	function qa_db_tagmeta_get($tag, $key)
+	function as_db_tagmeta_get($tag, $key)
 /*
 	Return the metadata value for tag $tag with $key ($key can also be an array of keys in which case this
 	returns an array of metadata key => value).
 */
 	{
-		return qa_db_meta_get('tagmetas', 'tag', $tag, $key);
+		return as_db_meta_get('tagmetas', 'tag', $tag, $key);
 	}
 
 
-	function qa_db_meta_set($metatable, $idcolumn, $idvalue, $title, $content)	
+	function as_db_meta_set($metatable, $idcolumn, $idvalue, $title, $content)	
 /*
 	Internal general function to set metadata
 */
 	{
-		qa_db_query_sub(
+		as_db_query_sub(
 			'REPLACE ^'.$metatable.' ('.$idcolumn.', title, content) VALUES ($, $, $)',
 			$idvalue, $title, $content
 		);
 	}
 
 	
-	function qa_db_meta_clear($metatable, $idcolumn, $idvalue, $title)
+	function as_db_meta_clear($metatable, $idcolumn, $idvalue, $title)
 /*
 	Internal general function to clear metadata
 */
 	{
 		if (is_array($title)) {
 			if (count($title))
-				qa_db_query_sub(
+				as_db_query_sub(
 					'DELETE FROM ^'.$metatable.' WHERE '.$idcolumn.'=$ AND title IN ($)',
 					$idvalue, $title
 				);
 			
 		} else
-			qa_db_query_sub(
+			as_db_query_sub(
 				'DELETE FROM ^'.$metatable.' WHERE '.$idcolumn.'=$ AND title=$',
 				$idvalue, $title
 			);
 	}
 
 	
-	function qa_db_meta_get($metatable, $idcolumn, $idvalue, $title)
+	function as_db_meta_get($metatable, $idcolumn, $idvalue, $title)
 /*
 	Internal general function to return metadata
 */
 	{
 		if (is_array($title)) {
 			if (count($title))
-				return qa_db_read_all_assoc(qa_db_query_sub(
+				return as_db_read_all_assoc(as_db_query_sub(
 					'SELECT title, content FROM ^'.$metatable.' WHERE '.$idcolumn.'=$ AND title IN($)',
 					$idvalue, $title
 				), 'title', 'content');
@@ -189,7 +189,7 @@
 				return array();
 		
 		} else
-			return qa_db_read_one_value(qa_db_query_sub(
+			return as_db_read_one_value(as_db_query_sub(
 				'SELECT content FROM ^'.$metatable.' WHERE '.$idcolumn.'=$ AND title=$',
 				$idvalue, $title
 			), true);

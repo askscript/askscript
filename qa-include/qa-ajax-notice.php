@@ -29,22 +29,22 @@
 	require_once QA_INCLUDE_DIR.'qa-db-users.php';
 	
 
-	$noticeid=qa_post_text('noticeid');	
+	$noticeid=as_post_text('noticeid');	
 	
-	if (!qa_check_form_security_code('notice-'.$noticeid, qa_post_text('code')))
-		echo "QA_AJAX_RESPONSE\n0\n".qa_lang('misc/form_security_reload');
+	if (!as_check_form_security_code('notice-'.$noticeid, as_post_text('code')))
+		echo "QA_AJAX_RESPONSE\n0\n".as_lang('misc/form_security_reload');
 	
 	else {
 		if ($noticeid=='visitor')
-			setcookie('qa_noticed', 1, time()+86400*3650, '/', QA_COOKIE_DOMAIN);
+			setcookie('as_noticed', 1, time()+86400*3650, '/', QA_COOKIE_DOMAIN);
 		
 		else {
-			$userid=qa_get_logged_in_userid();
+			$userid=as_get_logged_in_userid();
 			
 			if ($noticeid=='welcome')
-				qa_db_user_set_flag($userid, QA_USER_FLAGS_WELCOME_NOTICE, false);
+				as_db_user_set_flag($userid, QA_USER_FLAGS_WELCOME_NOTICE, false);
 			else
-				qa_db_usernotice_delete($userid, $noticeid);
+				as_db_usernotice_delete($userid, $noticeid);
 		}
 	
 		

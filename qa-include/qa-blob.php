@@ -29,10 +29,10 @@
 
 	@ini_set('display_errors', 0);
 
-	function qa_blob_db_fail_handler()
+	function as_blob_db_fail_handler()
 	{
 		header('HTTP/1.1 500 Internal Server Error');
-		qa_exit('error');
+		as_exit('error');
 	}
 	
 
@@ -40,16 +40,16 @@
 
 	require 'qa-base.php';
 
-	qa_report_process_stage('init_blob');
+	as_report_process_stage('init_blob');
 
 
 //	Output the blob in question
 
 	require_once QA_INCLUDE_DIR.'qa-app-blobs.php';
 
-	qa_db_connect('qa_blob_db_fail_handler');
+	as_db_connect('as_blob_db_fail_handler');
 	
-	$blob=qa_read_blob(qa_get('qa_blobid'));
+	$blob=as_read_blob(as_get('as_blobid'));
 	
 	if (isset($blob)) {
 		header('Cache-Control: max-age=2592000, public'); // allows browsers and proxies to cache the blob
@@ -86,7 +86,7 @@
 		header('HTTP/1.0 404 Not Found');
 
 	
-	qa_db_disconnect();
+	as_db_disconnect();
 
 
 /*

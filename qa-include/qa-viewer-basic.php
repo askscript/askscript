@@ -30,7 +30,7 @@
 	}
 
 
-	class qa_viewer_basic {
+	class as_viewer_basic {
 	
 		var $htmllineseparators;
 		var $htmlparagraphseparators;
@@ -56,7 +56,7 @@
 		function get_html($content, $format, $options)
 		{
 			if ($format=='html') {
-				$html=qa_sanitize_html($content, @$options['linksnewwindow'], false); // sanitize again for display, for extra safety, and due to new window setting
+				$html=as_sanitize_html($content, @$options['linksnewwindow'], false); // sanitize again for display, for extra safety, and due to new window setting
 
 				if (isset($options['blockwordspreg'])) { // filtering out blocked words inline within HTML is pretty complex, e.g. p<b>oo</b>p must be caught
 					require_once QA_INCLUDE_DIR.'qa-util-string.php';
@@ -68,7 +68,7 @@
 					$tagmatches=$pregmatches[0];
 					$text=preg_replace('/<[^>]*>/', '', $html); // effectively strip_tags() but use same regexp as above to ensure consistency
 
-					$blockmatches=qa_block_words_match_all($text, $options['blockwordspreg']); // search for blocked words within text
+					$blockmatches=as_block_words_match_all($text, $options['blockwordspreg']); // search for blocked words within text
 					
 					$nexttagmatch=array_shift($tagmatches);
 					$texttohtml=0;
@@ -85,7 +85,7 @@
 							if (isset($nexttagmatch))
 								$replacepart=min($replacepart, $nexttagmatch[1]-($textoffset+$texttohtml)); // stop replacing early if we hit an HTML tag
 							
-							$replacelength=qa_strlen(substr($text, $textoffset, $replacepart)); // to work with multi-byte characters
+							$replacelength=as_strlen(substr($text, $textoffset, $replacepart)); // to work with multi-byte characters
 							
 							$html=substr_replace($html, str_repeat('*', $replacelength), $textoffset+$texttohtml+$htmlshift, $replacepart);
 							$htmlshift+=$replacelength-$replacepart; // HTML might have moved around if we replaced multi-byte characters
@@ -113,7 +113,7 @@
 							$innerhtml=$thishtmluntagged[0];
 							
 							if (is_numeric(strpos($innerhtml, '://'))) { // quick test first
-								$newhtml=qa_html_convert_urls($innerhtml, qa_opt('links_in_new_window'));
+								$newhtml=as_html_convert_urls($innerhtml, as_opt('links_in_new_window'));
 								
 								$html=substr_replace($html, $newhtml, $htmlunlinked[1]+$thishtmluntagged[1], strlen($innerhtml));
 							}
@@ -124,18 +124,18 @@
 			} elseif ($format=='') {
 				if (isset($options['blockwordspreg'])) {
 					require_once QA_INCLUDE_DIR.'qa-util-string.php';
-					$content=qa_block_words_replace($content, $options['blockwordspreg']);
+					$content=as_block_words_replace($content, $options['blockwordspreg']);
 				}
 				
-				$html=qa_html($content, true);
+				$html=as_html($content, true);
 				
 				if (@$options['showurllinks']) {
 					require_once QA_INCLUDE_DIR.'qa-app-format.php';
-					$html=qa_html_convert_urls($html, qa_opt('links_in_new_window'));
+					$html=as_html_convert_urls($html, as_opt('links_in_new_window'));
 				}
 				
 			} else
-				$html='[no viewer found for format: '.qa_html($format).']'; // for unknown formats
+				$html='[no viewer found for format: '.as_html($format).']'; // for unknown formats
 			
 			return $html;
 		}
@@ -174,7 +174,7 @@
 				
 			if (isset($options['blockwordspreg'])) {
 				require_once QA_INCLUDE_DIR.'qa-util-string.php';
-				$text=qa_block_words_replace($text, $options['blockwordspreg']);
+				$text=as_block_words_replace($text, $options['blockwordspreg']);
 			}
 
 			return $text;

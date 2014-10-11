@@ -30,16 +30,16 @@
 	require_once QA_INCLUDE_DIR.'qa-db-selects.php';
 	
 	
-	$tohandle=qa_post_text('handle');
-	$start=(int)qa_post_text('start');
+	$tohandle=as_post_text('handle');
+	$start=(int)as_post_text('start');
 
-	$usermessages=qa_db_select_with_pending(qa_db_recent_messages_selectspec(null, null, $tohandle, false, null, $start));
-	$usermessages=qa_wall_posts_add_rules($usermessages, $start);
+	$usermessages=as_db_select_with_pending(as_db_recent_messages_selectspec(null, null, $tohandle, false, null, $start));
+	$usermessages=as_wall_posts_add_rules($usermessages, $start);
 	
 	foreach ($usermessages as $message)
-		if (qa_clicked('m'.$message['messageid'].'_dodelete') && $message['deleteable'])
-			if (qa_check_form_security_code('wall-'.$tohandle, qa_post_text('code'))) {
-				qa_wall_delete_post(qa_get_logged_in_userid(), qa_get_logged_in_handle(), qa_cookie_get(), $message);
+		if (as_clicked('m'.$message['messageid'].'_dodelete') && $message['deleteable'])
+			if (as_check_form_security_code('wall-'.$tohandle, as_post_text('code'))) {
+				as_wall_delete_post(as_get_logged_in_userid(), as_get_logged_in_handle(), as_cookie_get(), $message);
 				echo "QA_AJAX_RESPONSE\n1\n";
 				return;
 			}

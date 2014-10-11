@@ -30,7 +30,7 @@
 	}
 
 	
-	function qa_get_search_results($query, $start, $count, $userid, $absoluteurls, $fullcontent)
+	function as_get_search_results($query, $start, $count, $userid, $absoluteurls, $fullcontent)
 /*
 	Returns $count search results for $query performed by $userid, starting at offset $start. Set $absoluteurls to true
 	to get absolute URLs for the results and $fullcontent if the results should include full post content. This calls
@@ -41,15 +41,15 @@
 
 	//	Identify which search module should be used
 				
-		$searchmodules=qa_load_modules_with('search', 'process_search');
+		$searchmodules=as_load_modules_with('search', 'process_search');
 		
 		if (!count($searchmodules))
-			qa_fatal_error('No search engine is available');
+			as_fatal_error('No search engine is available');
 			
 		$module=reset($searchmodules); // use first one by default
 		
 		if (count($searchmodules)>1) {
-			$tryname=qa_opt('search_module'); // use chosen one if it's available
+			$tryname=as_opt('search_module'); // use chosen one if it's available
 			
 			if (isset($searchmodules[$tryname]))
 				$module=$searchmodules[$tryname];
@@ -84,11 +84,11 @@
 		
 	//	Perform the appropriate database queries
 	
-		list($postidfull, $postidtype, $postidquestion, $pageidpage)=qa_db_select_with_pending(
-			count($keypostidgetfull) ? qa_db_posts_selectspec($userid, array_keys($keypostidgetfull), $fullcontent) : null,
-			count($keypostidgettype) ? qa_db_posts_basetype_selectspec(array_keys($keypostidgettype)) : null,
-			count($keypostidgetquestion) ? qa_db_posts_to_qs_selectspec($userid, array_keys($keypostidgetquestion), $fullcontent) : null,
-			count($keypageidgetpage) ? qa_db_pages_selectspec(null, array_keys($keypageidgetpage)) : null
+		list($postidfull, $postidtype, $postidquestion, $pageidpage)=as_db_select_with_pending(
+			count($keypostidgetfull) ? as_db_posts_selectspec($userid, array_keys($keypostidgetfull), $fullcontent) : null,
+			count($keypostidgettype) ? as_db_posts_basetype_selectspec(array_keys($keypostidgettype)) : null,
+			count($keypostidgetquestion) ? as_db_posts_to_qs_selectspec($userid, array_keys($keypostidgetquestion), $fullcontent) : null,
+			count($keypageidgetpage) ? as_db_pages_selectspec(null, array_keys($keypageidgetpage)) : null
 		);
 	
 	//	Supplement the results as appropriate
@@ -124,10 +124,10 @@
 			
 			if (!isset($result['url'])) {
 				if (isset($result['question']))
-					$result['url']=qa_q_path($result['question']['postid'], $result['question']['title'],
+					$result['url']=as_q_path($result['question']['postid'], $result['question']['title'],
 						$absoluteurls, @$result['match_type'], @$result['match_postid']);
 				elseif (isset($result['page']))
-					$result['url']=qa_path($result['page']['tags'], null, qa_opt('site_url'));
+					$result['url']=as_path($result['page']['tags'], null, as_opt('site_url'));
 			}
 					
 			$results[$key]=$result;

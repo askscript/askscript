@@ -44,7 +44,7 @@
 	}
 
 
-	qa_register_plugin_module('widget', 'qa-basic-adsense.php', 'qa_basic_adsense', 'Basic AdSense');
+	as_register_plugin_module('widget', 'qa-basic-adsense.php', 'as_basic_adsense', 'Basic AdSense');
 	
 
 /*

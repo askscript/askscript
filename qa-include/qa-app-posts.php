@@ -37,7 +37,7 @@
 	require_once QA_INCLUDE_DIR.'qa-util-string.php';
 
 
-	function qa_post_create($type, $parentid, $title, $content, $format='', $categoryid=null, $tags=null, $userid=null, $notify=null, $email=null, $extravalue=null, $name=null)
+	function as_post_create($type, $parentid, $title, $content, $format='', $categoryid=null, $tags=null, $userid=null, $notify=null, $email=null, $extravalue=null, $name=null)
 /*
 	Create a new post in the database, and return its postid.
 	
@@ -56,34 +56,34 @@
 	post types you can specify the $name of the post's author, which is relevant if the $userid is null.
 */
 	{
-		$handle=qa_post_userid_to_handle($userid);
-		$text=qa_post_content_to_text($content, $format);
+		$handle=as_post_userid_to_handle($userid);
+		$text=as_post_content_to_text($content, $format);
 
 		switch ($type) {
 			case 'Q':
 			case 'Q_QUEUED':
-				$followanswer=isset($parentid) ? qa_post_get_full($parentid, 'A') : null;
-				$tagstring=qa_post_tags_to_tagstring($tags);
-				$postid=qa_question_create($followanswer, $userid, $handle, null, $title, $content, $format, $text, $tagstring,
+				$followanswer=isset($parentid) ? as_post_get_full($parentid, 'A') : null;
+				$tagstring=as_post_tags_to_tagstring($tags);
+				$postid=as_question_create($followanswer, $userid, $handle, null, $title, $content, $format, $text, $tagstring,
 					$notify, $email, $categoryid, $extravalue, $type=='Q_QUEUED', $name);
 				break;
 				
 			case 'A':
 			case 'A_QUEUED':
-				$question=qa_post_get_full($parentid, 'Q');
-				$postid=qa_answer_create($userid, $handle, null, $content, $format, $text, $notify, $email, $question, $type=='A_QUEUED', $name);
+				$question=as_post_get_full($parentid, 'Q');
+				$postid=as_answer_create($userid, $handle, null, $content, $format, $text, $notify, $email, $question, $type=='A_QUEUED', $name);
 				break;
 				
 			case 'C':
 			case 'C_QUEUED':
-				$parent=qa_post_get_full($parentid, 'QA');
-				$commentsfollows=qa_db_single_select(qa_db_full_child_posts_selectspec(null, $parentid));
-				$question=qa_post_parent_to_question($parent);
-				$postid=qa_comment_create($userid, $handle, null, $content, $format, $text, $notify, $email, $question, $parent, $commentsfollows, $type=='C_QUEUED', $name);
+				$parent=as_post_get_full($parentid, 'QA');
+				$commentsfollows=as_db_single_select(as_db_full_child_posts_selectspec(null, $parentid));
+				$question=as_post_parent_to_question($parent);
+				$postid=as_comment_create($userid, $handle, null, $content, $format, $text, $notify, $email, $question, $parent, $commentsfollows, $type=='C_QUEUED', $name);
 				break;
 				
 			default:
-				qa_fatal_error('Post type not recognized: '.$type);
+				as_fatal_error('Post type not recognized: '.$type);
 				break;
 		}
 		
@@ -91,14 +91,14 @@
 	}
 	
 	
-	function qa_post_set_content($postid, $title, $content, $format=null, $tags=null, $notify=null, $email=null, $byuserid=null, $extravalue=null, $name=null)
+	function as_post_set_content($postid, $title, $content, $format=null, $tags=null, $notify=null, $email=null, $byuserid=null, $extravalue=null, $name=null)
 /*
 	Change the data stored for post $postid based on any of the $title, $content, $format, $tags, $notify, $email,
 	$extravalue and $name parameters passed which are not null. The meaning of these parameters is the same as for
-	qa_post_create() above. Pass the identify of the user making this change in $byuserid (or null for silent).
+	as_post_create() above. Pass the identify of the user making this change in $byuserid (or null for silent).
 */
 	{
-		$oldpost=qa_post_get_full($postid, 'QAC');
+		$oldpost=as_post_get_full($postid, 'QAC');
 		
 		if (!isset($title))
 			$title=$oldpost['title'];
@@ -110,223 +110,223 @@
 			$format=$oldpost['format'];
 			
 		if (!isset($tags))
-			$tags=qa_tagstring_to_tags($oldpost['tags']);
+			$tags=as_tagstring_to_tags($oldpost['tags']);
 			
 		if (isset($notify) || isset($email))
-			$setnotify=qa_combine_notify_email($oldpost['userid'], isset($notify) ? $notify : isset($oldpost['notify']),
+			$setnotify=as_combine_notify_email($oldpost['userid'], isset($notify) ? $notify : isset($oldpost['notify']),
 				isset($email) ? $email : $oldpost['notify']);
 		else
 			$setnotify=$oldpost['notify'];
 	
-		$byhandle=qa_post_userid_to_handle($byuserid);
-		$text=qa_post_content_to_text($content, $format);
+		$byhandle=as_post_userid_to_handle($byuserid);
+		$text=as_post_content_to_text($content, $format);
 		
 		switch ($oldpost['basetype']) {
 			case 'Q':
-				$tagstring=qa_post_tags_to_tagstring($tags);
-				qa_question_set_content($oldpost, $title, $content, $format, $text, $tagstring, $setnotify, $byuserid, $byhandle, null, $extravalue, $name);
+				$tagstring=as_post_tags_to_tagstring($tags);
+				as_question_set_content($oldpost, $title, $content, $format, $text, $tagstring, $setnotify, $byuserid, $byhandle, null, $extravalue, $name);
 				break;
 				
 			case 'A':
-				$question=qa_post_get_full($oldpost['parentid'], 'Q');
-				qa_answer_set_content($oldpost, $content, $format, $text, $setnotify, $byuserid, $byhandle, null, $question, $name);
+				$question=as_post_get_full($oldpost['parentid'], 'Q');
+				as_answer_set_content($oldpost, $content, $format, $text, $setnotify, $byuserid, $byhandle, null, $question, $name);
 				break;
 				
 			case 'C':
-				$parent=qa_post_get_full($oldpost['parentid'], 'QA');
-				$question=qa_post_parent_to_question($parent);
-				qa_comment_set_content($oldpost, $content, $format, $text, $setnotify, $byuserid, $byhandle, null, $question, $parent, $name);
+				$parent=as_post_get_full($oldpost['parentid'], 'QA');
+				$question=as_post_parent_to_question($parent);
+				as_comment_set_content($oldpost, $content, $format, $text, $setnotify, $byuserid, $byhandle, null, $question, $parent, $name);
 				break;
 		}
 	}
 
 	
-	function qa_post_set_category($postid, $categoryid, $byuserid=null)
+	function as_post_set_category($postid, $categoryid, $byuserid=null)
 /*
 	Change the category of $postid to $categoryid. The category of all related posts (shown together on the same
 	question page) will also be changed. Pass the identify of the user making this change in $byuserid (or null for an
 	anonymous change).
 */
 	{
-		$oldpost=qa_post_get_full($postid, 'QAC');
+		$oldpost=as_post_get_full($postid, 'QAC');
 		
 		if ($oldpost['basetype']=='Q') {
-			$byhandle=qa_post_userid_to_handle($byuserid);
-			$answers=qa_post_get_question_answers($postid);
-			$commentsfollows=qa_post_get_question_commentsfollows($postid);
-			$closepost=qa_post_get_question_closepost($postid);
-			qa_question_set_category($oldpost, $categoryid, $byuserid, $byhandle, null, $answers, $commentsfollows, $closepost);
+			$byhandle=as_post_userid_to_handle($byuserid);
+			$answers=as_post_get_question_answers($postid);
+			$commentsfollows=as_post_get_question_commentsfollows($postid);
+			$closepost=as_post_get_question_closepost($postid);
+			as_question_set_category($oldpost, $categoryid, $byuserid, $byhandle, null, $answers, $commentsfollows, $closepost);
 
 		} else
-			qa_post_set_category($oldpost['parentid'], $categoryid, $byuserid); // keep looking until we find the parent question
+			as_post_set_category($oldpost['parentid'], $categoryid, $byuserid); // keep looking until we find the parent question
 	}
 
 	
-	function qa_post_set_selchildid($questionid, $answerid, $byuserid=null)
+	function as_post_set_selchildid($questionid, $answerid, $byuserid=null)
 /*
 	Set the selected best answer of $questionid to $answerid (or to none if $answerid is null). Pass the identify of the
 	user in $byuserid (or null for an anonymous change).
 */
 	{
-		$oldquestion=qa_post_get_full($questionid, 'Q');
-		$byhandle=qa_post_userid_to_handle($byuserid);
-		$answers=qa_post_get_question_answers($questionid);
+		$oldquestion=as_post_get_full($questionid, 'Q');
+		$byhandle=as_post_userid_to_handle($byuserid);
+		$answers=as_post_get_question_answers($questionid);
 		
 		if (isset($answerid) && !isset($answers[$answerid]))
-			qa_fatal_error('Answer ID could not be found: '.$answerid);
+			as_fatal_error('Answer ID could not be found: '.$answerid);
 		
-		qa_question_set_selchildid($byuserid, $byuserid, null, $oldquestion, $answerid, $answers);
+		as_question_set_selchildid($byuserid, $byuserid, null, $oldquestion, $answerid, $answers);
 	}
 
 	
-	function qa_post_set_closed($questionid, $closed=true, $originalpostid=null, $note=null, $byuserid=null)
+	function as_post_set_closed($questionid, $closed=true, $originalpostid=null, $note=null, $byuserid=null)
 /*
 	Closed $questionid if $closed is true, otherwise reopen it. If $closed is true, pass either the $originalpostid of
 	the question that it is a duplicate of, or a $note to explain why it's closed. Pass the identify of the user in
 	$byuserid (or null for an anonymous change).
 */
 	{
-		$oldquestion=qa_post_get_full($questionid, 'Q');
-		$oldclosepost=qa_post_get_question_closepost($questionid);
-		$byhandle=qa_post_userid_to_handle($byuserid);
+		$oldquestion=as_post_get_full($questionid, 'Q');
+		$oldclosepost=as_post_get_question_closepost($questionid);
+		$byhandle=as_post_userid_to_handle($byuserid);
 		
 		if ($closed) {
 			if (isset($originalpostid))
-				qa_question_close_duplicate($oldquestion, $oldclosepost, $originalpostid, $byuserid, $byhandle, null);
+				as_question_close_duplicate($oldquestion, $oldclosepost, $originalpostid, $byuserid, $byhandle, null);
 			elseif (isset($note))
-				qa_question_close_other($oldquestion, $oldclosepost, $note, $byuserid, $byhandle, null);
+				as_question_close_other($oldquestion, $oldclosepost, $note, $byuserid, $byhandle, null);
 			else
-				qa_fatal_error('Question must be closed as a duplicate or with a note');
+				as_fatal_error('Question must be closed as a duplicate or with a note');
 		
 		} else
-			qa_question_close_clear($oldquestion, $oldclosepost, $byuserid, $byhandle, null);
+			as_question_close_clear($oldquestion, $oldclosepost, $byuserid, $byhandle, null);
 	}
 	
 	
-	function qa_post_set_hidden($postid, $hidden=true, $byuserid=null)
+	function as_post_set_hidden($postid, $hidden=true, $byuserid=null)
 /*
 	Hide $postid if $hidden is true, otherwise show the post. Pass the identify of the user making this change in
 	$byuserid (or null for a silent change). This function is included mainly for backwards compatibility.
 */
 	{
-		qa_post_set_status($postid, $hidden ? QA_POST_STATUS_HIDDEN : QA_POST_STATUS_NORMAL, $byuserid);
+		as_post_set_status($postid, $hidden ? QA_POST_STATUS_HIDDEN : QA_POST_STATUS_NORMAL, $byuserid);
 	}
 	
 	
-	function qa_post_set_status($postid, $status, $byuserid=null)
+	function as_post_set_status($postid, $status, $byuserid=null)
 /*
 	Change the status of $postid to $status, which should be one of the QA_POST_STATUS_* constants defined in
 	qa-app-post-update.php. Pass the identify of the user making this change in $byuserid (or null for a silent change).
 */
 	{
-		$oldpost=qa_post_get_full($postid, 'QAC');
-		$byhandle=qa_post_userid_to_handle($byuserid);
+		$oldpost=as_post_get_full($postid, 'QAC');
+		$byhandle=as_post_userid_to_handle($byuserid);
 		
 		switch ($oldpost['basetype']) {
 			case 'Q':
-				$answers=qa_post_get_question_answers($postid);
-				$commentsfollows=qa_post_get_question_commentsfollows($postid);
-				$closepost=qa_post_get_question_closepost($postid);
-				qa_question_set_status($oldpost, $status, $byuserid, $byhandle, null, $answers, $commentsfollows, $closepost);
+				$answers=as_post_get_question_answers($postid);
+				$commentsfollows=as_post_get_question_commentsfollows($postid);
+				$closepost=as_post_get_question_closepost($postid);
+				as_question_set_status($oldpost, $status, $byuserid, $byhandle, null, $answers, $commentsfollows, $closepost);
 				break;
 				
 			case 'A':
-				$question=qa_post_get_full($oldpost['parentid'], 'Q');
-				$commentsfollows=qa_post_get_answer_commentsfollows($postid);
-				qa_answer_set_status($oldpost, $status, $byuserid, $byhandle, null, $question, $commentsfollows);
+				$question=as_post_get_full($oldpost['parentid'], 'Q');
+				$commentsfollows=as_post_get_answer_commentsfollows($postid);
+				as_answer_set_status($oldpost, $status, $byuserid, $byhandle, null, $question, $commentsfollows);
 				break;
 				
 			case 'C':
-				$parent=qa_post_get_full($oldpost['parentid'], 'QA');
-				$question=qa_post_parent_to_question($parent);
-				qa_comment_set_status($oldpost, $status, $byuserid, $byhandle, null, $question, $parent);
+				$parent=as_post_get_full($oldpost['parentid'], 'QA');
+				$question=as_post_parent_to_question($parent);
+				as_comment_set_status($oldpost, $status, $byuserid, $byhandle, null, $question, $parent);
 				break;
 		}
 	}
 
 	
-	function qa_post_set_created($postid, $created)
+	function as_post_set_created($postid, $created)
 /*
 	Set the created date of $postid to $created, which is a unix timestamp.
 */
 	{
-		$oldpost=qa_post_get_full($postid);
+		$oldpost=as_post_get_full($postid);
 		
-		qa_db_post_set_created($postid, $created);
+		as_db_post_set_created($postid, $created);
 		
 		switch ($oldpost['basetype']) {
 			case 'Q':
-				qa_db_hotness_update($postid);
+				as_db_hotness_update($postid);
 				break;
 				
 			case 'A':
-				qa_db_hotness_update($oldpost['parentid']);
+				as_db_hotness_update($oldpost['parentid']);
 				break;
 		}
 	}
 	
 	
-	function qa_post_delete($postid)
+	function as_post_delete($postid)
 /*
 	Delete $postid from the database, hiding it first if appropriate.
 */
 	{
-		$oldpost=qa_post_get_full($postid, 'QAC');
+		$oldpost=as_post_get_full($postid, 'QAC');
 		
 		if (!$oldpost['hidden']) {
-			qa_post_set_hidden($postid, true, null);
-			$oldpost=qa_post_get_full($postid, 'QAC');
+			as_post_set_hidden($postid, true, null);
+			$oldpost=as_post_get_full($postid, 'QAC');
 		}
 		
 		switch ($oldpost['basetype']) {
 			case 'Q':
-				$answers=qa_post_get_question_answers($postid);
-				$commentsfollows=qa_post_get_question_commentsfollows($postid);
-				$closepost=qa_post_get_question_closepost($postid);
+				$answers=as_post_get_question_answers($postid);
+				$commentsfollows=as_post_get_question_commentsfollows($postid);
+				$closepost=as_post_get_question_closepost($postid);
 				
 				if (count($answers) || count($commentsfollows))
-					qa_fatal_error('Could not delete question ID due to dependents: '.$postid);
+					as_fatal_error('Could not delete question ID due to dependents: '.$postid);
 					
-				qa_question_delete($oldpost, null, null, null, $closepost);
+				as_question_delete($oldpost, null, null, null, $closepost);
 				break;
 				
 			case 'A':
-				$question=qa_post_get_full($oldpost['parentid'], 'Q');
-				$commentsfollows=qa_post_get_answer_commentsfollows($postid);
+				$question=as_post_get_full($oldpost['parentid'], 'Q');
+				$commentsfollows=as_post_get_answer_commentsfollows($postid);
 
 				if (count($commentsfollows))
-					qa_fatal_error('Could not delete answer ID due to dependents: '.$postid);
+					as_fatal_error('Could not delete answer ID due to dependents: '.$postid);
 
-				qa_answer_delete($oldpost, $question, null, null, null);
+				as_answer_delete($oldpost, $question, null, null, null);
 				break;
 				
 			case 'C':
-				$parent=qa_post_get_full($oldpost['parentid'], 'QA');
-				$question=qa_post_parent_to_question($parent);
-				qa_comment_delete($oldpost, $question, $parent, null, null, null);
+				$parent=as_post_get_full($oldpost['parentid'], 'QA');
+				$question=as_post_parent_to_question($parent);
+				as_comment_delete($oldpost, $question, $parent, null, null, null);
 				break;
 		}
 	}
 
 
-	function qa_post_get_full($postid, $requiredbasetypes=null)
+	function as_post_get_full($postid, $requiredbasetypes=null)
 /*
 	Return the full information from the database for $postid in an array.
 */
 	{
-		$post=qa_db_single_select(qa_db_full_post_selectspec(null, $postid));
+		$post=as_db_single_select(as_db_full_post_selectspec(null, $postid));
 			
 		if (!is_array($post))
-			qa_fatal_error('Post ID could not be found: '.$postid);
+			as_fatal_error('Post ID could not be found: '.$postid);
 		
 		if (isset($requiredbasetypes) && !is_numeric(strpos($requiredbasetypes, $post['basetype'])))
-			qa_fatal_error('Post of wrong type: '.$post['basetype']);
+			as_fatal_error('Post of wrong type: '.$post['basetype']);
 		
 		return $post;
 	}
 
 	
-	function qa_post_userid_to_handle($userid)
+	function as_post_userid_to_handle($userid)
 /*
 	Return the handle corresponding to $userid, unless it is null in which case return null.
 */
@@ -335,15 +335,15 @@
 			if (QA_FINAL_EXTERNAL_USERS) {
 				require_once QA_INCLUDE_DIR.'qa-app-users.php';
 				
-				$handles=qa_get_public_from_userids(array($userid));
+				$handles=as_get_public_from_userids(array($userid));
 				
 				return @$handles[$userid];
 			
 			} else {
-				$user=qa_db_single_select(qa_db_user_account_selectspec($userid, true));
+				$user=as_db_single_select(as_db_user_account_selectspec($userid, true));
 				
 				if (!is_array($user))
-					qa_fatal_error('User ID could not be found: '.$userid);
+					as_fatal_error('User ID could not be found: '.$userid);
 
 				return $user['handle'];
 			}
@@ -353,21 +353,21 @@
 	}
 
 
-	function qa_post_content_to_text($content, $format)
+	function as_post_content_to_text($content, $format)
 /*
 	Return the textual rendition of $content in $format (used for indexing).
 */
 	{
-		$viewer=qa_load_viewer($content, $format);
+		$viewer=as_load_viewer($content, $format);
 		
 		if (!isset($viewer))
-			qa_fatal_error('Content could not be parsed in format: '.$format);
+			as_fatal_error('Content could not be parsed in format: '.$format);
 			
 		return $viewer->get_text($content, $format, array());
 	}
 
 	
-	function qa_post_tags_to_tagstring($tags)
+	function as_post_tags_to_tagstring($tags)
 /*
 	Return tagstring to store in the database based on $tags as an array or a comma-separated string.
 */
@@ -375,18 +375,18 @@
 		if (is_array($tags))
 			$tags=implode(',', $tags);
 		
-		return qa_tags_to_tagstring(array_unique(preg_split('/\s*,\s*/', qa_strtolower(strtr($tags, '/', ' ')), -1, PREG_SPLIT_NO_EMPTY)));
+		return as_tags_to_tagstring(array_unique(preg_split('/\s*,\s*/', as_strtolower(strtr($tags, '/', ' ')), -1, PREG_SPLIT_NO_EMPTY)));
 	}
 
 	
-	function qa_post_get_question_answers($questionid)
+	function as_post_get_question_answers($questionid)
 /*
 	Return the full database records for all answers to question $questionid
 */
 	{
 		$answers=array();
 		
-		$childposts=qa_db_single_select(qa_db_full_child_posts_selectspec(null, $questionid));
+		$childposts=as_db_single_select(as_db_full_child_posts_selectspec(null, $questionid));
 		
 		foreach ($childposts as $postid => $post)
 			if ($post['basetype']=='A')
@@ -396,16 +396,16 @@
 	}
 
 	
-	function qa_post_get_question_commentsfollows($questionid)
+	function as_post_get_question_commentsfollows($questionid)
 /*
 	Return the full database records for all comments or follow-on questions for question $questionid or its answers
 */
 	{
 		$commentsfollows=array();
 		
-		list($childposts, $achildposts)=qa_db_multi_select(array(
-			qa_db_full_child_posts_selectspec(null, $questionid),
-			qa_db_full_a_child_posts_selectspec(null, $questionid),
+		list($childposts, $achildposts)=as_db_multi_select(array(
+			as_db_full_child_posts_selectspec(null, $questionid),
+			as_db_full_a_child_posts_selectspec(null, $questionid),
 		));
 
 		foreach ($childposts as $postid => $post)
@@ -420,23 +420,23 @@
 	}
 	
 	
-	function qa_post_get_question_closepost($questionid)
+	function as_post_get_question_closepost($questionid)
 /*
 	Return the full database record for the post which closed $questionid, if there is any
 */
 	{
-		return qa_db_single_select(qa_db_post_close_post_selectspec($questionid));
+		return as_db_single_select(as_db_post_close_post_selectspec($questionid));
 	}
 
 	
-	function qa_post_get_answer_commentsfollows($answerid)
+	function as_post_get_answer_commentsfollows($answerid)
 /*
 	Return the full database records for all comments or follow-on questions for answer $answerid
 */
 	{
 		$commentsfollows=array();
 		
-		$childposts=qa_db_single_select(qa_db_full_child_posts_selectspec(null, $answerid));
+		$childposts=as_db_single_select(as_db_full_child_posts_selectspec(null, $answerid));
 
 		foreach ($childposts as $postid => $post)
 			if ( ($post['basetype']=='Q') || ($post['basetype']=='C') )
@@ -446,7 +446,7 @@
 	}
 	
 
-	function qa_post_parent_to_question($parent)
+	function as_post_parent_to_question($parent)
 /*
 	Return $parent if it's the database record for a question, otherwise return the database record for its parent
 */
@@ -454,7 +454,7 @@
 		if ($parent['basetype']=='Q')
 			$question=$parent;
 		else
-			$question=qa_post_get_full($parent['parentid'], 'Q');
+			$question=as_post_get_full($parent['parentid'], 'Q');
 		
 		return $question;
 	}

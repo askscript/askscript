@@ -30,15 +30,15 @@
 	}
 	
 	
-	function qa_db_hotness_update($firstpostid, $lastpostid=null, $viewincrement=false)
+	function as_db_hotness_update($firstpostid, $lastpostid=null, $viewincrement=false)
 /*
 	Recalculate the hotness in the database for posts $firstpostid to $lastpostid (if specified)
 	If $viewincrement is true, also increment the views counter for the post, and include that in the hotness calculation
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
-		if (qa_should_update_counts()) {
+		if (as_should_update_counts()) {
 			if (!isset($lastpostid))
 				$lastpostid=$firstpostid;
 			
@@ -55,18 +55,18 @@
 			$arguments=array(
 				$firstpostid,
 				$lastpostid,
-				qa_opt('hot_weight_q_age'),
-				qa_opt('hot_weight_a_age'),
-				qa_opt('hot_weight_answers')*160000,
-				qa_opt('hot_weight_votes')*160000,
+				as_opt('hot_weight_q_age'),
+				as_opt('hot_weight_a_age'),
+				as_opt('hot_weight_answers')*160000,
+				as_opt('hot_weight_votes')*160000,
 				$viewincrement ? 1 : 0,
-				qa_opt('hot_weight_views')*4000,
+				as_opt('hot_weight_views')*4000,
 			);
 			
 			if ($viewincrement)
-				$arguments[]=qa_remote_ip_address();
+				$arguments[]=as_remote_ip_address();
 	
-			 qa_db_query_raw(qa_db_apply_sub($query, $arguments));
+			 as_db_query_raw(as_db_apply_sub($query, $arguments));
 		}
 	}
 

@@ -30,12 +30,12 @@
 	}
 
 	
-	function qa_get_max_upload_size()
+	function as_get_max_upload_size()
 /*
 	Return the maximum size of file that can be uploaded, based on database and PHP limits
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		$mindb=16777215; // from MEDIUMBLOB column type
 		
@@ -54,7 +54,7 @@
 	}
 	
 	
-	function qa_upload_file($localfilename, $sourcefilename, $maxfilesize=null, $onlyimage=false, $imagemaxwidth=null, $imagemaxheight=null)
+	function as_upload_file($localfilename, $sourcefilename, $maxfilesize=null, $onlyimage=false, $imagemaxwidth=null, $imagemaxheight=null)
 /*
 	Move an uploaded image or other file into blob storage. Pass the $localfilename where the file is currently stored
 	(temporarily) and the $sourcefilename of the file on the user's computer (if using PHP's usual file upload
@@ -71,7 +71,7 @@
 	'bloburl' => the url that can be used to view/download the created blob (if there was no error)
 */
 	{
-		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
+		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
 		
 		$result=array();
 		
@@ -80,18 +80,18 @@
 		require_once QA_INCLUDE_DIR.'qa-app-users.php';
 		require_once QA_INCLUDE_DIR.'qa-app-limits.php';
 		
-		switch (qa_user_permit_error(null, QA_LIMIT_UPLOADS))
+		switch (as_user_permit_error(null, QA_LIMIT_UPLOADS))
 		{
 			case 'limit':
-				$result['error']=qa_lang('main/upload_limit');
+				$result['error']=as_lang('main/upload_limit');
 				return $result;
 			
 			case false:
-				qa_limits_increment(qa_get_logged_in_userid(), QA_LIMIT_UPLOADS);
+				as_limits_increment(as_get_logged_in_userid(), QA_LIMIT_UPLOADS);
 				break;
 
 			default:
-				$result['error']=qa_lang('users/no_permission');
+				$result['error']=as_lang('users/no_permission');
 				return $result;
 		}
 		
@@ -99,12 +99,12 @@
 	
 		$filesize=filesize($localfilename);
 		if (isset($maxfilesize))
-			$maxfilesize=min($maxfilesize, qa_get_max_upload_size());
+			$maxfilesize=min($maxfilesize, as_get_max_upload_size());
 		else
-			$maxfilesize=qa_get_max_upload_size();
+			$maxfilesize=as_get_max_upload_size();
 		
 		if ( ($filesize<=0) || ($filesize>$maxfilesize) ) { // if file was too big for PHP, $filesize will be zero
-			$result['error']=qa_lang_sub('main/max_upload_size_x', number_format($maxfilesize/1048576, 1).'MB');
+			$result['error']=as_lang_sub('main/max_upload_size_x', number_format($maxfilesize/1048576, 1).'MB');
 			return $result;
 		}
 		
@@ -141,7 +141,7 @@
 			
 		if ($onlyimage)
 			if ( (!$isimage) || !is_array($imagesize) ) {
-				$result['error']=qa_lang_sub('main/image_not_read', 'GIF, JPG, PNG');
+				$result['error']=as_lang_sub('main/image_not_read', 'GIF, JPG, PNG');
 				return $result;
 			}
 			
@@ -153,7 +153,7 @@
 		
 		require_once QA_INCLUDE_DIR.'qa-util-image.php';
 
-		if ($isimage && qa_has_gd_image()) {
+		if ($isimage && as_has_gd_image()) {
 			$image=@imagecreatefromstring($content);
 		
 			if (is_resource($image)) {
@@ -161,15 +161,15 @@
 				$result['height']=$height=imagesy($image);
 				
 				if (isset($imagemaxwidth) || isset($imagemaxheight))
-					if (qa_image_constrain(
+					if (as_image_constrain(
 						$width, $height,
 						isset($imagemaxwidth) ? $imagemaxwidth : $width,
 						isset($imagemaxheight) ? $imagemaxheight : $height
 					)) {
-						qa_gd_image_resize($image, $width, $height);
+						as_gd_image_resize($image, $width, $height);
 
 						if (is_resource($image)) {
-							$content=qa_gd_image_jpeg($image);
+							$content=as_gd_image_jpeg($image);
 							$result['format']=$format='jpeg';
 							$result['width']=$width;
 							$result['height']=$height;
@@ -185,29 +185,29 @@
 	
 		require_once QA_INCLUDE_DIR.'qa-app-blobs.php';
 
-		$userid=qa_get_logged_in_userid();
-		$cookieid=isset($userid) ? qa_cookie_get() : qa_cookie_get_create();
-		$result['blobid']=qa_create_blob($content, $format, $sourcefilename, $userid, $cookieid, qa_remote_ip_address());
+		$userid=as_get_logged_in_userid();
+		$cookieid=isset($userid) ? as_cookie_get() : as_cookie_get_create();
+		$result['blobid']=as_create_blob($content, $format, $sourcefilename, $userid, $cookieid, as_remote_ip_address());
 		
 		if (!isset($result['blobid'])) {
-			$result['error']=qa_lang('main/general_error');
+			$result['error']=as_lang('main/general_error');
 			return $result;
 		}
 		
-		$result['bloburl']=qa_get_blob_url($result['blobid'], true);
+		$result['bloburl']=as_get_blob_url($result['blobid'], true);
 	
 		return $result;		
 	}
 	
 
-	function qa_upload_file_one($maxfilesize=null, $onlyimage=false, $imagemaxwidth=null, $imagemaxheight=null)
+	function as_upload_file_one($maxfilesize=null, $onlyimage=false, $imagemaxwidth=null, $imagemaxheight=null)
 /*
-	In response to a file upload, move the first uploaded file into blob storage. Other parameters are as for qa_upload_file(...)
+	In response to a file upload, move the first uploaded file into blob storage. Other parameters are as for as_upload_file(...)
 */
 	{
 		$file=reset($_FILES);
 		
-		return qa_upload_file($file['tmp_name'], $file['name'], $maxfilesize, $onlyimage, $imagemaxwidth, $imagemaxheight);
+		return as_upload_file($file['tmp_name'], $file['name'], $maxfilesize, $onlyimage, $imagemaxwidth, $imagemaxheight);
 	}
 	
 	

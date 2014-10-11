@@ -44,7 +44,7 @@
 	}
 
 
-	qa_register_plugin_module('page', 'qa-xml-sitemap.php', 'qa_xml_sitemap', 'XML Sitemap');
+	as_register_plugin_module('page', 'qa-xml-sitemap.php', 'as_xml_sitemap', 'XML Sitemap');
 	
 
 /*

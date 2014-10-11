@@ -30,23 +30,23 @@
 	}
 
 
-	function qa_get_mysql_user_column_type()
+	function as_get_mysql_user_column_type()
 	{
 		return 'BIGINT UNSIGNED';
 	}
 
 
-	function qa_get_login_links($relative_url_prefix, $redirect_back_to_url)
+	function as_get_login_links($relative_url_prefix, $redirect_back_to_url)
 	{
 		return array(
-			'login' => wp_login_url(qa_opt('site_url').$redirect_back_to_url),
+			'login' => wp_login_url(as_opt('site_url').$redirect_back_to_url),
 			'register' => site_url('wp-login.php?action=register'),
 			'logout' => strtr(wp_logout_url(), array('&amp;' => '&')),
 		);
 	}
 	
 
-	function qa_get_logged_in_user()
+	function as_get_logged_in_user()
 	{
 		$wordpressuser=wp_get_current_user();
 		
@@ -73,7 +73,7 @@
 	}
 
 	
-	function qa_get_user_email($userid)
+	function as_get_user_email($userid)
 	{
 		$user=get_userdata($userid);
 		
@@ -81,12 +81,12 @@
 	}
 	
 
-	function qa_get_userids_from_public($publicusernames)
+	function as_get_userids_from_public($publicusernames)
 	{
 		global $wpdb;
 		
 		if (count($publicusernames))
-			return qa_db_read_all_assoc(qa_db_query_sub(
+			return as_db_read_all_assoc(as_db_query_sub(
 				'SELECT user_nicename, ID FROM '.$wpdb->base_prefix.'users WHERE user_nicename IN ($)',
 				$publicusernames
 			), 'user_nicename', 'ID');
@@ -95,22 +95,22 @@
 	}
 
 
-	function qa_get_public_from_userids($userids)
+	function as_get_public_from_userids($userids)
 	{
-		global $wpdb, $qa_cache_wp_user_emails;
+		global $wpdb, $as_cache_wp_user_emails;
 		
 		if (count($userids)) {
 			$useridtopublic=array();
-			$qa_cache_wp_user_emails=array();
+			$as_cache_wp_user_emails=array();
 			
-			$userfields=qa_db_read_all_assoc(qa_db_query_sub(
+			$userfields=as_db_read_all_assoc(as_db_query_sub(
 				'SELECT ID, user_nicename, user_email FROM '.$wpdb->base_prefix.'users WHERE ID IN (#)',
 				$userids
 			), 'ID');
 			
 			foreach ($userfields as $id => $fields) {
 				$useridtopublic[$id]=$fields['user_nicename'];
-				$qa_cache_wp_user_emails[$id]=$fields['user_email'];
+				$as_cache_wp_user_emails[$id]=$fields['user_email'];
 			}
 			
 			return $useridtopublic;
@@ -120,17 +120,17 @@
 	}
 
 
-	function qa_get_logged_in_user_html($logged_in_user, $relative_url_prefix)
+	function as_get_logged_in_user_html($logged_in_user, $relative_url_prefix)
 	{
 		$publicusername=$logged_in_user['publicusername'];
 		
-		return '<a href="'.qa_path_html('user/'.$publicusername).'" class="qa-user-link">'.htmlspecialchars($publicusername).'</a>';
+		return '<a href="'.as_path_html('user/'.$publicusername).'" class="qa-user-link">'.htmlspecialchars($publicusername).'</a>';
 	}
 
 
-	function qa_get_users_html($userids, $should_include_link, $relative_url_prefix)
+	function as_get_users_html($userids, $should_include_link, $relative_url_prefix)
 	{
-		$useridtopublic=qa_get_public_from_userids($userids);
+		$useridtopublic=as_get_public_from_userids($userids);
 		
 		$usershtml=array();
 
@@ -140,27 +140,27 @@
 			$usershtml[$userid]=htmlspecialchars($publicusername);
 			
 			if ($should_include_link)
-				$usershtml[$userid]='<a href="'.qa_path_html('user/'.$publicusername).'" class="qa-user-link">'.$usershtml[$userid].'</a>';
+				$usershtml[$userid]='<a href="'.as_path_html('user/'.$publicusername).'" class="qa-user-link">'.$usershtml[$userid].'</a>';
 		}
 			
 		return $usershtml;
 	}
 	
 	
-	function qa_avatar_html_from_userid($userid, $size, $padding)
+	function as_avatar_html_from_userid($userid, $size, $padding)
 	{
 		require_once QA_INCLUDE_DIR.'qa-app-format.php';
 		
-		global $qa_cache_wp_user_emails;
+		global $as_cache_wp_user_emails;
 		
-		if (isset($qa_cache_wp_user_emails[$userid]))
-			return qa_get_gravatar_html($qa_cache_wp_user_emails[$userid], $size);
+		if (isset($as_cache_wp_user_emails[$userid]))
+			return as_get_gravatar_html($as_cache_wp_user_emails[$userid], $size);
 		
 		return null;
 	}
 
 
-	function qa_user_report_action($userid, $action)
+	function as_user_report_action($userid, $action)
 	{
 	}
 

@@ -35,8 +35,8 @@
 	
 //	Check we have administrative privileges
 
-	if (!qa_admin_check_privileges($qa_content))
-		return $qa_content;
+	if (!as_admin_check_privileges($as_content))
+		return $as_content;
 
 	
 //	Find out the operation
@@ -55,11 +55,11 @@
 	$recalcnow=false;
 	
 	foreach ($allowstates as $allowstate)
-		if (qa_post_text($allowstate) || qa_get($allowstate)) {
+		if (as_post_text($allowstate) || as_get($allowstate)) {
 			$state=$allowstate;
-			$code=qa_post_text('code');
+			$code=as_post_text('code');
 			
-			if (isset($code) && qa_check_form_security_code('admin/recalc', $code))
+			if (isset($code) && as_check_form_security_code('admin/recalc', $code))
 				$recalcnow=true;
 		}
 			
@@ -80,10 +80,10 @@
 			
 			$stoptime=time()+2; // run in lumps of two seconds...
 			
-			while ( qa_recalc_perform_step($state) && (time()<$stoptime) )
+			while ( as_recalc_perform_step($state) && (time()<$stoptime) )
 				;
 			
-			echo qa_html(qa_recalc_get_message($state)).str_repeat('    ', 1024)."<br>\n";
+			echo as_html(as_recalc_get_message($state)).str_repeat('    ', 1024)."<br>\n";
 
 			flush();
 			sleep(1); // ... then rest for one
@@ -92,47 +92,47 @@
 ?>
 		</tt>
 		
-		<a href="<?php echo qa_path_html('admin/stats')?>"><?php echo qa_lang_html('admin/admin_title').' - '.qa_lang_html('admin/stats_title')?></a>
+		<a href="<?php echo as_path_html('admin/stats')?>"><?php echo as_lang_html('admin/admin_title').' - '.as_lang_html('admin/stats_title')?></a>
 	</body>
 </html>
 
 <?php
-		qa_exit();
+		as_exit();
 	
 	} elseif (isset($state)) {
-		$qa_content=qa_content_prepare();
+		$as_content=as_content_prepare();
 
-		$qa_content['title']=qa_lang_html('admin/admin_title');
-		$qa_content['error']=qa_lang_html('misc/form_security_again');
+		$as_content['title']=as_lang_html('admin/admin_title');
+		$as_content['error']=as_lang_html('misc/form_security_again');
 		
-		$qa_content['form']=array(
-			'tags' => 'method="post" action="'.qa_self_html().'"',
+		$as_content['form']=array(
+			'tags' => 'method="post" action="'.as_self_html().'"',
 		
 			'style' => 'wide',
 			
 			'buttons' => array(
 				'recalc' => array(
-					'tags' => 'name="'.qa_html($state).'"',
-					'label' => qa_lang_html('misc/form_security_again'),
+					'tags' => 'name="'.as_html($state).'"',
+					'label' => as_lang_html('misc/form_security_again'),
 				),
 			),
 			
 			'hidden' => array(
-				'code' => qa_get_form_security_code('admin/recalc'),
+				'code' => as_get_form_security_code('admin/recalc'),
 			),
 		);
 		
-		return $qa_content;
+		return $as_content;
 	
 	} else {
 		require_once QA_INCLUDE_DIR.'qa-app-format.php';
 		
-		$qa_content=qa_content_prepare();
+		$as_content=as_content_prepare();
 
-		$qa_content['title']=qa_lang_html('admin/admin_title');
-		$qa_content['error']=qa_lang_html('main/page_not_found');
+		$as_content['title']=as_lang_html('admin/admin_title');
+		$as_content['error']=as_lang_html('main/page_not_found');
 		
-		return $qa_content;
+		return $as_content;
 	}
 			
 

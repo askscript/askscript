@@ -30,7 +30,7 @@
 	}
 
 
-	class qa_event_limits {
+	class as_event_limits {
 
 		function process_event($event, $userid, $handle, $cookieid, $params)
 		{
@@ -46,20 +46,20 @@
 				case 'q_queue':
 				case 'q_post':
 				case 'q_claim':
-					qa_limits_increment($userid, QA_LIMIT_QUESTIONS);
+					as_limits_increment($userid, QA_LIMIT_QUESTIONS);
 					break;
 				
 				case 'a_queue':
 				case 'a_post':
 				case 'a_claim':
-					qa_limits_increment($userid, QA_LIMIT_ANSWERS);
+					as_limits_increment($userid, QA_LIMIT_ANSWERS);
 					break;
 				
 				case 'c_queue':	
 				case 'c_post':
 				case 'c_claim':
 				case 'a_to_c':
-					qa_limits_increment($userid, QA_LIMIT_COMMENTS);
+					as_limits_increment($userid, QA_LIMIT_COMMENTS);
 					break;
 				
 				case 'q_vote_up':
@@ -68,21 +68,21 @@
 				case 'a_vote_up':
 				case 'a_vote_down':
 				case 'a_vote_nil':
-					qa_limits_increment($userid, QA_LIMIT_VOTES);
+					as_limits_increment($userid, QA_LIMIT_VOTES);
 					break;
 					
 				case 'q_flag':
 				case 'a_flag':
 				case 'c_flag':
-					qa_limits_increment($userid, QA_LIMIT_FLAGS);
+					as_limits_increment($userid, QA_LIMIT_FLAGS);
 					break;
 					
 				case 'u_message':
-					qa_limits_increment($userid, QA_LIMIT_MESSAGES);
+					as_limits_increment($userid, QA_LIMIT_MESSAGES);
 					break;
 
 				case 'u_wall_post':
-					qa_limits_increment($userid, QA_LIMIT_WALL_POSTS);
+					as_limits_increment($userid, QA_LIMIT_WALL_POSTS);
 					break;
 			}
 			
@@ -101,12 +101,12 @@
 				if (isset($userid)) {
 					require_once QA_INCLUDE_DIR.'qa-app-users.php';
 					
-					qa_user_report_action($userid, $event);
+					as_user_report_action($userid, $event);
 	
 				} elseif (isset($cookieid)) {
 					require_once QA_INCLUDE_DIR.'qa-app-cookies.php';
 		
-					qa_cookie_report_action($cookieid, $event);
+					as_cookie_report_action($cookieid, $event);
 				}
 			}
 				

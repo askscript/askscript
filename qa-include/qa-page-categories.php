@@ -33,17 +33,17 @@
 	require_once QA_INCLUDE_DIR.'qa-app-format.php';
 
 
-	$categoryslugs=qa_request_parts(1);
+	$categoryslugs=as_request_parts(1);
 	$countslugs=count($categoryslugs);
 
 
 //	Get information about appropriate categories and redirect to questions page if category has no sub-categories
 	
-	$userid=qa_get_logged_in_userid();
-	list($categories, $categoryid, $favoritecats)=qa_db_select_with_pending(
-		qa_db_category_nav_selectspec($categoryslugs, false, false, true),
-		$countslugs ? qa_db_slugs_to_category_id_selectspec($categoryslugs) : null,
-		isset($userid) ? qa_db_user_favorite_categories_selectspec($userid) : null
+	$userid=as_get_logged_in_userid();
+	list($categories, $categoryid, $favoritecats)=as_db_select_with_pending(
+		as_db_category_nav_selectspec($categoryslugs, false, false, true),
+		$countslugs ? as_db_slugs_to_category_id_selectspec($categoryslugs) : null,
+		isset($userid) ? as_db_user_favorite_categories_selectspec($userid) : null
 	);
 	
 	if ($countslugs && !isset($categoryid))
@@ -52,7 +52,7 @@
 
 //	Function for recursive display of categories
 
-	function qa_category_nav_to_browse(&$navigation, $categories, $categoryid, $favoritemap)
+	function as_category_nav_to_browse(&$navigation, $categories, $categoryid, $favoritemap)
 	{
 		foreach ($navigation as $key => $navlink) {
 			$category=$categories[$navlink['categoryid']];
@@ -61,7 +61,7 @@
 				unset($navigation[$key]['url']);
 			elseif ($navlink['selected']) {
 				$navigation[$key]['state']='open';
-				$navigation[$key]['url']=qa_path_html('categories/'.qa_category_path_request($categories, $category['parentid']));
+				$navigation[$key]['url']=as_path_html('categories/'.as_category_path_request($categories, $category['parentid']));
 			} else
 				$navigation[$key]['state']='closed';
 				
@@ -71,28 +71,28 @@
 			$navigation[$key]['note']='';
 			
 			$navigation[$key]['note'].=
-				' - <a href="'.qa_path_html('questions/'.implode('/', array_reverse(explode('/', $category['backpath'])))).'">'.( ($category['qcount']==1)
-					? qa_lang_html_sub('main/1_question', '1', '1')
-					: qa_lang_html_sub('main/x_questions', number_format($category['qcount']))
+				' - <a href="'.as_path_html('questions/'.implode('/', array_reverse(explode('/', $category['backpath'])))).'">'.( ($category['qcount']==1)
+					? as_lang_html_sub('main/1_question', '1', '1')
+					: as_lang_html_sub('main/x_questions', number_format($category['qcount']))
 				).'</a>';
 				
 			if (strlen($category['content']))
-				$navigation[$key]['note'].=qa_html(' - '.$category['content']);
+				$navigation[$key]['note'].=as_html(' - '.$category['content']);
 			
 			if (isset($navlink['subnav']))
-				qa_category_nav_to_browse($navigation[$key]['subnav'], $categories, $categoryid, $favoritemap);
+				as_category_nav_to_browse($navigation[$key]['subnav'], $categories, $categoryid, $favoritemap);
 		}
 	}
 		
 
 //	Prepare content for theme
 
-	$qa_content=qa_content_prepare(false, array_keys(qa_category_path($categories, $categoryid)));
+	$as_content=as_content_prepare(false, array_keys(as_category_path($categories, $categoryid)));
 
-	$qa_content['title']=qa_lang_html('misc/browse_categories');
+	$as_content['title']=as_lang_html('misc/browse_categories');
 	
 	if (count($categories)) {
-		$navigation=qa_category_navigation($categories, $categoryid, 'categories/', false);
+		$navigation=as_category_navigation($categories, $categoryid, 'categories/', false);
 		
 		unset($navigation['all']);
 		
@@ -101,20 +101,20 @@
 			foreach ($favoritecats as $category)
 				$favoritemap[$category['categoryid']]=true;
 
-		qa_category_nav_to_browse($navigation, $categories, $categoryid, $favoritemap);
+		as_category_nav_to_browse($navigation, $categories, $categoryid, $favoritemap);
 		
-		$qa_content['nav_list']=array(
+		$as_content['nav_list']=array(
 			'nav' => $navigation,
 			'type' => 'browse-cat',
 		);
 
 	} else {
-		$qa_content['title']=qa_lang_html('main/no_categories_found');
-		$qa_content['suggest_next']=qa_html_suggest_qs_tags(qa_using_tags());
+		$as_content['title']=as_lang_html('main/no_categories_found');
+		$as_content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
 	}
 
 	
-	return $qa_content;
+	return $as_content;
 
 
 /*

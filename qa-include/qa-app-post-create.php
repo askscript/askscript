@@ -36,7 +36,7 @@
 	require_once QA_INCLUDE_DIR.'qa-util-string.php';
 	
 	
-	function qa_combine_notify_email($userid, $notify, $email)
+	function as_combine_notify_email($userid, $notify, $email)
 /*
 	Return value to store in database combining $notify and $email values entered by user $userid (or null for anonymous)
 */
@@ -45,7 +45,7 @@
 	}
 	
 	
-	function qa_question_create($followanswer, $userid, $handle, $cookieid, $title, $content, $format, $text, $tagstring, $notify, $email,
+	function as_question_create($followanswer, $userid, $handle, $cookieid, $title, $content, $format, $text, $tagstring, $notify, $email,
 		$categoryid=null, $extravalue=null, $queued=false, $name=null)
 /*
 	Add a question (application level) - create record, update appropriate counts, index it, send notifications.
@@ -55,28 +55,28 @@
 	{
 		require_once QA_INCLUDE_DIR.'qa-db-selects.php';
 
-		$postid=qa_db_post_create($queued ? 'Q_QUEUED' : 'Q', @$followanswer['postid'], $userid, isset($userid) ? null : $cookieid,
-			qa_remote_ip_address(), $title, $content, $format, $tagstring, qa_combine_notify_email($userid, $notify, $email),
+		$postid=as_db_post_create($queued ? 'Q_QUEUED' : 'Q', @$followanswer['postid'], $userid, isset($userid) ? null : $cookieid,
+			as_remote_ip_address(), $title, $content, $format, $tagstring, as_combine_notify_email($userid, $notify, $email),
 			$categoryid, isset($userid) ? null : $name);
 		
 		if (isset($extravalue))	{
 			require_once QA_INCLUDE_DIR.'qa-db-metas.php';
-			qa_db_postmeta_set($postid, 'qa_q_extra', $extravalue);
+			as_db_postmeta_set($postid, 'as_q_extra', $extravalue);
 		}
 		
-		qa_db_posts_calc_category_path($postid);
-		qa_db_hotness_update($postid);
+		as_db_posts_calc_category_path($postid);
+		as_db_hotness_update($postid);
 		
 		if ($queued) {
-			qa_db_queuedcount_update();
+			as_db_queuedcount_update();
 
 		} else {
-			qa_post_index($postid, 'Q', $postid, @$followanswer['postid'], $title, $content, $format, $text, $tagstring, $categoryid);
-			qa_update_counts_for_q($postid);
-			qa_db_points_update_ifuser($userid, 'qposts');
+			as_post_index($postid, 'Q', $postid, @$followanswer['postid'], $title, $content, $format, $text, $tagstring, $categoryid);
+			as_update_counts_for_q($postid);
+			as_db_points_update_ifuser($userid, 'qposts');
 		}
 		
-		qa_report_event($queued ? 'q_queue' : 'q_post', $userid, $handle, $cookieid, array(
+		as_report_event($queued ? 'q_queue' : 'q_post', $userid, $handle, $cookieid, array(
 			'postid' => $postid,
 			'parentid' => @$followanswer['postid'],
 			'parent' => $followanswer,
@@ -96,22 +96,22 @@
 	}
 	
 	
-	function qa_update_counts_for_q($postid)
+	function as_update_counts_for_q($postid)
 /*
 	Perform various common cached count updating operations to reflect changes in the question whose id is $postid
 */
 	{
 		if (isset($postid)) // post might no longer exist
-			qa_db_category_path_qcount_update(qa_db_post_get_category_path($postid));
+			as_db_category_path_qcount_update(as_db_post_get_category_path($postid));
 		
-		qa_db_qcount_update();
-		qa_db_unaqcount_update();
-		qa_db_unselqcount_update();
-		qa_db_unupaqcount_update();
+		as_db_qcount_update();
+		as_db_unaqcount_update();
+		as_db_unselqcount_update();
+		as_db_unupaqcount_update();
 	}
 	
 	
-	function qa_array_filter_by_keys($inarray, $keys)
+	function as_array_filter_by_keys($inarray, $keys)
 /*
 	Return an array containing the elements of $inarray whose key is in $keys
 */
@@ -126,62 +126,62 @@
 	}
 
 	
-	function qa_suspend_post_indexing($suspend=true)
+	function as_suspend_post_indexing($suspend=true)
 /*
-	Suspend the indexing (and unindexing) of posts via qa_post_index(...) and qa_post_unindex(...)
+	Suspend the indexing (and unindexing) of posts via as_post_index(...) and as_post_unindex(...)
 	if $suspend is true, otherwise reinstate it. A counter is kept to allow multiple calls.
 */
 	{
-		global $qa_post_indexing_suspended;
+		global $as_post_indexing_suspended;
 		
-		$qa_post_indexing_suspended+=($suspend ? 1 : -1);
+		$as_post_indexing_suspended+=($suspend ? 1 : -1);
 	}
 	
 	
-	function qa_post_index($postid, $type, $questionid, $parentid, $title, $content, $format, $text, $tagstring, $categoryid)
+	function as_post_index($postid, $type, $questionid, $parentid, $title, $content, $format, $text, $tagstring, $categoryid)
 /*
 	Add post $postid (which comes under $questionid) of $type (Q/A/C) to the database index, with $title, $text,
 	$tagstring and $categoryid. Calls through to all installed search modules.
 */
 	{
-		global $qa_post_indexing_suspended;
+		global $as_post_indexing_suspended;
 		
-		if ($qa_post_indexing_suspended>0)
+		if ($as_post_indexing_suspended>0)
 			return;
 			
 	//	Send through to any search modules for indexing
 	
-		$searches=qa_load_modules_with('search', 'index_post');
+		$searches=as_load_modules_with('search', 'index_post');
 		foreach ($searches as $search)
 			$search->index_post($postid, $type, $questionid, $parentid, $title, $content, $format, $text, $tagstring, $categoryid);
 	}
 
 		
-	function qa_answer_create($userid, $handle, $cookieid, $content, $format, $text, $notify, $email, $question, $queued=false, $name=null)
+	function as_answer_create($userid, $handle, $cookieid, $content, $format, $text, $notify, $email, $question, $queued=false, $name=null)
 /*
 	Add an answer (application level) - create record, update appropriate counts, index it, send notifications.
 	$question should contain database record for the question this is an answer to.
 	See qa-app-posts.php for a higher-level function which is easier to use.
 */
 	{
-		$postid=qa_db_post_create($queued ? 'A_QUEUED' : 'A', $question['postid'], $userid, isset($userid) ? null : $cookieid,
-			qa_remote_ip_address(), null, $content, $format, null, qa_combine_notify_email($userid, $notify, $email),
+		$postid=as_db_post_create($queued ? 'A_QUEUED' : 'A', $question['postid'], $userid, isset($userid) ? null : $cookieid,
+			as_remote_ip_address(), null, $content, $format, null, as_combine_notify_email($userid, $notify, $email),
 			$question['categoryid'], isset($userid) ? null : $name);
 		
-		qa_db_posts_calc_category_path($postid);
+		as_db_posts_calc_category_path($postid);
 		
 		if ($queued) {
-			qa_db_queuedcount_update();
+			as_db_queuedcount_update();
 			
 		} else {
 			if ($question['type']=='Q') // don't index answer if parent question is hidden or queued
-				qa_post_index($postid, 'A', $question['postid'], $question['postid'], null, $content, $format, $text, null, $question['categoryid']);
+				as_post_index($postid, 'A', $question['postid'], $question['postid'], null, $content, $format, $text, null, $question['categoryid']);
 			
-			qa_update_q_counts_for_a($question['postid']);
-			qa_db_points_update_ifuser($userid, 'aposts');
+			as_update_q_counts_for_a($question['postid']);
+			as_db_points_update_ifuser($userid, 'aposts');
 		}
 		
-		qa_report_event($queued ? 'a_queue' : 'a_post', $userid, $handle, $cookieid, array(
+		as_report_event($queued ? 'a_queue' : 'a_post', $userid, $handle, $cookieid, array(
 			'postid' => $postid,
 			'parentid' => $question['postid'],
 			'parent' => $question,
@@ -198,20 +198,20 @@
 	}
 	
 	
-	function qa_update_q_counts_for_a($questionid)
+	function as_update_q_counts_for_a($questionid)
 /*
 	Perform various common cached count updating operations to reflect changes in an answer of question $questionid
 */
 	{
-		qa_db_post_acount_update($questionid);
-		qa_db_hotness_update($questionid);
-		qa_db_acount_update();
-		qa_db_unaqcount_update();
-		qa_db_unupaqcount_update();
+		as_db_post_acount_update($questionid);
+		as_db_hotness_update($questionid);
+		as_db_acount_update();
+		as_db_unaqcount_update();
+		as_db_unupaqcount_update();
 	}
 
 	
-	function qa_comment_create($userid, $handle, $cookieid, $content, $format, $text, $notify, $email, $question, $parent, $commentsfollows, $queued=false, $name=null)
+	function as_comment_create($userid, $handle, $cookieid, $content, $format, $text, $notify, $email, $question, $parent, $commentsfollows, $queued=false, $name=null)
 /*
 	Add a comment (application level) - create record, update appropriate counts, index it, send notifications.
 	$question should contain database record for the question this is part of (as direct or comment on Q's answer).
@@ -229,21 +229,21 @@
 		if (!isset($parent))
 			$parent=$question; // for backwards compatibility with old answer parameter
 		
-		$postid=qa_db_post_create($queued ? 'C_QUEUED' : 'C', $parent['postid'], $userid, isset($userid) ? null : $cookieid,
-			qa_remote_ip_address(), null, $content, $format, null, qa_combine_notify_email($userid, $notify, $email),
+		$postid=as_db_post_create($queued ? 'C_QUEUED' : 'C', $parent['postid'], $userid, isset($userid) ? null : $cookieid,
+			as_remote_ip_address(), null, $content, $format, null, as_combine_notify_email($userid, $notify, $email),
 			$question['categoryid'], isset($userid) ? null : $name);
 		
-		qa_db_posts_calc_category_path($postid);
+		as_db_posts_calc_category_path($postid);
 		
 		if ($queued) {
-			qa_db_queuedcount_update();
+			as_db_queuedcount_update();
 		
 		} else {
 			if ( ($question['type']=='Q') && (($parent['type']=='Q') || ($parent['type']=='A')) ) // only index if antecedents fully visible
-				qa_post_index($postid, 'C', $question['postid'], $parent['postid'], null, $content, $format, $text, null, $question['categoryid']);
+				as_post_index($postid, 'C', $question['postid'], $parent['postid'], null, $content, $format, $text, null, $question['categoryid']);
 			
-			qa_db_points_update_ifuser($userid, 'cposts');
-			qa_db_ccount_update();
+			as_db_points_update_ifuser($userid, 'cposts');
+			as_db_ccount_update();
 		}
 		
 		$thread=array();
@@ -252,7 +252,7 @@
 			if (($comment['type']=='C') && ($comment['parentid']==$parent['postid'])) // find just those for this parent, fully visible
 				$thread[]=$comment;
 
-		qa_report_event($queued ? 'c_queue' : 'c_post', $userid, $handle, $cookieid, array(
+		as_report_event($queued ? 'c_queue' : 'c_post', $userid, $handle, $cookieid, array(
 			'postid' => $postid,
 			'parentid' => $parent['postid'],
 			'parenttype' => $parent['basetype'],

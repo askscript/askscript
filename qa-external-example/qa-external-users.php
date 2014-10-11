@@ -39,7 +39,7 @@
 	}
 
 
-	function qa_get_mysql_user_column_type()
+	function as_get_mysql_user_column_type()
 	{
 /*
 	==========================================================================
@@ -75,7 +75,7 @@
 	}
 
 
-	function qa_get_login_links($relative_url_prefix, $redirect_back_to_url)
+	function as_get_login_links($relative_url_prefix, $redirect_back_to_url)
 /*
 	===========================================================================
 	YOU MUST MODIFY THIS FUNCTION, BUT CAN DO SO AFTER Q2A CREATES ITS DATABASE
@@ -163,18 +163,18 @@
 	}
 	
 
-	function qa_get_logged_in_user()
+	function as_get_logged_in_user()
 /*
 	===========================================================================
 	YOU MUST MODIFY THIS FUNCTION, BUT CAN DO SO AFTER Q2A CREATES ITS DATABASE
 	===========================================================================
 
-	qa_get_logged_in_user()
+	as_get_logged_in_user()
 	
 	You should check (using $_COOKIE, $_SESSION or whatever is appropriate) whether a user is
 	currently logged in. If not, return null. If so, return an array with the following elements:
 
-	* userid: a user id appropriate for your response to qa_get_mysql_user_column_type()
+	* userid: a user id appropriate for your response to as_get_mysql_user_column_type()
 	* publicusername: a user description you are willing to show publicly, e.g. the username
 	* email: the logged in user's email address
 	* passsalt: (optional) password salt specific to this user, used for form security codes
@@ -185,10 +185,10 @@
 	To indicate that the user is blocked you can also add an element 'blocked' with the value true.
 	Blocked users are not allowed to perform any write actions such as voting or posting.
 	
-	The result of this function will be passed to your other function qa_get_logged_in_user_html()
+	The result of this function will be passed to your other function as_get_logged_in_user_html()
 	so you may add any other elements to the returned array if they will be useful to you.
 
-	Call qa_db_connection() to get the connection to the Q2A database. If your database is shared with
+	Call as_db_connection() to get the connection to the Q2A database. If your database is shared with
 	Q2A, you can use this with PHP's MySQL functions such as mysql_query() to run queries.
 	
 	In order to access the admin interface of your Q2A site, ensure that the array element 'level'
@@ -214,12 +214,12 @@
 		if ($_SESSION['is_logged_in']) {
 			$userid=$_SESSION['logged_in_userid'];
 
-			$qa_db_connection=qa_db_connection();
+			$as_db_connection=as_db_connection();
 			
 			$result=mysql_fetch_assoc(
 				mysql_query(
-					"SELECT email FROM users WHERE userid='".mysql_real_escape_string($userid, $qa_db_connection)."'",
-					$qa_db_connection
+					"SELECT email FROM users WHERE userid='".mysql_real_escape_string($userid, $as_db_connection)."'",
+					$as_db_connection
 				)
 			);
 			
@@ -245,13 +245,13 @@
 		* Your database has a users table that contains usernames, emails and a flag for admin privileges
 		
 		if ($_COOKIE['sessionid']) {
-			$qa_db_connection=qa_db_connection();
+			$as_db_connection=as_db_connection();
 			
 			$result=mysql_fetch_assoc(
 				mysql_query(
 					"SELECT userid, username, email, admin_flag FROM users WHERE userid=".
-					"(SELECT userid FROM sessions WHERE sessionid='".mysql_real_escape_string($_COOKIE['session_id'], $qa_db_connection)."')",
-					$qa_db_connection
+					"(SELECT userid FROM sessions WHERE sessionid='".mysql_real_escape_string($_COOKIE['session_id'], $as_db_connection)."')",
+					$as_db_connection
 				)
 			);
 			
@@ -270,17 +270,17 @@
 	}
 
 	
-	function qa_get_user_email($userid)
+	function as_get_user_email($userid)
 /*
 	===========================================================================
 	YOU MUST MODIFY THIS FUNCTION, BUT CAN DO SO AFTER Q2A CREATES ITS DATABASE
 	===========================================================================
 
-	qa_get_user_email($userid)
+	as_get_user_email($userid)
 	
 	Return the email address for user $userid, or null if you don't know it.
 	
-	Call qa_db_connection() to get the connection to the Q2A database. If your database is shared with
+	Call as_db_connection() to get the connection to the Q2A database. If your database is shared with
 	Q2A, you can use this with PHP's MySQL functions such as mysql_query() to run queries.
 */
 	{
@@ -295,12 +295,12 @@
 		* Your database is shared with the Q2A site
 		* Your database has a users table that contains emails
 		
-		$qa_db_connection=qa_db_connection();
+		$as_db_connection=as_db_connection();
 		
 		$result=mysql_fetch_assoc(
 			mysql_query(
-				"SELECT email FROM users WHERE userid='".mysql_real_escape_string($userid, $qa_db_connection)."'",
-				$qa_db_connection
+				"SELECT email FROM users WHERE userid='".mysql_real_escape_string($userid, $as_db_connection)."'",
+				$as_db_connection
 			)
 		);
 		
@@ -313,20 +313,20 @@
 	}
 	
 
-	function qa_get_userids_from_public($publicusernames)
+	function as_get_userids_from_public($publicusernames)
 /*
 	===========================================================================
 	YOU MUST MODIFY THIS FUNCTION, BUT CAN DO SO AFTER Q2A CREATES ITS DATABASE
 	===========================================================================
 
-	qa_get_userids_from_public($publicusernames)
+	as_get_userids_from_public($publicusernames)
 	
 	You should take the array of public usernames in $publicusernames, and return an array which
 	maps valid usernames to internal user ids. For each element of this array, the username should be
 	in the key, with the corresponding user id in the value. If your usernames are case- or accent-
 	insensitive, keys should contain the usernames as stored, not necessarily as in $publicusernames.
 	
-	Call qa_db_connection() to get the connection to the Q2A database. If your database is shared with
+	Call as_db_connection() to get the connection to the Q2A database. If your database is shared with
 	Q2A, you can use this with PHP's MySQL functions such as mysql_query() to run queries. If you
 	access this database or any other, try to use a single query instead of one per user.
 */
@@ -359,15 +359,15 @@
 		$publictouserid=array();
 			
 		if (count($publicusernames)) {
-			$qa_db_connection=qa_db_connection();
+			$as_db_connection=as_db_connection();
 			
 			$escapedusernames=array();
 			foreach ($publicusernames as $publicusername)
-				$escapedusernames[]="'".mysql_real_escape_string($publicusername, $qa_db_connection)."'";
+				$escapedusernames[]="'".mysql_real_escape_string($publicusername, $as_db_connection)."'";
 			
 			$results=mysql_query(
 				'SELECT username, userid FROM users WHERE username IN ('.implode(',', $escapedusernames).')',
-				$qa_db_connection
+				$as_db_connection
 			);
 	
 			while ($result=mysql_fetch_assoc($results))
@@ -380,21 +380,21 @@
 	}
 
 
-	function qa_get_public_from_userids($userids)
+	function as_get_public_from_userids($userids)
 /*
 	===========================================================================
 	YOU MUST MODIFY THIS FUNCTION, BUT CAN DO SO AFTER Q2A CREATES ITS DATABASE
 	===========================================================================
 
-	qa_get_public_from_userids($userids)
+	as_get_public_from_userids($userids)
 	
-	This is exactly like qa_get_userids_from_public(), but works in the other direction.
+	This is exactly like as_get_userids_from_public(), but works in the other direction.
 	
 	You should take the array of user identifiers in $userids, and return an array which maps valid
 	userids to public usernames. For each element of this array, the userid you were given should
 	be in the key, with the corresponding username in the value.
 	
-	Call qa_db_connection() to get the connection to the Q2A database. If your database is shared with
+	Call as_db_connection() to get the connection to the Q2A database. If your database is shared with
 	Q2A, you can use this with PHP's MySQL functions such as mysql_query() to run queries. If you
 	access this database or any other, try to use a single query instead of one per user.
 */
@@ -427,15 +427,15 @@
 		$useridtopublic=array();
 		
 		if (count($userids)) {
-			$qa_db_connection=qa_db_connection();
+			$as_db_connection=as_db_connection();
 			
 			$escapeduserids=array();
 			foreach ($userids as $userid)
-				$escapeduserids[]="'".mysql_real_escape_string($userid, $qa_db_connection)."'";
+				$escapeduserids[]="'".mysql_real_escape_string($userid, $as_db_connection)."'";
 			
 			$results=mysql_query(
 				'SELECT username, userid FROM users WHERE userid IN ('.implode(',', $escapeduserids).')',
-				$qa_db_connection
+				$as_db_connection
 			);
 	
 			while ($result=mysql_fetch_assoc($results))
@@ -448,20 +448,20 @@
 	}
 
 
-	function qa_get_logged_in_user_html($logged_in_user, $relative_url_prefix)
+	function as_get_logged_in_user_html($logged_in_user, $relative_url_prefix)
 /*
 	==========================================================================
 	     YOU MAY MODIFY THIS FUNCTION, BUT THE DEFAULT BELOW WILL WORK OK
 	==========================================================================
 
-	qa_get_logged_in_user_html($logged_in_user, $relative_url_prefix)
+	as_get_logged_in_user_html($logged_in_user, $relative_url_prefix)
 
 	You should return HTML code which identifies the logged in user, to be displayed next to the
 	logout link on the Q2A pages. This HTML will only be shown to the logged in user themselves.
 
-	$logged_in_user is the array that you returned from qa_get_logged_in_user(). Hopefully this
+	$logged_in_user is the array that you returned from as_get_logged_in_user(). Hopefully this
 	contains enough information to generate the HTML without another database query, but if not,
-	call qa_db_connection() to get the connection to the Q2A database.
+	call as_db_connection() to get the connection to the Q2A database.
 
 	$relative_url_prefix is a relative URL to the root of the Q2A site, which may be useful if
 	you want to include a link that uses relative URLs. If the Q2A site is in a subdirectory of
@@ -476,7 +476,7 @@
 
 		$publicusername=$logged_in_user['publicusername'];
 		
-		return '<a href="'.qa_path_html('user/'.$publicusername).'" class="qa-user-link">'.htmlspecialchars($publicusername).'</a>';
+		return '<a href="'.as_path_html('user/'.$publicusername).'" class="qa-user-link">'.htmlspecialchars($publicusername).'</a>';
 
 	/*
 		Example 1 - suitable if:
@@ -507,18 +507,18 @@
 	}
 
 
-	function qa_get_users_html($userids, $should_include_link, $relative_url_prefix)
+	function as_get_users_html($userids, $should_include_link, $relative_url_prefix)
 /*
 	==========================================================================
 	     YOU MAY MODIFY THIS FUNCTION, BUT THE DEFAULT BELOW WILL WORK OK
 	==========================================================================
 
-	qa_get_users_html($userids, $should_include_link, $relative_url_prefix)
+	as_get_users_html($userids, $should_include_link, $relative_url_prefix)
 
 	You should return an array of HTML to display for each user in $userids. For each element of
 	this array, the userid should be in the key, with the corresponding HTML in the value.
 	
-	Call qa_db_connection() to get the connection to the Q2A database. If your database is shared with
+	Call as_db_connection() to get the connection to the Q2A database. If your database is shared with
 	Q2A, you can use this with PHP's MySQL functions such as mysql_query() to run queries. If you
 	access this database or any other, try to use a single query instead of one per user.
 	
@@ -536,7 +536,7 @@
 
 	//	By default, show the public username linked to the Q2A profile page for each user
 
-		$useridtopublic=qa_get_public_from_userids($userids);
+		$useridtopublic=as_get_public_from_userids($userids);
 		
 		$usershtml=array();
 
@@ -546,7 +546,7 @@
 			$usershtml[$userid]=htmlspecialchars($publicusername);
 			
 			if ($should_include_link)
-				$usershtml[$userid]='<a href="'.qa_path_html('user/'.$publicusername).'" class="qa-user-link">'.$usershtml[$userid].'</a>';
+				$usershtml[$userid]='<a href="'.as_path_html('user/'.$publicusername).'" class="qa-user-link">'.$usershtml[$userid].'</a>';
 		}
 			
 		return $usershtml;
@@ -557,7 +557,7 @@
 		* Your Q2A site:       http://www.mysite.com/qa/
 		* Your user pages:     http://www.mysite.com/user/[username]
 	
-		$useridtopublic=qa_get_public_from_userids($userids);
+		$useridtopublic=as_get_public_from_userids($userids);
 		
 		foreach ($userids as $userid) {
 			$publicusername=$useridtopublic[$userid];
@@ -579,7 +579,7 @@
 		* Your user pages:     http://www.mysite.com/[username]/
 		* User photos (16x16): http://www.mysite.com/[username]/photo-small.jpeg
 	
-		$useridtopublic=qa_get_public_from_userids($userids);
+		$useridtopublic=as_get_public_from_userids($userids);
 		
 		foreach ($userids as $userid) {
 			$publicusername=$useridtopublic[$userid];
@@ -598,13 +598,13 @@
 	}
 
 
-	function qa_avatar_html_from_userid($userid, $size, $padding)
+	function as_avatar_html_from_userid($userid, $size, $padding)
 /*
 	==========================================================================
 	     YOU MAY MODIFY THIS FUNCTION, BUT THE DEFAULT BELOW WILL WORK OK
 	==========================================================================
 	
-	qa_avatar_html_from_userid($userid, $size, $padding)
+	as_avatar_html_from_userid($userid, $size, $padding)
 	
 	You should return some HTML for displaying the avatar of $userid on the page.
 	If you do not wish to show an avatar for this user, return null.
@@ -613,14 +613,14 @@
 
 	If $padding is true, the HTML you return should render to a square of $size x $size pixels,
 	even if the avatar is not square. This can be achieved using CSS padding - see function
-	qa_get_avatar_blob_html(...) in qa-app-format.php for an example. If $padding is false,
+	as_get_avatar_blob_html(...) in qa-app-format.php for an example. If $padding is false,
 	the HTML can render to anything which would fit inside a square of $size x $size pixels.
 	
 	Note that this function may be called many times to render an individual page, so it is not
 	a good idea to perform a database query each time it is called. Instead, you can use the fact
-	that before qa_avatar_html_from_userid(...) is called, qa_get_users_html(...) will have been
+	that before as_avatar_html_from_userid(...) is called, as_get_users_html(...) will have been
 	called with all the relevant users in the array $userids. So you can pull out the information
-	you need in qa_get_users_html(...) and cache it in a global variable, for use in this function.
+	you need in as_get_users_html(...) and cache it in a global variable, for use in this function.
 */
 	{
 		return null; // show no avatars by default
@@ -641,25 +641,25 @@
 	}
 	
 	
-	function qa_user_report_action($userid, $action)
+	function as_user_report_action($userid, $action)
 /*
 	==========================================================================
 	     YOU MAY MODIFY THIS FUNCTION, BUT THE DEFAULT BELOW WILL WORK OK
 	==========================================================================
 
-	qa_user_report_action($userid, $action)
+	as_user_report_action($userid, $action)
 
 	Informs you about an action by user $userid that modified the database, such as posting,
 	voting, etc... If you wish, you may use this to log user activity or monitor for abuse.
 	
-	Call qa_db_connection() to get the connection to the Q2A database. If your database is shared with
+	Call as_db_connection() to get the connection to the Q2A database. If your database is shared with
 	Q2A, you can use this with PHP's MySQL functions such as mysql_query() to run queries.
 	
 	$action will be a string (such as 'q_edit') describing the action. These strings will match the
 	first $event parameter passed to the process_event(...) function in event modules. In fact, you might
 	be better off just using a plugin with an event module instead, since you'll get more information.
 	
-	FYI, you can get the IP address of the user from qa_remote_ip_address().
+	FYI, you can get the IP address of the user from as_remote_ip_address().
 */
 	{
 		// do nothing by default

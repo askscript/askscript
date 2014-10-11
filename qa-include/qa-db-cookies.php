@@ -30,18 +30,18 @@
 	}
 
 
-	function qa_db_cookie_create($ipaddress)
+	function as_db_cookie_create($ipaddress)
 /*
 	Create a new random cookie for $ipaddress and insert into database, returning it
 */
 	{
 		for ($attempt=0; $attempt<10; $attempt++) {
-			$cookieid=qa_db_random_bigint();
+			$cookieid=as_db_random_bigint();
 			
-			if (qa_db_cookie_exists($cookieid))
+			if (as_db_cookie_exists($cookieid))
 				continue;
 
-			qa_db_query_sub(
+			as_db_query_sub(
 				'INSERT INTO ^cookies (cookieid, created, createip) '.
 					'VALUES (#, NOW(), COALESCE(INET_ATON($), 0))',
 				$cookieid, $ipaddress
@@ -54,24 +54,24 @@
 	}
 
 	
-	function qa_db_cookie_written($cookieid, $ipaddress)
+	function as_db_cookie_written($cookieid, $ipaddress)
 /*
 	Note in database that a write operation has been done by user identified by $cookieid and from $ipaddress
 */
 	{
-		qa_db_query_sub(
+		as_db_query_sub(
 			'UPDATE ^cookies SET written=NOW(), writeip=COALESCE(INET_ATON($), 0) WHERE cookieid=#',
 			$ipaddress, $cookieid
 		);
 	}
 
 	
-	function qa_db_cookie_exists($cookieid)
+	function as_db_cookie_exists($cookieid)
 /*
 	Return whether $cookieid exists in database
 */
 	{
-		return qa_db_read_one_value(qa_db_query_sub(
+		return as_db_read_one_value(as_db_query_sub(
 			'SELECT COUNT(*) FROM ^cookies WHERE cookieid=#',
 			$cookieid
 		)) > 0;

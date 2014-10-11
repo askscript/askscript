@@ -57,7 +57,7 @@
 	MySQL database, or to include the Question2Answer tables in an existing MySQL database.
 */
 
-	define('QA_MYSQL_TABLE_PREFIX', 'qa_');
+	define('QA_MYSQL_TABLE_PREFIX', 'as_');
 	
 /*
 	If you wish, you can define QA_MYSQL_USERS_PREFIX separately from QA_MYSQL_TABLE_PREFIX.
@@ -65,7 +65,7 @@
 	information about user accounts (not including users' activity and points). This allows
 	multiple Q2A sites to have shared logins and users, but separate posts and activity.
 
-	define('QA_MYSQL_USERS_PREFIX', 'qa_users_');
+	define('QA_MYSQL_USERS_PREFIX', 'as_users_');
 */
 
 /*

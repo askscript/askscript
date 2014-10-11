@@ -24,13 +24,13 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	class qa_html_theme_layer extends qa_html_theme_base {
+	class as_html_theme_layer extends as_html_theme_base {
 		
 		function head_links()
 		{
-			qa_html_theme_base::head_links();
+			as_html_theme_base::head_links();
 			
-			$this->output('<link rel="search" type="application/opensearchdescription+xml" title="'.qa_html(qa_opt('site_title')).'" href="'.qa_path_html('opensearch.xml').'"/>');
+			$this->output('<link rel="search" type="application/opensearchdescription+xml" title="'.as_html(as_opt('site_title')).'" href="'.as_path_html('opensearch.xml').'"/>');
 		}
 
 	}
