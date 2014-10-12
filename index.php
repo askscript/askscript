@@ -28,7 +28,7 @@
 
 	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
 	
-	require 'as-include/as-index.php';
+	require 'as-include/as-load.php';
 
 
 /*

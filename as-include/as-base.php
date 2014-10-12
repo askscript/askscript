@@ -27,6 +27,7 @@
 	
 	define('AS_VERSION', '1.6.3'); // also used as suffix for .js and .css requests
 	define('AS_BUILD_DATE', '2014-01-19');
+	
 
 //	Execution section of this file - remainder contains function definitions
 
@@ -37,6 +38,7 @@
 		require_once AS_WORDPRESS_LOAD_FILE;
 
 	as_initialize_constants_2();
+	
 	as_initialize_modularity();
 	as_register_core_modules();
 	as_load_plugin_files();
@@ -45,7 +47,6 @@
 	require_once AS_INCLUDE_DIR.'as-db.php';
 
 	as_db_allow_connect();
-	
 
 //	Version comparison functions
 

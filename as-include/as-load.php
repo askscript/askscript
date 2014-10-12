@@ -25,7 +25,7 @@
 */
 
 //	Try our best to set base path here just in case it wasn't set in index.php (pre version 1.0.1)
-
+	
 	if (!defined('AS_BASE_DIR'))
 		define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? dirname(__FILE__) : $_SERVER['SCRIPT_FILENAME']).'/');
 
@@ -45,16 +45,21 @@
 		
 	//	Otherwise, load the Q2A base file which sets up a bunch of crucial stuff
 		
-		require 'as-base.php';
+		// load hooking system	
+		require_once 'hooks.php';
 		
+		// load template system
+		require_once 'template.php';
+		
+		require_once 'as-base.php';	
 	
 	//	Determine the request and root of the installation, and the requested start position used by many pages
-		
+
 		function as_index_set_request()
 		{
-			if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
-		
 			$relativedepth=0;
+			
+			do_action('set_request');
 			
 			if (isset($_GET['as-rewrite'])) { // URLs rewritten by .htaccess
 				$urlformat=AS_URL_FORMAT_NEAT;
@@ -129,6 +134,8 @@
 				}
 			}
 			
+			apply_filters('request_parts', $requestparts);
+			
 			foreach ($requestparts as $part => $requestpart) // remove any blank parts
 				if (!strlen($requestpart))
 					unset($requestparts[$part]);
@@ -164,10 +171,10 @@
 	
 		//	Enable gzip compression for output (needs to come early)
 	
-			if (AS_HTML_COMPRESSION) // on by default
+			/* if (AS_HTML_COMPRESSION) // on by default
 				if (substr($requestlower, 0, 6)!='admin/') // not for admin pages since some of these contain lengthy processes
 					if (extension_loaded('zlib') && !headers_sent())
-						ob_start('ob_gzhandler');
+						ob_start('ob_gzhandler'); */
 						
 			if (substr($requestlower, 0, 5)=='feed/')
 				require AS_INCLUDE_DIR.'as-feed.php';
