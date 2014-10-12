@@ -1,14 +1,14 @@
 <?php
-
+	
 /*
 	Question2Answer by Gideon Greenspan and contributors
 
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-plugin/example-page/as-example-lang-default.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: US English language phrases for example plugin
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,12 +24,10 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
-
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+	return array(
+		'page_title' => 'Example plugin page (US English)',
+	);
 	
-	require 'as-include/as-index.php';
-
 
 /*
 	Omit PHP closing tag to help avoid accidental output

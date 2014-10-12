@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-include/as-ajax-recalc.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Server-side response to Ajax admin recalculation requests
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,11 +24,33 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
-
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+	require_once AS_INCLUDE_DIR.'as-app-users.php';
+	require_once AS_INCLUDE_DIR.'as-app-recalc.php';
 	
-	require 'as-include/as-index.php';
+
+	if (as_get_logged_in_level()>=AS_USER_LEVEL_ADMIN) {
+		
+		if (!as_check_form_security_code('admin/recalc', as_post_text('code'))) {
+			$state='';
+			$message=as_lang('misc/form_security_reload');
+		
+		} else {
+			$state=as_post_text('state');
+			$stoptime=time()+3;
+			
+			while ( as_recalc_perform_step($state) && (time()<$stoptime) )
+				;
+				
+			$message=as_recalc_get_message($state);
+		}
+	
+	} else {
+		$state='';
+		$message=as_lang('admin/no_privileges');
+	}
+	
+
+	echo "AS_AJAX_RESPONSE\n1\n".$state."\n".as_html($message);
 
 
 /*

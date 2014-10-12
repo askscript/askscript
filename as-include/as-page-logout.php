@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-include/as-page-logout.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Controller for logout page (not much to do)
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,12 +24,20 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
+	if (!defined('AS_VERSION')) { // don't allow this page to be requested directly from browser
+		header('Location: ../');
+		exit;
+	}
 
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+
+	if (AS_FINAL_EXTERNAL_USERS)
+		as_fatal_error('User logout is handled by external code');
 	
-	require 'as-include/as-index.php';
-
+	if (as_is_logged_in())
+		as_set_logged_in_user(null);
+		
+	as_redirect(''); // back to home page
+	
 
 /*
 	Omit PHP closing tag to help avoid accidental output

@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-plugin/event-logger/as-plugin.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Initiates event logger plugin
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,12 +24,28 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
+/*
+	Plugin Name: Event Logger
+	Plugin URI: 
+	Plugin Description: Stores a record of user activity in the database and/or log files
+	Plugin Version: 1.1
+	Plugin Date: 2011-12-06
+	Plugin Author: Question2Answer
+	Plugin Author URI: http://www.question2answer.org/
+	Plugin License: GPLv2
+	Plugin Minimum Question2Answer Version: 1.5
+	Plugin Update Check URI: 
+*/
 
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+
+	if (!defined('AS_VERSION')) { // don't allow this page to be requested directly from browser
+		header('Location: ../../');
+		exit;
+	}
+
+
+	as_register_plugin_module('event', 'as-event-logger.php', 'as_event_logger', 'Event Logger');
 	
-	require 'as-include/as-index.php';
-
 
 /*
 	Omit PHP closing tag to help avoid accidental output

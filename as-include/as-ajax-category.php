@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-include/as-ajax-category.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Server-side response to Ajax category information requests
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,12 +24,25 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
-
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+	require_once AS_INCLUDE_DIR.'as-db-selects.php';
 	
-	require 'as-include/as-index.php';
 
+	$categoryid=as_post_text('categoryid');
+	if (!strlen($categoryid))
+		$categoryid=null;
+	
+	list($fullcategory, $categories)=as_db_select_with_pending(
+		as_db_full_category_selectspec($categoryid, true),
+		as_db_category_sub_selectspec($categoryid)
+	);
+	
+	echo "AS_AJAX_RESPONSE\n1\n";
+	
+	echo as_html(strtr(@$fullcategory['content'], "\r\n", '  ')); // category description
+	
+	foreach ($categories as $category)
+		echo "\n".$category['categoryid'].'/'.$category['title']; // subcategory information
+	
 
 /*
 	Omit PHP closing tag to help avoid accidental output

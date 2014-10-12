@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-include/as-ajax-mailing.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Server-side response to Ajax mailing loop requests
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,11 +24,32 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
+	require_once AS_INCLUDE_DIR.'as-app-users.php';
+	require_once AS_INCLUDE_DIR.'as-app-mailing.php';
 
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
 	
-	require 'as-include/as-index.php';
+	$continue=false;
+	
+	if (as_get_logged_in_level()>=AS_USER_LEVEL_ADMIN) {
+		$starttime=time();
+		
+		as_mailing_perform_step();
+		
+		if ($starttime==time())
+			sleep(1); // make sure at least one second has passed
+		
+		$message=as_mailing_progress_message();
+		
+		if (isset($message))
+			$continue=true;
+		else
+			$message=as_lang('admin/mailing_complete');
+	
+	} else
+		$message=as_lang('admin/no_privileges');
+
+	
+	echo "AS_AJAX_RESPONSE\n".(int)$continue."\n".as_html($message);
 
 
 /*

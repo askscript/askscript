@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-include/as-db-options.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Database-level access to table containing admin options
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,11 +24,22 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
+	if (!defined('AS_VERSION')) { // don't allow this page to be requested directly from browser
+		header('Location: ../');
+		exit;
+	}
 
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
-	
-	require 'as-include/as-index.php';
+
+	function as_db_set_option($name, $value)
+/*
+	Set option $name to $value in the database
+*/
+	{
+		as_db_query_sub(
+			'REPLACE ^options (title, content) VALUES ($, $)',
+			$name, $value
+		);
+	}
 
 
 /*

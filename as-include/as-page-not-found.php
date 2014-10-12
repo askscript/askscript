@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-include/as-page-not-found.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Controller for page not found (error 404)
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,11 +24,24 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
-
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+	if (!defined('AS_VERSION')) { // don't allow this page to be requested directly from browser
+		header('Location: ../');
+		exit;
+	}
 	
-	require 'as-include/as-index.php';
+	require_once AS_INCLUDE_DIR.'as-app-format.php';
+
+
+	header('HTTP/1.0 404 Not Found');
+
+	as_set_template('not-found');
+
+	$as_content=as_content_prepare();
+	$as_content['error']=as_lang_html('main/page_not_found');
+	$as_content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
+	
+	
+	return $as_content;
 
 
 /*

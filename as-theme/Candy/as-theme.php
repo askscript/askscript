@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-theme/Candy/as-theme.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Override something in base theme class for Candy theme
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,12 +24,15 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
-
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+	class as_html_theme extends as_html_theme_base
+	{
+		function nav_user_search() // reverse the usual order
+		{
+			$this->search();
+			$this->nav('user');
+		}
+	}
 	
-	require 'as-include/as-index.php';
-
 
 /*
 	Omit PHP closing tag to help avoid accidental output

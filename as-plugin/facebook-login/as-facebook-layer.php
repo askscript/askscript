@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-plugin/facebook-login/as-facebook-layer.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Theme layer class for mouseover layer plugin
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,12 +24,22 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
+	class as_html_theme_layer extends as_html_theme_base {
+		
+		function head_css()
+		{
+			as_html_theme_base::head_css();
+			
+			if (strlen(as_opt('facebook_app_id')) && strlen(as_opt('facebook_app_secret')))
+				$this->output(
+					'<style><!--',
+					'.fb-login-button.fb_iframe_widget.fb_hide_iframes span {display:none;}',
+					'--></style>'
+				);
+		}
 
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+	}
 	
-	require 'as-include/as-index.php';
-
 
 /*
 	Omit PHP closing tag to help avoid accidental output

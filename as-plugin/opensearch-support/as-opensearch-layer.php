@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-plugin/opensearch-support/as-opensearch-layer.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Theme layer class for OpenSearch plugin
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,12 +24,17 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
+	class as_html_theme_layer extends as_html_theme_base {
+		
+		function head_links()
+		{
+			as_html_theme_base::head_links();
+			
+			$this->output('<link rel="search" type="application/opensearchdescription+xml" title="'.as_html(as_opt('site_title')).'" href="'.as_path_html('opensearch.xml').'"/>');
+		}
 
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+	}
 	
-	require 'as-include/as-index.php';
-
 
 /*
 	Omit PHP closing tag to help avoid accidental output

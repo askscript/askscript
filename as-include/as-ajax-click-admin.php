@@ -6,9 +6,9 @@
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-include/as-ajax-click-admin.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Server-side response to Ajax single clicks on posts in admin section
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,13 +24,22 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
+	require_once AS_INCLUDE_DIR.'as-app-admin.php';
+	require_once AS_INCLUDE_DIR.'as-app-users.php';
+	require_once AS_INCLUDE_DIR.'as-app-cookies.php';
 
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+
+	$entityid=as_post_text('entityid');
+	$action=as_post_text('action');
+
+	if (!as_check_form_security_code('admin/click', as_post_text('code')))
+		echo "AS_AJAX_RESPONSE\n0\n".as_lang('misc/form_security_reload');
+	elseif (as_admin_single_click($entityid, $action)) // permission check happens in here
+		echo "AS_AJAX_RESPONSE\n1\n";
+	else
+		echo "AS_AJAX_RESPONSE\n0\n".as_lang('main/general_error');
+				
 	
-	require 'as-include/as-index.php';
-
-
 /*
 	Omit PHP closing tag to help avoid accidental output
 */

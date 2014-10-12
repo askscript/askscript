@@ -1,14 +1,14 @@
 <?php
-
+	
 /*
 	Question2Answer by Gideon Greenspan and contributors
 
 	http://www.question2answer.org/
 
 	
-	File: index.php
+	File: as-include/as-url-test.php
 	Version: See define()s at top of as-include/as-base.php
-	Description: A stub that only sets up the Q2A root and includes as-index.php
+	Description: Sits in an iframe and shows a green page with word 'OK'
 
 
 	This program is free software; you can redistribute it and/or
@@ -24,11 +24,16 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-//	Set base path here so this works with symbolic links for multiple installations
-
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+	if (as_gpc_to_string(@$_GET['param'])==AS_URL_TEST_STRING) {
+		require_once AS_INCLUDE_DIR.'as-app-admin.php';
 	
-	require 'as-include/as-index.php';
+		echo '<html><body style="margin:0; padding:0;">';
+		echo '<table width="100%" height="100%" cellspacing="0" cellpadding="0">';
+		echo '<tr valign="middle"><td align="center" style="border-style:solid; border-width:1px; background-color:#fff; ';
+		echo as_admin_url_test_html();
+		echo '/td></tr></table>';
+		echo '</body></html>';
+	}
 
 
 /*
