@@ -147,7 +147,7 @@
 		
 	function as_wall_post_view($message)
 /*
-	Returns an element to add to $as_content['message_list']['messages'] for $message (as obtained via
+	Returns an element to add to $content['message_list']['messages'] for $message (as obtained via
 	as_db_recent_messages_selectspec() and then as_wall_posts_add_rules()).
 */
 	{
@@ -176,7 +176,7 @@
 	
 	function as_wall_view_more_link($handle, $start)
 /*
-	Returns an element to add to $as_content['message_list']['messages'] with a link to view all wall posts
+	Returns an element to add to $content['message_list']['messages'] with a link to view all wall posts
 */
 	{
 		return array(

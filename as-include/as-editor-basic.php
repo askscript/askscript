@@ -48,7 +48,7 @@
 		}
 
 
-		function get_field(&$as_content, $content, $format, $fieldname, $rows /* $autofocus parameter deprecated */)
+		function get_field(&$content, $content, $format, $fieldname, $rows /* $autofocus parameter deprecated */)
 		{
 			return array(
 				'type' => 'textarea',

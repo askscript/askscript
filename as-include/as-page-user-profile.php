@@ -336,26 +336,26 @@
 
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 	
-	$as_content['title']=as_lang_html_sub('profile/user_x', $userhtml);
-	$as_content['error']=@$errors['page'];
+	$content['title']=as_lang_html_sub('profile/user_x', $userhtml);
+	$content['error']=@$errors['page'];
 
 	if (isset($loginuserid) && !AS_FINAL_EXTERNAL_USERS) {
 		$favoritemap=as_get_favorite_non_qs_map();
 		$favorite=@$favoritemap['user'][$useraccount['userid']];
 		
-		$as_content['favorite']=as_favorite_form(AS_ENTITY_USER, $useraccount['userid'], $favorite,
+		$content['favorite']=as_favorite_form(AS_ENTITY_USER, $useraccount['userid'], $favorite,
 			as_lang_sub($favorite ? 'main/remove_x_favorites' : 'users/add_user_x_favorites', $handle));
 	}
 
-	$as_content['script_rel'][]='as-content/as-user.js?'.AS_VERSION;
+	$content['script_rel'][]='as-content/as-user.js?'.AS_VERSION;
 
 
 //	General information about the user, only available if we're using internal user management
 	
 	if (!AS_FINAL_EXTERNAL_USERS) {
-		$as_content['form_profile']=array(
+		$content['form_profile']=array(
 			'tags' => 'method="post" action="'.as_self_html().'"',
 			
 			'style' => 'wide',
@@ -390,14 +390,14 @@
 			),
 		);
 		
-		if (empty($as_content['form_profile']['fields']['avatar']['html']))
-			unset($as_content['form_profile']['fields']['avatar']);
+		if (empty($content['form_profile']['fields']['avatar']['html']))
+			unset($content['form_profile']['fields']['avatar']);
 		
 	
 	//	Private message link
 	
 		if ( as_opt('allow_private_messages') && isset($loginuserid) && ($loginuserid!=$userid) && !($useraccount['flags'] & AS_USER_FLAGS_NO_MESSAGES) && !$userediting )
-			$as_content['form_profile']['fields']['level']['value'].=strtr(as_lang_html('profile/send_private_message'), array(
+			$content['form_profile']['fields']['level']['value'].=strtr(as_lang_html('profile/send_private_message'), array(
 				'^1' => '<a href="'.as_path_html('message/'.$handle).'">',
 				'^2' => '</a>',
 			));
@@ -408,7 +408,7 @@
 		if ($userediting) {
 
 			if (isset($maxlevelassign)) {
-				$as_content['form_profile']['fields']['level']['type']='select';
+				$content['form_profile']['fields']['level']['type']='select';
 	
 				$showlevels=array(AS_USER_LEVEL_BASIC);
 				if (as_opt('moderate_users'))
@@ -426,7 +426,7 @@
 							$catleveloptions[$showlevel]=$leveloptions[$showlevel];
 					}
 						
-				$as_content['form_profile']['fields']['level']['options']=$leveloptions;
+				$content['form_profile']['fields']['level']['options']=$leveloptions;
 
 			
 			//	Category-specific levels
@@ -435,12 +435,12 @@
 					$catleveladd=as_get('catleveladd') ? true : false;
 					
 					if ((!$catleveladd) && !count($userlevels))
-						$as_content['form_profile']['fields']['level']['suffix']=strtr(as_lang_html('users/category_level_add'), array(
+						$content['form_profile']['fields']['level']['suffix']=strtr(as_lang_html('users/category_level_add'), array(
 							'^1' => '<a href="'.as_path_html(as_request(), array('state' => 'edit', 'catleveladd' => 1)).'">',
 							'^2' => '</a>',
 						));
 					else
-						$as_content['form_profile']['fields']['level']['suffix']=as_lang_html('users/level_in_general');
+						$content['form_profile']['fields']['level']['suffix']=as_lang_html('users/level_in_general');
 						
 					if ($catleveladd || count($userlevels))
 						$userlevels[]=array('entitytype' => AS_ENTITY_CATEGORY);
@@ -451,7 +451,7 @@
 							$index++;
 							$id='ls_'.+$index;
 							
-							$as_content['form_profile']['fields']['uc_'.$index.'_level']=array(
+							$content['form_profile']['fields']['uc_'.$index.'_level']=array(
 								'label' => as_lang_html('users/category_level_label'),
 								'type' => 'select',
 								'tags' => 'name="uc_'.$index.'_level" id="'.as_html($id).'" onchange="this.as_prev=this.options[this.selectedIndex].value;"',
@@ -460,20 +460,20 @@
 								'suffix' => as_lang_html('users/category_level_in'),
 							);
 							
-							$as_content['form_profile']['fields']['uc_'.$index.'_cat']=array();
+							$content['form_profile']['fields']['uc_'.$index.'_cat']=array();
 						
 							if (isset($userlevel['entityid']))
 								$fieldnavcategories=as_db_select_with_pending(as_db_category_nav_selectspec($userlevel['entityid'], true));
 							else
 								$fieldnavcategories=$navcategories;
 						
-							as_set_up_category_field($as_content, $as_content['form_profile']['fields']['uc_'.$index.'_cat'],
+							as_set_up_category_field($content, $content['form_profile']['fields']['uc_'.$index.'_cat'],
 								'uc_'.$index.'_cat', $fieldnavcategories, @$userlevel['entityid'], true, true);
 						
-							unset($as_content['form_profile']['fields']['uc_'.$index.'_cat']['note']);
+							unset($content['form_profile']['fields']['uc_'.$index.'_cat']['note']);
 						}
 
-					$as_content['script_lines'][]=array(
+					$content['script_lines'][]=array(
 						"function as_update_category_levels()",
 						"{",
 						"\tglob=document.getElementById('level_select');",
@@ -494,11 +494,11 @@
 						"}",
 					);
 					
-					$as_content['script_onloads'][]=array(
+					$content['script_onloads'][]=array(
 						"as_update_category_levels();",
 					);
 					
-					$as_content['form_profile']['fields']['level']['tags'].=' id="level_select" onchange="as_update_category_levels();"';
+					$content['form_profile']['fields']['level']['tags'].=' id="level_select" onchange="as_update_category_levels();"';
 						
 				}
 			}
@@ -506,7 +506,7 @@
 		} else {
 			foreach ($userlevels as $userlevel)
 				if ( ($userlevel['entitytype']==AS_ENTITY_CATEGORY) && ($userlevel['level']>$useraccount['level']) )
-					$as_content['form_profile']['fields']['level']['value'].='<br/>'.
+					$content['form_profile']['fields']['level']['value'].='<br/>'.
 						strtr(as_lang_html('users/level_for_category'), array(
 							'^1' => as_html(as_user_level_string($userlevel['level'])),
 							'^2' => '<a href="'.as_path_html(implode('/', array_reverse(explode('/', $userlevel['backpath'])))).'">'.as_html($userlevel['title']).'</a>',
@@ -531,7 +531,7 @@
 			}
 				
 		if (count($showpermits))
-			$as_content['form_profile']['fields']['permits']=array(
+			$content['form_profile']['fields']['permits']=array(
 				'type' => 'static',
 				'label' => as_lang_html('profile/extra_privileges'),
 				'value' => as_html(implode("\n", $showpermits), true),
@@ -547,7 +547,7 @@
 			$isconfirmed=($useraccount['flags'] & AS_USER_FLAGS_EMAIL_CONFIRMED) ? true : false;
 			$htmlemail=as_html(isset($inemail) ? $inemail : $useraccount['email']);
 	
-			$as_content['form_profile']['fields']['email']=array(
+			$content['form_profile']['fields']['email']=array(
 				'type' => $userediting ? 'text' : 'static',
 				'label' => as_lang_html('users/email_label'),
 				'tags' => 'name="email"',
@@ -564,7 +564,7 @@
 	//	Show IP addresses and times for last login or write - only if we're a moderator or higher
 	
 		if (($loginlevel>=AS_USER_LEVEL_MODERATOR) && !as_user_permit_error()) {
-			$as_content['form_profile']['fields']['lastlogin']=array(
+			$content['form_profile']['fields']['lastlogin']=array(
 				'type' => 'static',
 				'label' => as_lang_html('users/last_login_label'),
 				'value' =>
@@ -577,7 +577,7 @@
 			);
 
 			if (isset($useraccount['written']))
-				$as_content['form_profile']['fields']['lastwrite']=array(
+				$content['form_profile']['fields']['lastwrite']=array(
 					'type' => 'static',
 					'label' => as_lang_html('users/last_write_label'),
 					'value' =>
@@ -589,7 +589,7 @@
 					'id' => 'lastwrite',
 				);
 			else
-				unset($as_content['form_profile']['fields']['lastwrite']);
+				unset($content['form_profile']['fields']['lastwrite']);
 
 		}
 		
@@ -626,7 +626,7 @@
 					$notehtml=as_lang_html('users/only_shown_experts');
 			}
 				
-			$as_content['form_profile']['fields'][$userfield['title']]=array(
+			$content['form_profile']['fields'][$userfield['title']]=array(
 				'type' => $fieldsediting ? 'text' : 'static',
 				'label' => as_html($label),
 				'tags' => 'name="field_'.$userfield['fieldid'].'"',
@@ -647,14 +647,14 @@
 				(as_opt('avatar_allow_gravatar') && ($useraccount['flags'] & AS_USER_FLAGS_SHOW_GRAVATAR)) ||
 				(as_opt('avatar_allow_upload') && (($useraccount['flags'] & AS_USER_FLAGS_SHOW_AVATAR)) && isset($useraccount['avatarblobid']))
 			) {
-				$as_content['form_profile']['fields']['removeavatar']=array(
+				$content['form_profile']['fields']['removeavatar']=array(
 					'type' => 'checkbox',
 					'label' => as_lang_html('users/remove_avatar'),
 					'tags' => 'name="removeavatar"',
 				);
 			}
 			
-			$as_content['form_profile']['buttons']=array(
+			$content['form_profile']['buttons']=array(
 				'save' => array(
 					'tags' => 'onclick="as_show_waiting_after(this, false);"',
 					'label' => as_lang_html('users/save_user'),
@@ -666,57 +666,57 @@
 				),
 			);
 			
-			$as_content['form_profile']['hidden']=array(
+			$content['form_profile']['hidden']=array(
 				'dosave' => '1',
 				'code' => as_get_form_security_code('user-edit-'.$handle),
 			);
 
 		} elseif ($usereditbutton) {
-			$as_content['form_profile']['buttons']=array();
+			$content['form_profile']['buttons']=array();
 			
 			if ($approvebutton)
-				$as_content['form_profile']['buttons']['approve']=array(
+				$content['form_profile']['buttons']['approve']=array(
 					'tags' => 'name="doapprove"',
 					'label' => as_lang_html('users/approve_user_button'),
 				);
 							
-			$as_content['form_profile']['buttons']['edit']=array(
+			$content['form_profile']['buttons']['edit']=array(
 				'tags' => 'name="doedit"',
 				'label' => as_lang_html('users/edit_user_button'),
 			);
 			
 			if (isset($maxlevelassign) && ($useraccount['level']<AS_USER_LEVEL_MODERATOR)) {
 				if ($useraccount['flags'] & AS_USER_FLAGS_USER_BLOCKED) {
-					$as_content['form_profile']['buttons']['unblock']=array(
+					$content['form_profile']['buttons']['unblock']=array(
 						'tags' => 'name="dounblock"',
 						'label' => as_lang_html('users/unblock_user_button'),
 					);
 					
 					if (!as_user_permit_error('permit_hide_show'))
-						$as_content['form_profile']['buttons']['hideall']=array(
+						$content['form_profile']['buttons']['hideall']=array(
 							'tags' => 'name="dohideall" onclick="as_show_waiting_after(this, false);"',
 							'label' => as_lang_html('users/hide_all_user_button'),
 						);
 						
 					if ($loginlevel>=AS_USER_LEVEL_ADMIN)
-						$as_content['form_profile']['buttons']['delete']=array(
+						$content['form_profile']['buttons']['delete']=array(
 							'tags' => 'name="dodelete" onclick="as_show_waiting_after(this, false);"',
 							'label' => as_lang_html('users/delete_user_button'),
 						);
 					
 				} else
-					$as_content['form_profile']['buttons']['block']=array(
+					$content['form_profile']['buttons']['block']=array(
 						'tags' => 'name="doblock"',
 						'label' => as_lang_html('users/block_user_button'),
 					);
 					
-				$as_content['form_profile']['hidden']=array(
+				$content['form_profile']['hidden']=array(
 					'code' => as_get_form_security_code('user-'.$handle),
 				);
 			}
 
 		} elseif (isset($loginuserid) && ($loginuserid==$userid))
-			$as_content['form_profile']['buttons']=array(
+			$content['form_profile']['buttons']=array(
 				'account' => array(
 					'tags' => 'name="doaccount"',
 					'label' => as_lang_html('users/edit_profile'),
@@ -724,17 +724,17 @@
 			);
 			
 		
-		if (!is_array($as_content['form_profile']['fields']['removeavatar']))
-			unset($as_content['form_profile']['fields']['removeavatar']);
+		if (!is_array($content['form_profile']['fields']['removeavatar']))
+			unset($content['form_profile']['fields']['removeavatar']);
 			
-		$as_content['raw']['account']=$useraccount; // for plugin layers to access
-		$as_content['raw']['profile']=$userprofile;
+		$content['raw']['account']=$useraccount; // for plugin layers to access
+		$content['raw']['profile']=$userprofile;
 	}
 	
 
 //	Information about user activity, available also with single sign-on integration
 
-	$as_content['form_activity']=array(
+	$content['form_activity']=array(
 		'title' => '<a name="activity">'.as_lang_html_sub('profile/activity_by_x', $userhtml).'</a>',
 		
 		'style' => 'wide',
@@ -782,27 +782,27 @@
 	);
 	
 	if ($loginlevel>=AS_USER_LEVEL_ADMIN) {
-		$as_content['form_activity']['tags']='method="post" action="'.as_self_html().'"';
+		$content['form_activity']['tags']='method="post" action="'.as_self_html().'"';
 		
-		$as_content['form_activity']['buttons']=array(
+		$content['form_activity']['buttons']=array(
 			'setbonus' => array(
 				'tags' => 'name="dosetbonus"',
 				'label' => as_lang_html('profile/set_bonus_button'),
 			),
 		);
 		
-		$as_content['form_activity']['hidden']=array(
+		$content['form_activity']['hidden']=array(
 			'code' => as_get_form_security_code('user-activity-'.$handle),
 		);
 		
 	} else
-		unset($as_content['form_activity']['fields']['bonus']);
+		unset($content['form_activity']['fields']['bonus']);
 	
-	if (!isset($as_content['form_activity']['fields']['title']['value']))
-		unset($as_content['form_activity']['fields']['title']);
+	if (!isset($content['form_activity']['fields']['title']['value']))
+		unset($content['form_activity']['fields']['title']);
 	
 	if (as_opt('comment_on_qs') || as_opt('comment_on_as')) { // only show comment count if comments are enabled
-		$as_content['form_activity']['fields']['comments']=array(
+		$content['form_activity']['fields']['comments']=array(
 			'type' => 'static',
 			'label' => as_lang_html('profile/comments'),
 			'value' => '<span class="as-uf-user-c-posts">'.as_html(number_format(@$userpoints['cposts'])).'</span>',
@@ -832,7 +832,7 @@
 				: as_lang_html_sub('main/x_answers', $innervalue);
 		}
 		
-		$as_content['form_activity']['fields']['votedon']=array(
+		$content['form_activity']['fields']['votedon']=array(
 			'type' => 'static',
 			'label' => as_lang_html('profile/voted_on'),
 			'value' => $votedonvalue,
@@ -847,7 +847,7 @@
 		$innervalue='<span class="as-uf-user-downvotes">'.number_format($downvotes).'</span>';
 		$votegavevalue.=($downvotes==1) ? as_lang_html_sub('profile/1_down_vote', $innervalue, '1') : as_lang_html_sub('profile/x_down_votes', $innervalue);
 		
-		$as_content['form_activity']['fields']['votegave']=array(
+		$content['form_activity']['fields']['votegave']=array(
 			'type' => 'static',
 			'label' => as_lang_html('profile/gave_out'),
 			'value' => $votegavevalue,
@@ -862,7 +862,7 @@
 		$votegotvalue.=(@$userpoints['downvoteds']==1) ? as_lang_html_sub('profile/1_down_vote', $innervalue, '1')
 			: as_lang_html_sub('profile/x_down_votes', $innervalue);
 
-		$as_content['form_activity']['fields']['votegot']=array(
+		$content['form_activity']['fields']['votegot']=array(
 			'type' => 'static',
 			'label' => as_lang_html('profile/received'),
 			'value' => $votegotvalue,
@@ -871,16 +871,16 @@
 	}
 	
 	if (@$userpoints['points'])
-		$as_content['form_activity']['fields']['points']['value'].=
+		$content['form_activity']['fields']['points']['value'].=
 			as_lang_html_sub('profile/ranked_x', '<span class="as-uf-user-rank">'.number_format($userrank).'</span>');
 	
 	if (@$userpoints['aselects'])
-		$as_content['form_activity']['fields']['questions']['value'].=($userpoints['aselects']==1)
+		$content['form_activity']['fields']['questions']['value'].=($userpoints['aselects']==1)
 			? as_lang_html_sub('profile/1_with_best_chosen', '<span class="as-uf-user-q-selects">1</span>', '1')
 			: as_lang_html_sub('profile/x_with_best_chosen', '<span class="as-uf-user-q-selects">'.number_format($userpoints['aselects']).'</span>');
 	
 	if (@$userpoints['aselecteds'])
-		$as_content['form_activity']['fields']['answers']['value'].=($userpoints['aselecteds']==1)
+		$content['form_activity']['fields']['answers']['value'].=($userpoints['aselecteds']==1)
 			? as_lang_html_sub('profile/1_chosen_as_best', '<span class="as-uf-user-a-selecteds">1</span>', '1')
 			: as_lang_html_sub('profile/x_chosen_as_best', '<span class="as-uf-user-a-selecteds">'.number_format($userpoints['aselecteds']).'</span>');
 
@@ -888,15 +888,15 @@
 	
 //	For plugin layers to access
 
-	$as_content['raw']['userid']=$userid;
-	$as_content['raw']['points']=$userpoints;
-	$as_content['raw']['rank']=$userrank;
+	$content['raw']['userid']=$userid;
+	$content['raw']['points']=$userpoints;
+	$content['raw']['rank']=$userrank;
 
 
 //	Wall posts
 
 	if ((!AS_FINAL_EXTERNAL_USERS) && as_opt('allow_user_walls')) {
-		$as_content['message_list']=array(
+		$content['message_list']=array(
 			'title' => '<a name="wall">'.as_lang_html_sub('profile/wall_for_x', $userhtml).'</a>',
 			
 			'tags' => 'id="wallmessages"',
@@ -916,10 +916,10 @@
 		);
 		
 		if ($wallposterrorhtml)
-			$as_content['message_list']['error']=$wallposterrorhtml; // an error that means we are not allowed to post
+			$content['message_list']['error']=$wallposterrorhtml; // an error that means we are not allowed to post
 			
 		else {
-			$as_content['message_list']['form']['fields']=array(
+			$content['message_list']['form']['fields']=array(
 				'message' => array(
 					'tags' => 'name="message" id="message"',
 					'value' => as_html(@$inmessage, false),
@@ -928,7 +928,7 @@
 				),
 			);
 				
-			$as_content['message_list']['form']['buttons']=array(
+			$content['message_list']['form']['buttons']=array(
 				'post' => array(
 					'tags' => 'name="dowallpost" onclick="return as_submit_wall_post(this, true);"',
 					'label' => as_lang_html('profile/post_wall_button'),
@@ -937,20 +937,20 @@
 		}
 
 		foreach ($usermessages as $message)
-			$as_content['message_list']['messages'][]=as_wall_post_view($message);
+			$content['message_list']['messages'][]=as_wall_post_view($message);
 		
 		if ($useraccount['wallposts']>count($usermessages))
-			$as_content['message_list']['messages'][]=as_wall_view_more_link($handle, count($usermessages));
+			$content['message_list']['messages'][]=as_wall_view_more_link($handle, count($usermessages));
 	}
 	
 	
 //	Sub menu for navigation in user pages
 
-	$as_content['navigation']['sub']=as_user_sub_navigation($handle, 'profile',
+	$content['navigation']['sub']=as_user_sub_navigation($handle, 'profile',
 		isset($loginuserid) && ($loginuserid==(AS_FINAL_EXTERNAL_USERS ? $userid : $useraccount['userid'])));
 
 
-	return $as_content;
+	return $content;
 
 
 /*

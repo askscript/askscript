@@ -304,9 +304,9 @@
 	}
 
 
-	function as_page_q_edit_q_form(&$as_content, $question, $in, $errors, $completetags, $categories)
+	function as_page_q_edit_q_form(&$content, $question, $in, $errors, $completetags, $categories)
 /*
-	Returns a $as_content form for editing the question and sets up other parts of $as_content accordingly
+	Returns a $content form for editing the question and sets up other parts of $content accordingly
 */
 	{
 		$form=array(
@@ -372,7 +372,7 @@
 			$editor=as_load_editor($content, $format, $editorname);
 			
 			$form['fields']['content']=array_merge($form['fields']['content'],
-				as_editor_load_field($editor, $as_content, $content, $format, 'q_content', 12, true));
+				as_editor_load_field($editor, $content, $content, $format, 'q_content', 12, true));
 				
 			if (method_exists($editor, 'update_script'))
 				$form['buttons']['save']['tags']='onclick="as_show_waiting_after(this, false); '.$editor->update_script('q_content').'"';
@@ -383,7 +383,7 @@
 			unset($form['fields']['content']);
 		
 		if (as_using_categories() && count($categories) && $question['retagcatable'])
-			as_set_up_category_field($as_content, $form['fields']['category'], 'q_category', $categories,
+			as_set_up_category_field($content, $form['fields']['category'], 'q_category', $categories,
 				isset($in['categoryid']) ? $in['categoryid'] : $question['categoryid'], 
 				as_opt('allow_no_category') || !isset($question['categoryid']), as_opt('allow_no_sub_category'));
 		else
@@ -393,16 +393,16 @@
 			unset($form['fields']['extra']);
 		
 		if (as_using_tags() && $question['retagcatable'])
-			as_set_up_tag_field($as_content, $form['fields']['tags'], 'q_tags', isset($in['tags']) ? $in['tags'] : as_tagstring_to_tags($question['tags']),
+			as_set_up_tag_field($content, $form['fields']['tags'], 'q_tags', isset($in['tags']) ? $in['tags'] : as_tagstring_to_tags($question['tags']),
 				array(), $completetags, as_opt('page_size_ask_tags'));
 		else
 			unset($form['fields']['tags']);
 		
 		if ($question['isbyuser']) {
 			if (!as_is_logged_in())
-				as_set_up_name_field($as_content, $form['fields'], isset($in['name']) ? $in['name'] : @$question['name'], 'q_');
+				as_set_up_name_field($content, $form['fields'], isset($in['name']) ? $in['name'] : @$question['name'], 'q_');
 
-			as_set_up_notify_fields($as_content, $form['fields'], 'Q', as_get_logged_in_email(),
+			as_set_up_notify_fields($content, $form['fields'], 'Q', as_get_logged_in_email(),
 				isset($in['notify']) ? $in['notify'] : !empty($question['notify']),
 				isset($in['email']) ? $in['email'] : @$question['notify'], @$errors['email'], 'q_');
 		}
@@ -522,9 +522,9 @@
 	}
 	
 
-	function as_page_q_close_q_form(&$as_content, $question, $id, $in, $errors)
+	function as_page_q_close_q_form(&$content, $question, $id, $in, $errors)
 /*
-	Returns a $as_content form for closing the question and sets up other parts of $as_content accordingly
+	Returns a $content form for closing the question and sets up other parts of $content accordingly
 */
 	{
 		$form=array(
@@ -573,13 +573,13 @@
 			),
 		);
 		
-		as_set_display_rules($as_content, array(
+		as_set_display_rules($content, array(
 			'close_label_duplicate' => 'q_close_duplicate',
 			'close_label_other' => '!q_close_duplicate',
 			'close_note_duplicate' => 'q_close_duplicate',
 		));
 		
-		$as_content['focusid']='q_close_details';
+		$content['focusid']='q_close_details';
 
 		return $form;
 	}
@@ -637,9 +637,9 @@
 	}
 	
 	
-	function as_page_q_edit_a_form(&$as_content, $id, $answer, $question, $answers, $commentsfollows, $in, $errors)
+	function as_page_q_edit_a_form(&$content, $id, $answer, $question, $answers, $commentsfollows, $in, $errors)
 /*
-	Returns a $as_content form for editing an answer and sets up other parts of $as_content accordingly
+	Returns a $content form for editing an answer and sets up other parts of $content accordingly
 */
 	{
 		require_once AS_INCLUDE_DIR.'as-util-string.php';
@@ -669,7 +669,7 @@
 			
 			'fields' => array(
 				'content' => array_merge(
-					as_editor_load_field($editor, $as_content, $content, $format, $prefix.'content', 12),
+					as_editor_load_field($editor, $content, $content, $format, $prefix.'content', 12),
 					array(
 						'error' => as_html(@$errors['content']),
 					)
@@ -736,7 +736,7 @@
 				'value' => @$commentonoptions[$lastbeforeid],
 			);
 			
-			as_set_display_rules($as_content, array(
+			as_set_display_rules($content, array(
 				$prefix.'commenton' => $prefix.'dotoc',
 				$prefix.'toshown' => $prefix.'dotoc',
 				$prefix.'tohidden' => '!'.$prefix.'dotoc',
@@ -747,9 +747,9 @@
 		
 		if ($answer['isbyuser']) {
 			if (!as_is_logged_in())
-				as_set_up_name_field($as_content, $form['fields'], isset($in['name']) ? $in['name'] : @$answer['name'], $prefix);
+				as_set_up_name_field($content, $form['fields'], isset($in['name']) ? $in['name'] : @$answer['name'], $prefix);
 			
-			as_set_up_notify_fields($as_content, $form['fields'], 'A', as_get_logged_in_email(),
+			as_set_up_notify_fields($content, $form['fields'], 'A', as_get_logged_in_email(),
 				isset($in['notify']) ? $in['notify'] : !empty($answer['notify']),
 				isset($in['email']) ? $in['email'] : @$answer['notify'], @$errors['email'], $prefix);
 		}
@@ -897,9 +897,9 @@
 	}
 
 	
-	function as_page_q_edit_c_form(&$as_content, $id, $comment, $in, $errors)
+	function as_page_q_edit_c_form(&$content, $id, $comment, $in, $errors)
 /*
-	Returns a $as_content form for editing a comment and sets up other parts of $as_content accordingly
+	Returns a $content form for editing a comment and sets up other parts of $content accordingly
 */
 	{
 		$commentid=$comment['postid'];
@@ -922,7 +922,7 @@
 			
 			'fields' => array(
 				'content' => array_merge(
-					as_editor_load_field($editor, $as_content, $content, $format, $prefix.'content', 4, true),
+					as_editor_load_field($editor, $content, $content, $format, $prefix.'content', 4, true),
 					array(
 						'error' => as_html(@$errors['content']),
 					)
@@ -951,9 +951,9 @@
 		
 		if ($comment['isbyuser']) {
 			if (!as_is_logged_in())
-				as_set_up_name_field($as_content, $form['fields'], isset($in['name']) ? $in['name'] : @$comment['name'], $prefix);
+				as_set_up_name_field($content, $form['fields'], isset($in['name']) ? $in['name'] : @$comment['name'], $prefix);
 
-			as_set_up_notify_fields($as_content, $form['fields'], 'C', as_get_logged_in_email(),
+			as_set_up_notify_fields($content, $form['fields'], 'C', as_get_logged_in_email(),
 				isset($in['notify']) ? $in['notify'] : !empty($comment['notify']),
 				isset($in['email']) ? $in['email'] : @$comment['notify'], @$errors['email'], $prefix);
 		}

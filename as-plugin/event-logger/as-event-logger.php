@@ -53,7 +53,7 @@
 		}
 
 		
-		function admin_form(&$as_content)
+		function admin_form(&$content)
 		{
 
 		//	Process form input
@@ -87,7 +87,7 @@
 				
 		//	Create the form for display
 
-			as_set_display_rules($as_content, array(
+			as_set_display_rules($content, array(
 				'event_logger_directory_display' => 'event_logger_to_files_field',
 				'event_logger_hide_header_display' => 'event_logger_to_files_field',
 			));

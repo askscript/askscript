@@ -87,9 +87,9 @@
 
 //	Prepare content for theme
 
-	$as_content=as_content_prepare(false, array_keys(as_category_path($categories, $categoryid)));
+	$content=as_content_prepare(false, array_keys(as_category_path($categories, $categoryid)));
 
-	$as_content['title']=as_lang_html('misc/browse_categories');
+	$content['title']=as_lang_html('misc/browse_categories');
 	
 	if (count($categories)) {
 		$navigation=as_category_navigation($categories, $categoryid, 'categories/', false);
@@ -103,18 +103,18 @@
 
 		as_category_nav_to_browse($navigation, $categories, $categoryid, $favoritemap);
 		
-		$as_content['nav_list']=array(
+		$content['nav_list']=array(
 			'nav' => $navigation,
 			'type' => 'browse-cat',
 		);
 
 	} else {
-		$as_content['title']=as_lang_html('main/no_categories_found');
-		$as_content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
+		$content['title']=as_lang_html('main/no_categories_found');
+		$content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
 	}
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

@@ -34,8 +34,8 @@
 	
 //	Check admin privileges
 
-	if (!as_admin_check_privileges($as_content))
-		return $as_content;
+	if (!as_admin_check_privileges($content))
+		return $content;
 		
 		
 //	Map modules with options to their containing plugins
@@ -64,13 +64,13 @@
 
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/plugins_title');
+	$content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/plugins_title');
 	
-	$as_content['error']=as_admin_page_error();
+	$content['error']=as_admin_page_error();
 	
-	$as_content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
+	$content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
 
 	$pluginfiles=glob(AS_PLUGIN_DIR.'*/as-plugin.php');
 	
@@ -85,7 +85,7 @@
 					as_redirect('install');
 				
 				else
-					$as_content['error']=strtr(as_lang_html('admin/module_x_database_init'), array(
+					$content['error']=strtr(as_lang_html('admin/module_x_database_init'), array(
 						'^1' => as_html($name),
 						'^2' => as_html($type),
 						'^3' => '<a href="'.as_path_html('install').'">',
@@ -96,7 +96,7 @@
 	}
 	
 	if ( as_is_http_post() && !as_check_form_security_code('admin/plugins', as_post_text('as_form_security_code')) ) {
-		$as_content['error']=as_lang_html('misc/form_security_reload');
+		$content['error']=as_lang_html('misc/form_security_reload');
 		$showpluginforms=false;
 	} else
 		$showpluginforms=true;
@@ -152,7 +152,7 @@
 				
 				$updatehtml='(<span id="'.$elementid.'">...</span>)';
 				
-				$as_content['script_onloads'][]=array(
+				$content['script_onloads'][]=array(
 					"as_version_check(".as_js($metadata['update']).", 'Plugin Version', ".as_js($metadata['version'], true).", 'Plugin URI', ".as_js($elementid).");"
 				);
 
@@ -179,7 +179,7 @@
 				$pluginhtml='<strike style="color:#999">'.$pluginhtml.'</strike><br><span style="color:#f00">'.
 					as_lang_html_sub('admin/requires_php_version', as_html($metadata['min_php'])).'</span>';
 				
-			$as_content['form_plugin_'.$pluginindex]=array(
+			$content['form_plugin_'.$pluginindex]=array(
 				'tags' => 'id="'.as_html($hash).'"',
 				'style' => 'tall',
 				'fields' => array(
@@ -197,7 +197,7 @@
 				
 					$module=as_load_module($type, $name);
 				
-					$form=$module->admin_form($as_content);
+					$form=$module->admin_form($content);
 
 					if (!isset($form['tags']))
 						$form['tags']='method="post" action="'.as_admin_plugin_options_path($plugindirectory).'"';
@@ -209,16 +209,16 @@
 			
 					$form['hidden']['as_form_security_code']=as_get_form_security_code('admin/plugins');
 			
-					$as_content['form_plugin_options']=$form;
+					$content['form_plugin_options']=$form;
 				}
 
 		}
 	}
 	
-	$as_content['navigation']['sub']=as_admin_sub_navigation();
+	$content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $as_content;
+	return $content;
 	
 
 /*

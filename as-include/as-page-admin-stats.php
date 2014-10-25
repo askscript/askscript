@@ -36,8 +36,8 @@
 	
 //	Check admin privileges (do late to allow one DB query)
 
-	if (!as_admin_check_privileges($as_content))
-		return $as_content;
+	if (!as_admin_check_privileges($content))
+		return $content;
 
 
 //	Get the information to display
@@ -54,13 +54,13 @@
 
 //	Prepare content for theme
 
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/stats_title');
+	$content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/stats_title');
 	
-	$as_content['error']=as_admin_page_error();
+	$content['error']=as_admin_page_error();
 
-	$as_content['form']=array(
+	$content['form']=array(
 		'style' => 'wide',
 		
 		'fields' => array(
@@ -193,15 +193,15 @@
 	);
 	
 	if (AS_FINAL_EXTERNAL_USERS)
-		unset($as_content['form']['fields']['users']);
+		unset($content['form']['fields']['users']);
 	else
-		unset($as_content['form']['fields']['users_active']);
+		unset($content['form']['fields']['users_active']);
 
-	foreach ($as_content['form']['fields'] as $index => $field)
+	foreach ($content['form']['fields'] as $index => $field)
 		if (empty($field['type']))
-			$as_content['form']['fields'][$index]['type']='static';
+			$content['form']['fields'][$index]['type']='static';
 	
-	$as_content['form_2']=array(
+	$content['form_2']=array(
 		'tags' => 'method="post" action="'.as_path_html('admin/recalc').'"',
 		
 		'title' => as_lang_html('admin/database_cleanup'),
@@ -252,18 +252,18 @@
 	);
 	
 	if (!as_using_categories())
-		unset($as_content['form_2']['buttons']['recalc_categories']);
+		unset($content['form_2']['buttons']['recalc_categories']);
 	
 	if (defined('AS_BLOBS_DIRECTORY')) {
 		if (as_db_has_blobs_in_db())
-			$as_content['form_2']['buttons']['blobs_to_disk']=array(
+			$content['form_2']['buttons']['blobs_to_disk']=array(
 				'label' => as_lang_html('admin/blobs_to_disk'),
 				'tags' => 'name="doblobstodisk" onclick="return as_recalc_click(this.name, this, '.as_js(as_lang('admin/blobs_stop')).', \'blobs_to_disk_note\');"',
 				'note' => '<span id="blobs_to_disk_note">'.as_lang_html('admin/blobs_to_disk_note').'</span>',
 			);
 		
 		if (as_db_has_blobs_on_disk())
-			$as_content['form_2']['buttons']['blobs_to_db']=array(
+			$content['form_2']['buttons']['blobs_to_db']=array(
 				'label' => as_lang_html('admin/blobs_to_db'),
 				'tags' => 'name="doblobstodb" onclick="return as_recalc_click(this.name, this, '.as_js(as_lang('admin/blobs_stop')).', \'blobs_to_db_note\');"',
 				'note' => '<span id="blobs_to_db_note">'.as_lang_html('admin/blobs_to_db_note').'</span>',
@@ -271,13 +271,13 @@
 	}
 
 	
-	$as_content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
-	$as_content['script_var']['as_warning_recalc']=as_lang('admin/stop_recalc_warning');
+	$content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
+	$content['script_var']['as_warning_recalc']=as_lang('admin/stop_recalc_warning');
 
-	$as_content['navigation']['sub']=as_admin_sub_navigation();
+	$content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

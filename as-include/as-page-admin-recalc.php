@@ -35,8 +35,8 @@
 	
 //	Check we have administrative privileges
 
-	if (!as_admin_check_privileges($as_content))
-		return $as_content;
+	if (!as_admin_check_privileges($content))
+		return $content;
 
 	
 //	Find out the operation
@@ -100,12 +100,12 @@
 		as_exit();
 	
 	} elseif (isset($state)) {
-		$as_content=as_content_prepare();
+		$content=as_content_prepare();
 
-		$as_content['title']=as_lang_html('admin/admin_title');
-		$as_content['error']=as_lang_html('misc/form_security_again');
+		$content['title']=as_lang_html('admin/admin_title');
+		$content['error']=as_lang_html('misc/form_security_again');
 		
-		$as_content['form']=array(
+		$content['form']=array(
 			'tags' => 'method="post" action="'.as_self_html().'"',
 		
 			'style' => 'wide',
@@ -122,17 +122,17 @@
 			),
 		);
 		
-		return $as_content;
+		return $content;
 	
 	} else {
 		require_once AS_INCLUDE_DIR.'as-app-format.php';
 		
-		$as_content=as_content_prepare();
+		$content=as_content_prepare();
 
-		$as_content['title']=as_lang_html('admin/admin_title');
-		$as_content['error']=as_lang_html('main/page_not_found');
+		$content['title']=as_lang_html('admin/admin_title');
+		$content['error']=as_lang_html('main/page_not_found');
 		
-		return $as_content;
+		return $content;
 	}
 			
 

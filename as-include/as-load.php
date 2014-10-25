@@ -26,9 +26,29 @@
 
 //	Try our best to set base path here just in case it wasn't set in index.php (pre version 1.0.1)
 	
-	if (!defined('AS_BASE_DIR'))
-		define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? dirname(__FILE__) : $_SERVER['SCRIPT_FILENAME']).'/');
+	if (!defined('BASE_DIR'))
+		define('BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? dirname(__FILE__) : $_SERVER['SCRIPT_FILENAME']).'/');
+	
+	function get_base_url(){
+		/* First we need to get the protocol the website is using */
+		$protocol = strtolower(substr($_SERVER["SERVER_PROTOCOL"], 0, 5)) == 'https' ? 'https://' : 'http://';
 
+		$root = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $_SERVER['DOCUMENT_ROOT']);
+		if(substr($root, -1) == '/')$root = substr($root, 0, -1);
+		$base = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, rtrim(BASE_DIR, '/'));
+
+			
+		/* Returns localhost OR mysite.com */
+		$host = $_SERVER['HTTP_HOST'];
+
+		$url = $protocol . $host . '/' . str_replace($root, '', $base );
+		
+		return (substr($url, -1) == '/') ? substr($url, 0, -1) : $url;
+	}
+	
+	define('BASE_URL', get_base_url());
+	define('LIB_DIR_URL', BASE_URL.'/as-include/lib');
+	define('THEME_DIR_URL', BASE_URL.'/as-theme');
 
 //	If this is an special non-page request, branch off here
 
@@ -47,113 +67,87 @@
 		
 		// load hooking system	
 		require_once 'hooks.php';
+
+		global $as_request_map;
 		
-		// load template system
-		require_once 'template.php';
+		define('AS_CATEGORY_DEPTH', 4); // you can't change this number!
+
+		if (!defined('BASE_DIR'))
+			define('BASE_DIR', dirname(dirname(__FILE__)).'/'); // try out best if not set in index.php or as-index.php - won't work with symbolic links
+			
+		define('AS_EXTERNAL_DIR', BASE_DIR.'as-external/');
+		define('AS_INCLUDE_DIR', BASE_DIR.'as-include/');
+		define('AS_LANG_DIR', BASE_DIR.'as-lang/');
+		define('THEME_DIR', BASE_DIR.'as-theme/');
+		define('AS_PLUGIN_DIR', BASE_DIR.'as-plugin/');
+
+		if (!file_exists(BASE_DIR.'as-config.php'))
+			as_fatal_error('The config file could not be found. Please read the instructions in as-config-example.php.');
 		
-		require_once 'as-base.php';	
+		require_once BASE_DIR.'as-config.php';
+		
+		$as_request_map=is_array(@$AS_CONST_PATH_MAP) ? $AS_CONST_PATH_MAP : array();
+		
+		//	Default values if not set in as-config.php
 	
-	//	Determine the request and root of the installation, and the requested start position used by many pages
-
-		function as_index_set_request()
-		{
-			$relativedepth=0;
-			
-			do_action('set_request');
-			
-			if (isset($_GET['as-rewrite'])) { // URLs rewritten by .htaccess
-				$urlformat=AS_URL_FORMAT_NEAT;
-				$requestparts=explode('/', as_gpc_to_string($_GET['as-rewrite']));
-				unset($_GET['as-rewrite']);
-				
-				if (!empty($_SERVER['REQUEST_URI'])) { // workaround for the fact that Apache unescapes characters while rewriting
-					$origpath=$_SERVER['REQUEST_URI'];
-					$_GET=array();
-					
-					$questionpos=strpos($origpath, '?');
-					if (is_numeric($questionpos)) {
-						$params=explode('&', substr($origpath, $questionpos+1));
-						
-						foreach ($params as $param)
-							if (preg_match('/^([^\=]*)(\=(.*))?$/', $param, $matches)) {
-								$argument=strtr(urldecode($matches[1]), '.', '_'); // simulate PHP's $_GET behavior
-								$_GET[$argument]=as_string_to_gpc(urldecode(@$matches[3]));
-							}
+		@define('AS_COOKIE_DOMAIN', '');
+		@define('AS_HTML_COMPRESSION', true);
+		@define('AS_MAX_LIMIT_START', 19999);
+		@define('AS_IGNORED_WORDS_FREQ', 10000);
+		@define('AS_ALLOW_UNINDEXED_QUERIES', false);
+		@define('AS_OPTIMIZE_LOCAL_DB', false);
+		@define('AS_OPTIMIZE_DISTANT_DB', false);
+		@define('AS_PERSISTENT_CONN_DB', false);
+		@define('AS_DEBUG_PERFORMANCE', false);
 		
-						$origpath=substr($origpath, 0, $questionpos);
-					}
-					
-					// Generally we assume that $_GET['as-rewrite'] has the right path depth, but this won't be the case if there's
-					// a & or # somewhere in the middle of the path, due to apache unescaping. So we make a special case for that.
-					$keepparts=count($requestparts);
-					$requestparts=explode('/', urldecode($origpath)); // new request calculated from $_SERVER['REQUEST_URI']
-
-					for ($part=count($requestparts)-1; $part>=0; $part--)
-						if (is_numeric(strpos($requestparts[$part], '&')) || is_numeric(strpos($requestparts[$part], '#'))) { 
-							$keepparts+=count($requestparts)-$part-1; // this is how many parts we lost
-							break;
-						}
-						
-					$requestparts=array_slice($requestparts, -$keepparts); // remove any irrelevant parts from the beginning
-				}
-
-				$relativedepth=count($requestparts);
-				
-			} elseif (isset($_GET['as'])) {
-				if (strpos($_GET['as'], '/')===false) {
-					$urlformat=( (empty($_SERVER['REQUEST_URI'])) || (strpos($_SERVER['REQUEST_URI'], '/index.php')!==false) )
-						? AS_URL_FORMAT_SAFEST : AS_URL_FORMAT_PARAMS;
-					$requestparts=array(as_gpc_to_string($_GET['as']));
-					
-					for ($part=1; $part<10; $part++)
-						if (isset($_GET['as_'.$part])) {
-							$requestparts[]=as_gpc_to_string($_GET['as_'.$part]);
-							unset($_GET['as_'.$part]);
-						}
-				
-				} else {
-					$urlformat=AS_URL_FORMAT_PARAM;
-					$requestparts=explode('/', as_gpc_to_string($_GET['as']));
-				}
-				
-				unset($_GET['as']);
-			
-			} else {
-				$phpselfunescaped=strtr($_SERVER['PHP_SELF'], '+', ' '); // seems necessary, and plus does not work with this scheme
-				$indexpath='/index.php/';
-				$indexpos=strpos($phpselfunescaped, $indexpath);
-				
-				if (is_numeric($indexpos)) {
-					$urlformat=AS_URL_FORMAT_INDEX;
-					$requestparts=explode('/', substr($phpselfunescaped, $indexpos+strlen($indexpath)));
-					$relativedepth=1+count($requestparts);
-			
-				} else {
-					$urlformat=null; // at home page so can't identify path type
-					$requestparts=array();
-				}
-			}
-			
-			apply_filters('request_parts', $requestparts);
-			
-			foreach ($requestparts as $part => $requestpart) // remove any blank parts
-				if (!strlen($requestpart))
-					unset($requestparts[$part]);
-					
-			reset($requestparts);
-			$key=key($requestparts);
-			
-			$replacement=array_search(@$requestparts[$key], as_get_request_map());
-			if ($replacement!==false)
-				$requestparts[$key]=$replacement;
-		
-			as_set_request(
-				implode('/', $requestparts),
-				($relativedepth>1) ? str_repeat('../', $relativedepth-1) : './',
-				$urlformat
-			);
+		//	Start performance monitoring
+	
+		if (AS_DEBUG_PERFORMANCE) {
+			require_once 'as-util-debug.php';
+			as_usage_init();
 		}
+		
+		//	More for WordPress integration
+		
+		
+		define('AS_FINAL_MYSQL_HOSTNAME', AS_MYSQL_HOSTNAME);
+		define('AS_FINAL_MYSQL_USERNAME', AS_MYSQL_USERNAME);
+		define('AS_FINAL_MYSQL_PASSWORD', AS_MYSQL_PASSWORD);
+		define('AS_FINAL_MYSQL_DATABASE', AS_MYSQL_DATABASE);
+		define('AS_FINAL_EXTERNAL_USERS', AS_EXTERNAL_USERS);
+		
+		
+		//	Possible URL schemes for Q2A and the string used for url scheme testing
+
+		define('AS_URL_FORMAT_INDEX', 0);  // http://...../index.php/123/why-is-the-sky-blue
+		define('AS_URL_FORMAT_NEAT', 1);   // http://...../123/why-is-the-sky-blue [requires .htaccess]
+		define('AS_URL_FORMAT_PARAM', 3);  // http://...../?as=123/why-is-the-sky-blue
+		define('AS_URL_FORMAT_PARAMS', 4); // http://...../?as=123&as_1=why-is-the-sky-blue
+		define('AS_URL_FORMAT_SAFEST', 5); // http://...../index.php?as=123&as_1=why-is-the-sky-blue
+
+		define('AS_URL_TEST_STRING', '$&-_~#%\\@^*()=!()][`\';:|".{},<>?# p§½??'); // tests escaping, spaces, quote slashing and unicode - but not + and /
+				
+		require_once 'as-base.php';
+		require_once 'as-app-format.php';
+		
+		global $current_theme;
+		$current_theme = as_get_site_theme();
+		
+		if (file_exists(THEME_DIR.$current_theme.'/functions.php')) {
+			require_once THEME_DIR.$current_theme.'/functions.php';
+		}else{
+			as_fatal_error('functions.php file missing in '.$current_theme.' theme');
+		}
+		
+		require AS_INCLUDE_DIR.'theme.php';
+		
+		as_initialize_php();
 	
+		as_initialize_modularity();
+		as_register_core_modules();
+		as_load_plugin_files();
+		as_load_override_files();
+		
 		as_index_set_request();
 		
 		
@@ -178,8 +172,45 @@
 						
 			if (substr($requestlower, 0, 5)=='feed/')
 				require AS_INCLUDE_DIR.'as-feed.php';
-			else
-				require AS_INCLUDE_DIR.'as-page.php';
+			else{
+				require AS_INCLUDE_DIR.'template.php';
+				
+				global $content;
+
+				as_report_process_stage('init_page');
+				as_db_connect('as_page_db_fail_handler');
+					
+				as_page_queue_pending();
+				as_load_state();
+				as_check_login_modules();
+
+				if (AS_DEBUG_PERFORMANCE)
+					as_usage_mark('setup');
+
+				as_check_page_clicks();
+
+				$content=as_get_request_content();
+				
+				if (is_array($content)) {
+					if (AS_DEBUG_PERFORMANCE)
+						as_usage_mark('view');
+
+					as_output_content($content);
+
+					if (AS_DEBUG_PERFORMANCE)
+						as_usage_mark('theme');
+						
+					if (as_do_content_stats($content))
+						if (AS_DEBUG_PERFORMANCE)
+							as_usage_mark('stats');
+
+					if (AS_DEBUG_PERFORMANCE)
+						as_usage_output();
+				}
+				
+				as_db_disconnect();
+				
+			}
 		}
 	}
 	

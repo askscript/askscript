@@ -104,7 +104,7 @@
 		}
 
 		
-		function form_html(&$as_content, $error)
+		function form_html(&$content, $error)
 		{
 			require_once $this->directory.'recaptchalib.php';
 			
@@ -112,7 +112,7 @@
 			if (strpos('|en|nl|fr|de|pt|ru|es|tr|', '|'.$language.'|')===false) // supported as of 3/2010
 				$language='en';
 				
-			$as_content['script_lines'][]=array(
+			$content['script_lines'][]=array(
 				"var RecaptchaOptions={",
 				"\ttheme:'white',",
 				"\tlang:".as_js($language),

@@ -23,28 +23,7 @@
 
 	More about this license: http://www.question2answer.org/license.php
 */
-
-	
-	define('AS_VERSION', '1.6.3'); // also used as suffix for .js and .css requests
-	define('AS_BUILD_DATE', '2014-01-19');
-	
-
-//	Execution section of this file - remainder contains function definitions
-
-	as_initialize_php();
-	as_initialize_constants_1();
-
-	if (defined('AS_WORDPRESS_LOAD_FILE')) // if relevant, load WordPress integration in global scope
-		require_once AS_WORDPRESS_LOAD_FILE;
-
-	as_initialize_constants_2();
-	
-	as_initialize_modularity();
-	as_register_core_modules();
-	as_load_plugin_files();
-	as_load_override_files();
-
-	require_once AS_INCLUDE_DIR.'as-db.php';
+	require_once AS_INCLUDE_DIR.'database.php';
 
 	as_db_allow_connect();
 
@@ -129,116 +108,6 @@
 		}
 	}
 	
-	
-	function as_initialize_constants_1()
-/*
-	First stage of setting up Q2A constants, before (if necessary) loading WordPress integration
-*/
-	{
-		global $as_request_map;
-		
-		define('AS_CATEGORY_DEPTH', 4); // you can't change this number!
-
-		if (!defined('AS_BASE_DIR'))
-			define('AS_BASE_DIR', dirname(dirname(__FILE__)).'/'); // try out best if not set in index.php or as-index.php - won't work with symbolic links
-			
-		define('AS_EXTERNAL_DIR', AS_BASE_DIR.'as-external/');
-		define('AS_INCLUDE_DIR', AS_BASE_DIR.'as-include/');
-		define('AS_LANG_DIR', AS_BASE_DIR.'as-lang/');
-		define('AS_THEME_DIR', AS_BASE_DIR.'as-theme/');
-		define('AS_PLUGIN_DIR', AS_BASE_DIR.'as-plugin/');
-
-		if (!file_exists(AS_BASE_DIR.'as-config.php'))
-			as_fatal_error('The config file could not be found. Please read the instructions in as-config-example.php.');
-		
-		require_once AS_BASE_DIR.'as-config.php';
-		
-		$as_request_map=is_array(@$AS_CONST_PATH_MAP) ? $AS_CONST_PATH_MAP : array();
-
-		if (defined('AS_WORDPRESS_INTEGRATE_PATH') && strlen(AS_WORDPRESS_INTEGRATE_PATH)) {
-			define('AS_FINAL_WORDPRESS_INTEGRATE_PATH', AS_WORDPRESS_INTEGRATE_PATH.((substr(AS_WORDPRESS_INTEGRATE_PATH, -1)=='/') ? '' : '/'));
-			define('AS_WORDPRESS_LOAD_FILE', AS_FINAL_WORDPRESS_INTEGRATE_PATH.'wp-load.php');
-	
-			if (!is_readable(AS_WORDPRESS_LOAD_FILE))
-				as_fatal_error('Could not find wp-load.php file for WordPress integration - please check AS_WORDPRESS_INTEGRATE_PATH in as-config.php');
-		}
-	}
-	
-	
-	function as_initialize_constants_2()
-/*
-	Second stage of setting up Q2A constants, after (if necessary) loading WordPress integration
-*/
-	{
-	
-	//	Default values if not set in as-config.php
-	
-		@define('AS_COOKIE_DOMAIN', '');
-		@define('AS_HTML_COMPRESSION', true);
-		@define('AS_MAX_LIMIT_START', 19999);
-		@define('AS_IGNORED_WORDS_FREQ', 10000);
-		@define('AS_ALLOW_UNINDEXED_QUERIES', false);
-		@define('AS_OPTIMIZE_LOCAL_DB', false);
-		@define('AS_OPTIMIZE_DISTANT_DB', false);
-		@define('AS_PERSISTENT_CONN_DB', false);
-		@define('AS_DEBUG_PERFORMANCE', false);
-		
-	//	Start performance monitoring
-	
-		if (AS_DEBUG_PERFORMANCE) {
-			require_once 'as-util-debug.php';
-			as_usage_init();
-		}
-		
-	//	More for WordPress integration
-		
-		if (defined('AS_FINAL_WORDPRESS_INTEGRATE_PATH')) {
-			define('AS_FINAL_MYSQL_HOSTNAME', DB_HOST);
-			define('AS_FINAL_MYSQL_USERNAME', DB_USER);
-			define('AS_FINAL_MYSQL_PASSWORD', DB_PASSWORD);
-			define('AS_FINAL_MYSQL_DATABASE', DB_NAME);
-			define('AS_FINAL_EXTERNAL_USERS', true);
-			
-			// Undo WordPress's addition of magic quotes to various things (leave $_COOKIE as is since WP code might need that)
-
-			function as_undo_wordpress_quoting($param, $isget)
-			{
-				if (is_array($param)) { // 
-					foreach ($param as $key => $value)
-						$param[$key]=as_undo_wordpress_quoting($value, $isget);
-					
-				} else {
-					$param=stripslashes($param);
-					if ($isget)
-						$param=strtr($param, array('\\\'' => '\'', '\"' => '"')); // also compensate for WordPress's .htaccess file
-				}
-				
-				return $param;
-			}
-			
-			$_GET=as_undo_wordpress_quoting($_GET, true);
-			$_POST=as_undo_wordpress_quoting($_POST, false);
-			$_SERVER['PHP_SELF']=stripslashes($_SERVER['PHP_SELF']);
-		
-		} else {
-			define('AS_FINAL_MYSQL_HOSTNAME', AS_MYSQL_HOSTNAME);
-			define('AS_FINAL_MYSQL_USERNAME', AS_MYSQL_USERNAME);
-			define('AS_FINAL_MYSQL_PASSWORD', AS_MYSQL_PASSWORD);
-			define('AS_FINAL_MYSQL_DATABASE', AS_MYSQL_DATABASE);
-			define('AS_FINAL_EXTERNAL_USERS', AS_EXTERNAL_USERS);
-		}
-		
-	//	Possible URL schemes for Q2A and the string used for url scheme testing
-
-		define('AS_URL_FORMAT_INDEX', 0);  // http://...../index.php/123/why-is-the-sky-blue
-		define('AS_URL_FORMAT_NEAT', 1);   // http://...../123/why-is-the-sky-blue [requires .htaccess]
-		define('AS_URL_FORMAT_PARAM', 3);  // http://...../?as=123/why-is-the-sky-blue
-		define('AS_URL_FORMAT_PARAMS', 4); // http://...../?as=123&as_1=why-is-the-sky-blue
-		define('AS_URL_FORMAT_SAFEST', 5); // http://...../index.php?as=123&as_1=why-is-the-sky-blue
-
-		define('AS_URL_TEST_STRING', '$&-_~#%\\@^*()=!()][`\';:|".{},<>?# π§½Жש'); // tests escaping, spaces, quote slashing and unicode - but not + and /
-	}
-
 
 	function as_initialize_modularity()
 /*
@@ -295,7 +164,7 @@
 						continue; // skip plugin which requires a later version of PHP
 				
 				$as_plugin_directory=dirname($pluginfile).'/';
-				$as_plugin_urltoroot=substr($as_plugin_directory, strlen(AS_BASE_DIR));
+				$as_plugin_urltoroot=substr($as_plugin_directory, strlen(BASE_DIR));
 				
 				require_once $pluginfile;
 				
@@ -957,39 +826,7 @@
 	}
 	
 	
-	function as_is_mobile_probably()
-/*
-	Return true if it appears that the page request is coming from a mobile client rather than a desktop/laptop web browser
-*/
-	{
-		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
-		
-		require_once AS_INCLUDE_DIR.'as-util-string.php';
-		
-		// inspired by: http://dangerousprototypes.com/docs/PhpBB3_MOD:_Replacement_mobile_browser_detection_for_mobile_themes
-		
-		$loweragent=strtolower(@$_SERVER['HTTP_USER_AGENT']);
-		
-		if (strpos($loweragent, 'ipad')!==false) // consider iPad as desktop
-			return false;
-		
-		$mobileheaders=array('HTTP_X_OPERAMINI_PHONE', 'HTTP_X_WAP_PROFILE', 'HTTP_PROFILE');
-		
-		foreach ($mobileheaders as $header)
-			if (isset($_SERVER[$header]))
-				return true;
-				
-		if (as_string_matches_one($loweragent, array(
-			'android', 'phone', 'mobile', 'windows ce', 'palm', ' mobi', 'wireless', 'blackberry', 'opera mini', 'symbian',
-			'nokia', 'samsung', 'ericsson,', 'vodafone/', 'kindle', 'ipod', 'wap1.', 'wap2.', 'sony', 'sanyo', 'sharp',
-			'panasonic', 'philips', 'pocketpc', 'avantgo', 'blazer', 'ipaq', 'up.browser', 'up.link', 'mmp', 'smartphone', 'midp'
-		)))
-			return true;
-		
-		return as_string_matches_one(strtolower(@$_SERVER['HTTP_ACCEPT']), array(
-			'application/vnd.wap.xhtml+xml', 'text/vnd.wap.wml'
-		));
-	}
+	
 	
 	
 //	Language phrase support
@@ -1464,6 +1301,107 @@
 		$as_process_reports_suspended=null;
 	}
 	
+	
+	//	Determine the request and root of the installation, and the requested start position used by many pages
+
+		function as_index_set_request()
+		{
+			$relativedepth=0;
+			
+			do_action('set_request');
+			
+			if (isset($_GET['as-rewrite'])) { // URLs rewritten by .htaccess
+				$urlformat=AS_URL_FORMAT_NEAT;
+				$requestparts=explode('/', as_gpc_to_string($_GET['as-rewrite']));
+				unset($_GET['as-rewrite']);
+				
+				if (!empty($_SERVER['REQUEST_URI'])) { // workaround for the fact that Apache unescapes characters while rewriting
+					$origpath=$_SERVER['REQUEST_URI'];
+					$_GET=array();
+					
+					$questionpos=strpos($origpath, '?');
+					if (is_numeric($questionpos)) {
+						$params=explode('&', substr($origpath, $questionpos+1));
+						
+						foreach ($params as $param)
+							if (preg_match('/^([^\=]*)(\=(.*))?$/', $param, $matches)) {
+								$argument=strtr(urldecode($matches[1]), '.', '_'); // simulate PHP's $_GET behavior
+								$_GET[$argument]=as_string_to_gpc(urldecode(@$matches[3]));
+							}
+		
+						$origpath=substr($origpath, 0, $questionpos);
+					}
+					
+					// Generally we assume that $_GET['as-rewrite'] has the right path depth, but this won't be the case if there's
+					// a & or # somewhere in the middle of the path, due to apache unescaping. So we make a special case for that.
+					$keepparts=count($requestparts);
+					$requestparts=explode('/', urldecode($origpath)); // new request calculated from $_SERVER['REQUEST_URI']
+
+					for ($part=count($requestparts)-1; $part>=0; $part--)
+						if (is_numeric(strpos($requestparts[$part], '&')) || is_numeric(strpos($requestparts[$part], '#'))) { 
+							$keepparts+=count($requestparts)-$part-1; // this is how many parts we lost
+							break;
+						}
+						
+					$requestparts=array_slice($requestparts, -$keepparts); // remove any irrelevant parts from the beginning
+				}
+
+				$relativedepth=count($requestparts);
+				
+			} elseif (isset($_GET['as'])) {
+				if (strpos($_GET['as'], '/')===false) {
+					$urlformat=( (empty($_SERVER['REQUEST_URI'])) || (strpos($_SERVER['REQUEST_URI'], '/index.php')!==false) )
+						? AS_URL_FORMAT_SAFEST : AS_URL_FORMAT_PARAMS;
+					$requestparts=array(as_gpc_to_string($_GET['as']));
+					
+					for ($part=1; $part<10; $part++)
+						if (isset($_GET['as_'.$part])) {
+							$requestparts[]=as_gpc_to_string($_GET['as_'.$part]);
+							unset($_GET['as_'.$part]);
+						}
+				
+				} else {
+					$urlformat=AS_URL_FORMAT_PARAM;
+					$requestparts=explode('/', as_gpc_to_string($_GET['as']));
+				}
+				
+				unset($_GET['as']);
+			
+			} else {
+				$phpselfunescaped=strtr($_SERVER['PHP_SELF'], '+', ' '); // seems necessary, and plus does not work with this scheme
+				$indexpath='/index.php/';
+				$indexpos=strpos($phpselfunescaped, $indexpath);
+				
+				if (is_numeric($indexpos)) {
+					$urlformat=AS_URL_FORMAT_INDEX;
+					$requestparts=explode('/', substr($phpselfunescaped, $indexpos+strlen($indexpath)));
+					$relativedepth=1+count($requestparts);
+			
+				} else {
+					$urlformat=null; // at home page so can't identify path type
+					$requestparts=array();
+				}
+			}
+			
+			apply_filters('request_parts', $requestparts);
+			
+			foreach ($requestparts as $part => $requestpart) // remove any blank parts
+				if (!strlen($requestpart))
+					unset($requestparts[$part]);
+					
+			reset($requestparts);
+			$key=key($requestparts);
+			
+			$replacement=array_search(@$requestparts[$key], as_get_request_map());
+			if ($replacement!==false)
+				$requestparts[$key]=$replacement;
+		
+			as_set_request(
+				implode('/', $requestparts),
+				($relativedepth>1) ? str_repeat('../', $relativedepth-1) : './',
+				$urlformat
+			);
+		}
 
 /*
 	Omit PHP closing tag to help avoid accidental output

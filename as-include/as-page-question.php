@@ -87,47 +87,47 @@
 		return include AS_INCLUDE_DIR.'as-page-not-found.php';
 
 	if (!$question['viewable']) {
-		$as_content=as_content_prepare();
+		$content=as_content_prepare();
 		
 		if ($question['queued'])
-			$as_content['error']=as_lang_html('question/q_waiting_approval');
+			$content['error']=as_lang_html('question/q_waiting_approval');
 		elseif ($question['flagcount'] && !isset($question['lastuserid']))
-			$as_content['error']=as_lang_html('question/q_hidden_flagged');
+			$content['error']=as_lang_html('question/q_hidden_flagged');
 		elseif ($question['authorlast'])
-			$as_content['error']=as_lang_html('question/q_hidden_author');
+			$content['error']=as_lang_html('question/q_hidden_author');
 		else
-			$as_content['error']=as_lang_html('question/q_hidden_other');
+			$content['error']=as_lang_html('question/q_hidden_other');
 
-		$as_content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
+		$content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
 
-		return $as_content;
+		return $content;
 	}
 	
 	$permiterror=as_user_post_permit_error('permit_view_q_page', $question, null, false);
 	
 	if ( $permiterror && (as_is_human_probably() || !as_opt('allow_view_q_bots')) ) {
-		$as_content=as_content_prepare();
+		$content=as_content_prepare();
 		$topage=as_q_request($questionid, $question['title']);
 		
 		switch ($permiterror) {
 			case 'login':
-				$as_content['error']=as_insert_login_links(as_lang_html('main/view_q_must_login'), $topage);
+				$content['error']=as_insert_login_links(as_lang_html('main/view_q_must_login'), $topage);
 				break;
 				
 			case 'confirm':
-				$as_content['error']=as_insert_login_links(as_lang_html('main/view_q_must_confirm'), $topage);
+				$content['error']=as_insert_login_links(as_lang_html('main/view_q_must_confirm'), $topage);
 				break;
 				
 			case 'approve':
-				$as_content['error']=as_lang_html('main/view_q_must_be_approved');
+				$content['error']=as_lang_html('main/view_q_must_be_approved');
 				break;
 				
 			default:
-				$as_content['error']=as_lang_html('users/no_permission');
+				$content['error']=as_lang_html('users/no_permission');
 				break;
 		}
 		
-		return $as_content;
+		return $content;
 	}
 
 
@@ -181,22 +181,22 @@
 	
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare(true, array_keys(as_category_path($categories, $question['categoryid'])));
+	$content=as_content_prepare(true, array_keys(as_category_path($categories, $question['categoryid'])));
 	
 	if (isset($userid) && !$formrequested)
-		$as_content['favorite']=as_favorite_form(AS_ENTITY_QUESTION, $questionid, $favorite, 
+		$content['favorite']=as_favorite_form(AS_ENTITY_QUESTION, $questionid, $favorite, 
 			as_lang($favorite ? 'question/remove_q_favorites' : 'question/add_q_favorites'));
 
-	$as_content['script_rel'][]='as-content/as-question.js?'.AS_VERSION;
+	$content['script_rel'][]='as-content/as-question.js?'.AS_VERSION;
 
 	if (isset($pageerror))
-		$as_content['error']=$pageerror; // might also show voting error set in as-index.php
+		$content['error']=$pageerror; // might also show voting error set in as-index.php
 	
 	elseif ($question['queued'])
-		$as_content['error']=$question['isbyuser'] ? as_lang_html('question/q_your_waiting_approval') : as_lang_html('question/q_waiting_your_approval');
+		$content['error']=$question['isbyuser'] ? as_lang_html('question/q_your_waiting_approval') : as_lang_html('question/q_waiting_your_approval');
 	
 	if ($question['hidden'])
-		$as_content['hidden']=true;
+		$content['hidden']=true;
 	
 	as_sort_by($commentsfollows, 'created');
 
@@ -204,21 +204,21 @@
 //	Prepare content for the question...
 	
 	if ($formtype=='q_edit') { // ...in edit mode
-		$as_content['title']=as_lang_html($question['editable'] ? 'question/edit_q_title' :
+		$content['title']=as_lang_html($question['editable'] ? 'question/edit_q_title' :
 			(as_using_categories() ? 'question/recat_q_title' : 'question/retag_q_title'));
-		$as_content['form_q_edit']=as_page_q_edit_q_form($as_content, $question, @$qin, @$qerrors, $completetags, $categories);
-		$as_content['q_view']['raw']=$question;
+		$content['form_q_edit']=as_page_q_edit_q_form($content, $question, @$qin, @$qerrors, $completetags, $categories);
+		$content['q_view']['raw']=$question;
 
 	} else { // ...in view mode
-		$as_content['q_view']=as_page_q_question_view($question, $parentquestion, $closepost, $usershtml, $formrequested);
+		$content['q_view']=as_page_q_question_view($question, $parentquestion, $closepost, $usershtml, $formrequested);
 
-		$as_content['title']=$as_content['q_view']['title'];
+		$content['title']=$content['q_view']['title'];
 
-		$as_content['description']=as_html(as_shorten_string_line(as_viewer_text($question['content'], $question['format']), 150));
+		$content['description']=as_html(as_shorten_string_line(as_viewer_text($question['content'], $question['format']), 150));
 		
 		$categorykeyword=@$categories[$question['categoryid']]['title'];
 		
-		$as_content['keywords']=as_html(implode(',', array_merge(
+		$content['keywords']=as_html(implode(',', array_merge(
 			(as_using_categories() && strlen($categorykeyword)) ? array($categorykeyword) : array(),
 			as_tagstring_to_tags($question['tags'])
 		))); // as far as I know, META keywords have zero effect on search rankings or listings, but many people have asked for this
@@ -228,21 +228,21 @@
 //	Prepare content for an answer being edited (if any) or to be added
 
 	if ($formtype=='a_edit') {
-		$as_content['a_form']=as_page_q_edit_a_form($as_content, 'a'.$formpostid, $answers[$formpostid],
+		$content['a_form']=as_page_q_edit_a_form($content, 'a'.$formpostid, $answers[$formpostid],
 			$question, $answers, $commentsfollows, @$aeditin[$formpostid], @$aediterrors[$formpostid]);
 
-		$as_content['a_form']['c_list']=as_page_q_comment_follow_list($question, $answers[$formpostid],
+		$content['a_form']['c_list']=as_page_q_comment_follow_list($question, $answers[$formpostid],
 			$commentsfollows, true, $usershtml, $formrequested, $formpostid);
 
 		$jumptoanchor='a'.$formpostid;
 	
 	} elseif (($formtype=='a_add') || ($question['answerbutton'] && !$formrequested)) {
-		$as_content['a_form']=as_page_q_add_a_form($as_content, 'anew', $captchareason, $question, @$anewin, @$anewerrors, $formtype=='a_add', $formrequested);
+		$content['a_form']=as_page_q_add_a_form($content, 'anew', $captchareason, $question, @$anewin, @$anewerrors, $formtype=='a_add', $formrequested);
 		
 		if ($formrequested)
 			$jumptoanchor='anew';
 		elseif ($formtype=='a_add')
-			$as_content['script_onloads'][]=array(
+			$content['script_onloads'][]=array(
 				"as_element_revealed=document.getElementById('anew');"
 			);
 	}
@@ -251,11 +251,11 @@
 //	Prepare content for comments on the question, plus add or edit comment forms
 
 	if ($formtype=='q_close') {
-		$as_content['q_view']['c_form']=as_page_q_close_q_form($as_content, $question, 'close', @$closein, @$closeerrors);
+		$content['q_view']['c_form']=as_page_q_close_q_form($content, $question, 'close', @$closein, @$closeerrors);
 		$jumptoanchor='close';
 	
 	} elseif ((($formtype=='c_add') && ($formpostid==$questionid)) || ($question['commentbutton'] && !$formrequested) ) { // ...to be added
-		$as_content['q_view']['c_form']=as_page_q_add_c_form($as_content, $question, $question, 'c'.$questionid,
+		$content['q_view']['c_form']=as_page_q_add_c_form($content, $question, $question, 'c'.$questionid,
 			$captchareason, @$cnewin[$questionid], @$cnewerrors[$questionid], $formtype=='c_add');
 		
 		if (($formtype=='c_add') && ($formpostid==$questionid)) {
@@ -264,20 +264,20 @@
 		}
 		
 	} elseif (($formtype=='c_edit') && (@$commentsfollows[$formpostid]['parentid']==$questionid)) { // ...being edited
-		$as_content['q_view']['c_form']=as_page_q_edit_c_form($as_content, 'c'.$formpostid, $commentsfollows[$formpostid],
+		$content['q_view']['c_form']=as_page_q_edit_c_form($content, 'c'.$formpostid, $commentsfollows[$formpostid],
 			@$ceditin[$formpostid], @$cediterrors[$formpostid]);
 
 		$jumptoanchor='c'.$formpostid;
 		$commentsall=$questionid;
 	}
 
-	$as_content['q_view']['c_list']=as_page_q_comment_follow_list($question, $question, $commentsfollows,
+	$content['q_view']['c_list']=as_page_q_comment_follow_list($question, $question, $commentsfollows,
 		$commentsall==$questionid, $usershtml, $formrequested, $formpostid); // ...for viewing
 	
 
 //	Prepare content for existing answers (could be added to by Ajax)
 
-	$as_content['a_list']=array(
+	$content['a_list']=array(
 		'tags' => 'id="a_list"',
 		'as' => array(),
 	);
@@ -338,7 +338,7 @@
 	
 	// set the canonical url based on possible pagination
 	
-	$as_content['canonical']=as_path_html(as_q_request($question['postid'], $question['title']),
+	$content['canonical']=as_path_html(as_q_request($question['postid'], $question['title']),
 		($pagestart>0) ? array('start' => $pagestart) : null, as_opt('site_url'));
 		
 	// build the actual answer list
@@ -354,7 +354,7 @@
 		//	Prepare content for comments on this answer, plus add or edit comment forms
 			
 			if ((($formtype=='c_add') && ($formpostid==$answerid)) || ($answer['commentbutton'] && !$formrequested) ) { // ...to be added
-				$a_view['c_form']=as_page_q_add_c_form($as_content, $question, $answer, 'c'.$answerid,
+				$a_view['c_form']=as_page_q_add_c_form($content, $question, $answer, 'c'.$answerid,
 					$captchareason, @$cnewin[$answerid], @$cnewerrors[$answerid], $formtype=='c_add');
 
 				if (($formtype=='c_add') && ($formpostid==$answerid)) {
@@ -363,7 +363,7 @@
 				}
 
 			} else if (($formtype=='c_edit') && (@$commentsfollows[$formpostid]['parentid']==$answerid)) { // ...being edited
-				$a_view['c_form']=as_page_q_edit_c_form($as_content, 'c'.$formpostid, $commentsfollows[$formpostid],
+				$a_view['c_form']=as_page_q_edit_c_form($content, 'c'.$formpostid, $commentsfollows[$formpostid],
 					@$ceditin[$formpostid], @$cediterrors[$formpostid]);
 					
 				$jumptoanchor='c'.$formpostid;
@@ -375,32 +375,32 @@
 
 		//	Add the answer to the list
 				
-			$as_content['a_list']['as'][]=$a_view;
+			$content['a_list']['as'][]=$a_view;
 		}
 	}
 	
 	if ($question['basetype']=='Q') {
-		$as_content['a_list']['title_tags']='id="a_list_title"';
+		$content['a_list']['title_tags']='id="a_list_title"';
 
 		if ($countfortitle==1)
-			$as_content['a_list']['title']=as_lang_html('question/1_answer_title');
+			$content['a_list']['title']=as_lang_html('question/1_answer_title');
 		elseif ($countfortitle>0)
-			$as_content['a_list']['title']=as_lang_html_sub('question/x_answers_title', $countfortitle);
+			$content['a_list']['title']=as_lang_html_sub('question/x_answers_title', $countfortitle);
 		else
-			$as_content['a_list']['title_tags'].=' style="display:none;" ';
+			$content['a_list']['title_tags'].=' style="display:none;" ';
 	}
 
 	if (!$formrequested)
-		$as_content['page_links']=as_html_page_links(as_request(), $pagestart, $pagesize, $countforpages, as_opt('pages_prev_next'), array(), false, 'a_list_title');
+		$content['page_links']=as_html_page_links(as_request(), $pagestart, $pagesize, $countforpages, as_opt('pages_prev_next'), array(), false, 'a_list_title');
 
 
 //	Some generally useful stuff
 	
 	if (as_using_categories() && count($categories))
-		$as_content['navigation']['cat']=as_category_navigation($categories, $question['categoryid']);
+		$content['navigation']['cat']=as_category_navigation($categories, $question['categoryid']);
 
 	if (isset($jumptoanchor))
-		$as_content['script_onloads'][]=array(
+		$content['script_onloads'][]=array(
 			'as_scroll_page_to($("#"+'.as_js($jumptoanchor).').offset().top);'
 		);
 		
@@ -419,10 +419,10 @@
 			( ($question['cookieid']!=$cookieid) || (!isset($question['cookieid'])) ) // and different cookieid from the creator
 		) )
 	)
-		$as_content['inc_views_postid']=$questionid;
+		$content['inc_views_postid']=$questionid;
 
 		
-	return $as_content;
+	return $content;
 
 
 /*

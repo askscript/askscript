@@ -58,34 +58,34 @@
 	switch (as_request_part(2)) {
 		case 'wall':
 			as_set_template('user-wall');
-			$as_content=include AS_INCLUDE_DIR.'as-page-user-wall.php';
+			$content=include AS_INCLUDE_DIR.'as-page-user-wall.php';
 			break;
 		
 		case 'activity':
 			as_set_template('user-activity');
-			$as_content=include AS_INCLUDE_DIR.'as-page-user-activity.php';
+			$content=include AS_INCLUDE_DIR.'as-page-user-activity.php';
 			break;
 
 		case 'questions':
 			as_set_template('user-questions');
-			$as_content=include AS_INCLUDE_DIR.'as-page-user-questions.php';
+			$content=include AS_INCLUDE_DIR.'as-page-user-questions.php';
 			break;
 
 		case 'answers':
 			as_set_template('user-answers');
-			$as_content=include AS_INCLUDE_DIR.'as-page-user-answers.php';
+			$content=include AS_INCLUDE_DIR.'as-page-user-answers.php';
 			break;
 
 		case null:
-			$as_content=include AS_INCLUDE_DIR.'as-page-user-profile.php';
+			$content=include AS_INCLUDE_DIR.'as-page-user-profile.php';
 			break;
 			
 		default:
-			$as_content=include AS_INCLUDE_DIR.'as-page-not-found.php';
+			$content=include AS_INCLUDE_DIR.'as-page-not-found.php';
 			break;
 	}
 	
-	return $as_content;
+	return $content;
 
 /*
 	Omit PHP closing tag to help avoid accidental output

@@ -201,26 +201,16 @@
 		
 		function html()
 		{
-			$this->output(
-				'<html>',
-				'<!-- Powered by Question2Answer - http://www.question2answer.org/ -->'
-			);
+
 			
-			$this->head();
+			//$this->head();
 			$this->body();
-			
-			$this->output(
-				'<!-- Powered by Question2Answer - http://www.question2answer.org/ -->',
-				'</html>'
-			);
+
 		}
 		
 		function head()
 		{
-			$this->output(
-				'<head>',
-				'<meta http-equiv="content-type" content="'.$this->content['content_type'].'"/>'
-			);
+
 			
 			$this->head_title();
 			$this->head_metas();

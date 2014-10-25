@@ -30,27 +30,27 @@
 	}
 
 	
-	function as_admin_check_privileges(&$as_content)
+	function as_admin_check_privileges(&$content)
 /*
 	Return true if user is logged in with admin privileges. If not, return false
-	and set up $as_content with the appropriate title and error message
+	and set up $content with the appropriate title and error message
 */
 	{
 		if (!as_is_logged_in()) {
 			require_once AS_INCLUDE_DIR.'as-app-format.php';
 			
-			$as_content=as_content_prepare();
+			$content=as_content_prepare();
 
-			$as_content['title']=as_lang_html('admin/admin_title');
-			$as_content['error']=as_insert_login_links(as_lang_html('admin/not_logged_in'), as_request());
+			$content['title']=as_lang_html('admin/admin_title');
+			$content['error']=as_insert_login_links(as_lang_html('admin/not_logged_in'), as_request());
 			
 			return false;
 
 		} elseif (as_get_logged_in_level()<AS_USER_LEVEL_ADMIN) {
-			$as_content=as_content_prepare();
+			$content=as_content_prepare();
 			
-			$as_content['title']=as_lang_html('admin/admin_title');
-			$as_content['error']=as_lang_html('admin/no_privileges');
+			$content['title']=as_lang_html('admin/admin_title');
+			$content['error']=as_lang_html('admin/no_privileges');
 			
 			return false;
 		}
@@ -143,10 +143,10 @@
 		
 		$options=array();
 
-		$directory=@opendir(AS_THEME_DIR);
+		$directory=@opendir(THEME_DIR);
 		if (is_resource($directory)) {
 			while (($theme=readdir($directory))!==false)
-				if ( (substr($theme, 0, 1)!='.') && file_exists(AS_THEME_DIR.$theme.'/as-styles.css') )
+				if ( (substr($theme, 0, 1)!='.') && file_exists(THEME_DIR.$theme.'/as-styles.css') )
 					$options[$theme]=$theme;
 
 			closedir($directory);

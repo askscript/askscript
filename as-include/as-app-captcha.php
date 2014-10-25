@@ -66,21 +66,21 @@
 	}
 
 
-	function as_set_up_captcha_field(&$as_content, &$fields, $errors, $note=null)
+	function as_set_up_captcha_field(&$content, &$fields, $errors, $note=null)
 /*
-	Prepare $as_content for showing a captcha, adding the element to $fields, given previous $errors, and a $note to display
+	Prepare $content for showing a captcha, adding the element to $fields, given previous $errors, and a $note to display
 */
 	{
 		if (as_captcha_available()) {
 			$captcha=as_load_module('captcha', as_opt('captcha_module'));
 			
-			$count=@++$as_content['as_captcha_count']; // work around fact that reCAPTCHA can only display per page
+			$count=@++$content['as_captcha_count']; // work around fact that reCAPTCHA can only display per page
 			
 			if ($count>1)
 				$html='[captcha placeholder]'; // single captcha will be moved about the page, to replace this
 			else {
-				$as_content['script_var']['as_captcha_in']='as_captcha_div_1';
-				$html=$captcha->form_html($as_content, @$errors['captcha']);
+				$content['script_var']['as_captcha_in']='as_captcha_div_1';
+				$html=$captcha->form_html($content, @$errors['captcha']);
 			}
 			
 			$fields['captcha']=array(

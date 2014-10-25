@@ -52,9 +52,9 @@
 		return include AS_INCLUDE_DIR.'as-page-not-found.php';
 
 	if (as_user_permit_error()) {
-		$as_content=as_content_prepare();
-		$as_content['error']=as_lang_html('users/no_permission');
-		return $as_content;
+		$content=as_content_prepare();
+		$content['error']=as_lang_html('users/no_permission');
+		return $content;
 	}
 
 
@@ -119,13 +119,13 @@
 	
 //	Prepare content for theme
 
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('misc/feedback_title');
+	$content['title']=as_lang_html('misc/feedback_title');
 	
-	$as_content['error']=@$pageerror;
+	$content['error']=@$pageerror;
 
-	$as_content['form']=array(
+	$content['form']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 		
 		'style' => 'tall',
@@ -170,18 +170,18 @@
 	);
 	
 	if ($usecaptcha && !$feedbacksent)
-		as_set_up_captcha_field($as_content, $as_content['form']['fields'], @$errors);
+		as_set_up_captcha_field($content, $content['form']['fields'], @$errors);
 
 
-	$as_content['focusid']='message';
+	$content['focusid']='message';
 	
 	if ($feedbacksent) {
-		$as_content['form']['ok']=as_lang_html('misc/feedback_sent');
-		unset($as_content['form']['buttons']);
+		$content['form']['ok']=as_lang_html('misc/feedback_sent');
+		unset($content['form']['buttons']);
 	}
 
 	
-	return $as_content;
+	return $content;
 	
 
 /*

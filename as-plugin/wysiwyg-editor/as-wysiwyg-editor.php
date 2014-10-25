@@ -51,7 +51,7 @@
 		}
 	
 	
-		function admin_form(&$as_content)
+		function admin_form(&$content)
 		{
 			require_once AS_INCLUDE_DIR.'as-app-upload.php';
 			
@@ -64,7 +64,7 @@
 				$saved=true;
 			}
 			
-			as_set_display_rules($as_content, array(
+			as_set_display_rules($content, array(
 				'wysiwyg_editor_upload_all_display' => 'wysiwyg_editor_upload_images_field',
 				'wysiwyg_editor_upload_max_size_display' => 'wysiwyg_editor_upload_images_field',
 			));
@@ -119,13 +119,13 @@
 		}
 
 		
-		function get_field(&$as_content, $content, $format, $fieldname, $rows /* $autofocus parameter deprecated */)
+		function get_field(&$content, $content, $format, $fieldname, $rows /* $autofocus parameter deprecated */)
 		{
 			$scriptsrc=$this->urltoroot.'ckeditor.js?'.AS_VERSION;			
 			$alreadyadded=false;
 
-			if (isset($as_content['script_src']))
-				foreach ($as_content['script_src'] as $testscriptsrc)
+			if (isset($content['script_src']))
+				foreach ($content['script_src'] as $testscriptsrc)
 					if ($testscriptsrc==$scriptsrc)
 						$alreadyadded=true;
 					
@@ -133,8 +133,8 @@
 				$uploadimages=as_opt('wysiwyg_editor_upload_images');
 				$uploadall=$uploadimages && as_opt('wysiwyg_editor_upload_all');
 				
-				$as_content['script_src'][]=$scriptsrc;
-				$as_content['script_lines'][]=array(
+				$content['script_src'][]=$scriptsrc;
+				$content['script_lines'][]=array(
 					"as_wysiwyg_editor_config={toolbar:[".
 						"['Bold','Italic','Underline','Strike'],".
 						"['Font','FontSize'],".

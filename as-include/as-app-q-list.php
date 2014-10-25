@@ -34,7 +34,7 @@
 		$navcategories, $categoryid, $categoryqcount, $categorypathprefix, $feedpathprefix, $suggest,
 		$pagelinkparams=null, $categoryparams=null, $dummy=null)
 /*
-	Returns the $as_content structure for a question list page showing $questions retrieved from the
+	Returns the $content structure for a question list page showing $questions retrieved from the
 	database. If $pagesize is not null, it sets the max number of questions to display. If $count is
 	not null, pagination is determined by $start and $count. The page title is $sometitle unless
 	there are no questions shown, in which case it's $nonetitle. $navcategories should contain the
@@ -65,9 +65,9 @@
 
 	//	Prepare content for theme
 		
-		$as_content=as_content_prepare(true, array_keys(as_category_path($navcategories, $categoryid)));
+		$content=as_content_prepare(true, array_keys(as_category_path($navcategories, $categoryid)));
 	
-		$as_content['q_list']['form']=array(
+		$content['q_list']['form']=array(
 			'tags' => 'method="post" action="'.as_self_html().'"',
 			
 			'hidden' => array(
@@ -75,46 +75,46 @@
 			),
 		);
 		
-		$as_content['q_list']['qs']=array();
+		$content['q_list']['qs']=array();
 		
 		if (count($questions)) {
-			$as_content['title']=$sometitle;
+			$content['title']=$sometitle;
 		
 			$defaults=as_post_html_defaults('Q');
 			if (isset($categorypathprefix))
 				$defaults['categorypathprefix']=$categorypathprefix;
 				
 			foreach ($questions as $question)
-				$as_content['q_list']['qs'][]=as_any_to_q_html_fields($question, $userid, as_cookie_get(),
+				$content['q_list']['qs'][]=as_any_to_q_html_fields($question, $userid, as_cookie_get(),
 					$usershtml, null, as_post_html_options($question, $defaults));
 
 		} else
-			$as_content['title']=$nonetitle;
+			$content['title']=$nonetitle;
 		
 		if (isset($userid) && isset($categoryid)) {
 			$favoritemap=as_get_favorite_non_qs_map();
 			$categoryisfavorite=@$favoritemap['category'][$navcategories[$categoryid]['backpath']] ? true : false;
 			
-			$as_content['favorite']=as_favorite_form(AS_ENTITY_CATEGORY, $categoryid, $categoryisfavorite,
+			$content['favorite']=as_favorite_form(AS_ENTITY_CATEGORY, $categoryid, $categoryisfavorite,
 				as_lang_sub($categoryisfavorite ? 'main/remove_x_favorites' : 'main/add_category_x_favorites', $navcategories[$categoryid]['title']));
 		}
 			
 		if (isset($count) && isset($pagesize))
-			$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $count, as_opt('pages_prev_next'), $pagelinkparams);
+			$content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $count, as_opt('pages_prev_next'), $pagelinkparams);
 		
-		if (empty($as_content['page_links']))
-			$as_content['suggest_next']=$suggest;
+		if (empty($content['page_links']))
+			$content['suggest_next']=$suggest;
 			
 		if (as_using_categories() && count($navcategories) && isset($categorypathprefix))
-			$as_content['navigation']['cat']=as_category_navigation($navcategories, $categoryid, $categorypathprefix, $categoryqcount, $categoryparams);
+			$content['navigation']['cat']=as_category_navigation($navcategories, $categoryid, $categorypathprefix, $categoryqcount, $categoryparams);
 		
 		if (isset($feedpathprefix) && (as_opt('feed_per_category') || !isset($categoryid)) )
-			$as_content['feed']=array(
+			$content['feed']=array(
 				'url' => as_path_html(as_feed_request($feedpathprefix.(isset($categoryid) ? ('/'.as_category_path_request($navcategories, $categoryid)) : ''))),
 				'label' => strip_tags($sometitle),
 			);
 			
-		return $as_content;
+		return $content;
 	}
 	
 	

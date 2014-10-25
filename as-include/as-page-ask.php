@@ -62,34 +62,34 @@
 	$permiterror=as_user_maximum_permit_error('permit_post_q', AS_LIMIT_QUESTIONS);
 
 	if ($permiterror) {
-		$as_content=as_content_prepare();
+		$content=as_content_prepare();
 		
 		// The 'approve', 'login', 'confirm', 'limit', 'userblock', 'ipblock' permission errors are reported to the user here
 		// The other option ('level') prevents the menu option being shown, in as_content_prepare(...)
 
 		switch ($permiterror) {
 			case 'login':
-				$as_content['error']=as_insert_login_links(as_lang_html('question/ask_must_login'), as_request(), isset($followpostid) ? array('follow' => $followpostid) : null);
+				$content['error']=as_insert_login_links(as_lang_html('question/ask_must_login'), as_request(), isset($followpostid) ? array('follow' => $followpostid) : null);
 				break;
 				
 			case 'confirm':
-				$as_content['error']=as_insert_login_links(as_lang_html('question/ask_must_confirm'), as_request(), isset($followpostid) ? array('follow' => $followpostid) : null);
+				$content['error']=as_insert_login_links(as_lang_html('question/ask_must_confirm'), as_request(), isset($followpostid) ? array('follow' => $followpostid) : null);
 				break;
 				
 			case 'limit':
-				$as_content['error']=as_lang_html('question/ask_limit');
+				$content['error']=as_lang_html('question/ask_limit');
 				break;
 				
 			case 'approve':
-				$as_content['error']=as_lang_html('question/ask_must_be_approved');
+				$content['error']=as_lang_html('question/ask_must_be_approved');
 				break;
 				
 			default:
-				$as_content['error']=as_lang_html('users/no_permission');
+				$content['error']=as_lang_html('users/no_permission');
 				break;
 		}
 		
-		return $as_content;
+		return $content;
 	}
 	
 
@@ -154,21 +154,21 @@
 
 //	Prepare content for theme
 
-	$as_content=as_content_prepare(false, array_keys(as_category_path($categories, @$in['categoryid'])));
+	$content=as_content_prepare(false, array_keys(as_category_path($categories, @$in['categoryid'])));
 	
-	$as_content['title']=as_lang_html(isset($followanswer) ? 'question/ask_follow_title' : 'question/ask_title');
-	$as_content['error']=@$errors['page'];
+	$content['title']=as_lang_html(isset($followanswer) ? 'question/ask_follow_title' : 'question/ask_title');
+	$content['error']=@$errors['page'];
 
 	$editorname=isset($in['editor']) ? $in['editor'] : as_opt('editor_for_qs');
 	$editor=as_load_editor(@$in['content'], @$in['format'], $editorname);
 
-	$field=as_editor_load_field($editor, $as_content, @$in['content'], @$in['format'], 'content', 12, false);
+	$field=as_editor_load_field($editor, $content, @$in['content'], @$in['format'], 'content', 12, false);
 	$field['label']=as_lang_html('question/q_content_label');
 	$field['error']=as_html(@$errors['content']);
 	
 	$custom=as_opt('show_custom_ask') ? trim(as_opt('custom_ask')) : '';
 
-	$as_content['form']=array(
+	$content['form']=array(
 		'tags' => 'name="ask" method="post" action="'.as_self_html().'"',
 		
 		'style' => 'tall',
@@ -210,14 +210,14 @@
 	);
 			
 	if (!strlen($custom))
-		unset($as_content['form']['fields']['custom']);
+		unset($content['form']['fields']['custom']);
 
 	if (as_opt('do_ask_check_qs') || as_opt('do_example_tags')) {
-		$as_content['script_rel'][]='as-content/as-ask.js?'.AS_VERSION;
-		$as_content['form']['fields']['title']['tags'].=' onchange="as_title_change(this.value);"';
+		$content['script_rel'][]='as-content/as-ask.js?'.AS_VERSION;
+		$content['form']['fields']['title']['tags'].=' onchange="as_title_change(this.value);"';
 		
 		if (strlen(@$in['title']))
-			$as_content['script_onloads'][]='as_title_change('.as_js($in['title']).');';
+			$content['script_onloads'][]='as_title_change('.as_js($in['title']).');';
 	}
 	
 	if (isset($followanswer)) {
@@ -229,7 +229,7 @@
 			'value' => $viewer->get_html($followanswer['content'], $followanswer['format'], array('blockwordspreg' => as_get_block_words_preg())),
 		);
 		
-		as_array_insert($as_content['form']['fields'], 'title', array('follows' => $field));
+		as_array_insert($content['form']['fields'], 'title', array('follows' => $field));
 	}
 		
 	if (as_using_categories() && count($categories)) {
@@ -238,12 +238,12 @@
 			'error' => as_html(@$errors['categoryid']),
 		);
 		
-		as_set_up_category_field($as_content, $field, 'category', $categories, $in['categoryid'], true, as_opt('allow_no_sub_category'));
+		as_set_up_category_field($content, $field, 'category', $categories, $in['categoryid'], true, as_opt('allow_no_sub_category'));
 		
 		if (!as_opt('allow_no_category')) // don't auto-select a category even though one is required
 			$field['options']['']='';
 			
-		as_array_insert($as_content['form']['fields'], 'content', array('category' => $field));
+		as_array_insert($content['form']['fields'], 'content', array('category' => $field));
 	}
 	
 	if (as_opt('extra_field_active')) {
@@ -254,7 +254,7 @@
 			'error' => as_html(@$errors['extra']),
 		);
 		
-		as_array_insert($as_content['form']['fields'], null, array('extra' => $field));
+		as_array_insert($content['form']['fields'], null, array('extra' => $field));
 	}
 	
 	if (as_using_tags()) {
@@ -262,27 +262,27 @@
 			'error' => as_html(@$errors['tags']),
 		);
 		
-		as_set_up_tag_field($as_content, $field, 'tags', isset($in['tags']) ? $in['tags'] : array(), array(),
+		as_set_up_tag_field($content, $field, 'tags', isset($in['tags']) ? $in['tags'] : array(), array(),
 			as_opt('do_complete_tags') ? array_keys($completetags) : array(), as_opt('page_size_ask_tags'));
 	
-		as_array_insert($as_content['form']['fields'], null, array('tags' => $field));
+		as_array_insert($content['form']['fields'], null, array('tags' => $field));
 	}
 	
 	if (!isset($userid))
-		as_set_up_name_field($as_content, $as_content['form']['fields'], @$in['name']);
+		as_set_up_name_field($content, $content['form']['fields'], @$in['name']);
 	
-	as_set_up_notify_fields($as_content, $as_content['form']['fields'], 'Q', as_get_logged_in_email(),
+	as_set_up_notify_fields($content, $content['form']['fields'], 'Q', as_get_logged_in_email(),
 		isset($in['notify']) ? $in['notify'] : as_opt('notify_users_default'), @$in['email'], @$errors['email']);
 	
 	if ($captchareason) {
 		require_once 'as-app-captcha.php';
-		as_set_up_captcha_field($as_content, $as_content['form']['fields'], @$errors, as_captcha_reason_note($captchareason));
+		as_set_up_captcha_field($content, $content['form']['fields'], @$errors, as_captcha_reason_note($captchareason));
 	}
 			
-	$as_content['focusid']='title';
+	$content['focusid']='title';
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

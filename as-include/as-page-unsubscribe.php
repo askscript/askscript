@@ -63,21 +63,21 @@
 
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 	
-	$as_content['title']=as_lang_html('users/unsubscribe_title');
+	$content['title']=as_lang_html('users/unsubscribe_title');
 
 	if ($unsubscribed)
-		$as_content['error']=strtr(as_lang_html('users/unsubscribe_complete'), array(
+		$content['error']=strtr(as_lang_html('users/unsubscribe_complete'), array(
 			'^0' => as_html(as_opt('site_title')),
 			'^1' => '<a href="'.as_path_html('account').'">',
 			'^2' => '</a>',
 		));
 	else
-		$as_content['error']=as_insert_login_links(as_lang_html('users/unsubscribe_wrong_log_in'), 'unsubscribe');
+		$content['error']=as_insert_login_links(as_lang_html('users/unsubscribe_wrong_log_in'), 'unsubscribe');
 
 		
-	return $as_content;
+	return $content;
 
 
 /*

@@ -59,8 +59,8 @@
 
 //	Check admin privileges (do late to allow one DB query)
 
-	if (!as_admin_check_privileges($as_content))
-		return $as_content;
+	if (!as_admin_check_privileges($content))
+		return $content;
 
 
 //	For non-text options, lists of option types, minima and maxima
@@ -812,14 +812,14 @@
 	
 //	Prepare content for theme
 
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html($subtitle);
-	$as_content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
+	$content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html($subtitle);
+	$content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
 
-	$as_content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
+	$content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
 	
-	$as_content['form']=array(
+	$content['form']=array(
 		'ok' => $formokhtml,
 		
 		'tags' => 'method="post" action="'.as_self_html().'" name="admin_form" onsubmit="document.forms.admin_form.has_js.value=1; return true;"',
@@ -848,21 +848,21 @@
 	);
 
 	if ($recalchotness) {
-		$as_content['form']['ok']='<span id="recalc_ok"></span>';
-		$as_content['form']['hidden']['code_recalc']=as_get_form_security_code('admin/recalc');
+		$content['form']['ok']='<span id="recalc_ok"></span>';
+		$content['form']['hidden']['code_recalc']=as_get_form_security_code('admin/recalc');
 		
-		$as_content['script_var']['as_warning_recalc']=as_lang('admin/stop_recalc_warning');
+		$content['script_var']['as_warning_recalc']=as_lang('admin/stop_recalc_warning');
 		
-		$as_content['script_onloads'][]=array(
+		$content['script_onloads'][]=array(
 			"as_recalc_click('dorecountposts', document.getElementById('dosaveoptions'), null, 'recalc_ok');"
 		);
 
 	} elseif ($startmailing) {
 		
 		if (as_post_text('has_js')) {
-			$as_content['form']['ok']='<span id="mailing_ok">'.as_html($mailingprogress).'</span>';
+			$content['form']['ok']='<span id="mailing_ok">'.as_html($mailingprogress).'</span>';
 			
-			$as_content['script_onloads'][]=array(
+			$content['script_onloads'][]=array(
 				"as_mailing_start('mailing_ok', 'domailingpause');"
 			);
 		
@@ -903,12 +903,12 @@
 		if (empty($optionname)) {
 			$indented=false;
 			
-			$as_content['form']['fields'][]=array(
+			$content['form']['fields'][]=array(
 				'type' => 'blank'
 			);
 		
 		} elseif (strpos($optionname, '/')!==false) {
-			$as_content['form']['fields'][]=array(
+			$content['form']['fields'][]=array(
 				'type' => 'static',
 				'label' => as_lang_html($optionname),
 			);
@@ -988,7 +988,7 @@
 					
 					as_optionfield_make_select($optionfield, $themeoptions, $value, 'Classic');
 					
-					$contents=file_get_contents(AS_THEME_DIR.$value.'/as-styles.css');
+					$contents=file_get_contents(THEME_DIR.$value.'/as-styles.css');
 
 					$metadata=as_admin_addon_metadata($contents, array(
 						'uri' => 'Theme URI',
@@ -1028,7 +1028,7 @@
 						
 						$updatehtml='(<span id="'.$elementid.'">...</span>)';
 						
-						$as_content['script_onloads'][]=array(
+						$content['script_onloads'][]=array(
 							"as_version_check(".as_js($metadata['update']).", 'Theme Version', ".as_js($metadata['version'], true).", 'Theme URI', ".as_js($elementid).");"
 						);
 
@@ -1121,7 +1121,7 @@
 					break;
 
 				case 'avatar_default_show';
-					$as_content['form']['tags'].='enctype="multipart/form-data"';
+					$content['form']['tags'].='enctype="multipart/form-data"';
 					$optionfield['label'].=' <span style="margin:2px 0; display:inline-block;">'.
 						as_get_avatar_blob_html(as_opt('avatar_default_blobid'), as_opt('avatar_default_width'), as_opt('avatar_default_height'), 32).
 						'</span> <input name="avatar_default_file" type="file" style="width:16em;">';
@@ -1492,7 +1492,7 @@
 			if (isset($feedrequest) && $value)
 				$optionfield['note']='<a href="'.as_path_html(as_feed_request($feedrequest)).'">'.as_lang_html($feedisexample ? 'admin/feed_link_example' : 'admin/feed_link').'</a>';
 
-			$as_content['form']['fields'][$optionname]=$optionfield;
+			$content['form']['fields'][$optionname]=$optionfield;
 		}
 		
 
@@ -1518,9 +1518,9 @@
 				
 				$listhtml.='<li><b><a href="'.as_path_html('admin/userfields').'">'.as_lang_html('admin/add_new_field').'</a></b></li>';
 	
-				$as_content['form']['fields'][]=array('type' => 'blank');
+				$content['form']['fields'][]=array('type' => 'blank');
 				
-				$as_content['form']['fields']['userfields']=array(
+				$content['form']['fields']['userfields']=array(
 					'label' => as_lang_html('admin/profile_fields'),
 					'id' => 'profile_fields',
 					'style' => 'tall',
@@ -1529,7 +1529,7 @@
 				);
 			}
 			
-			$as_content['form']['fields'][]=array('type' => 'blank');
+			$content['form']['fields'][]=array('type' => 'blank');
 
 			$pointstitle=as_get_points_to_titles();
 
@@ -1549,7 +1549,7 @@
 
 			$listhtml.='<li><b><a href="'.as_path_html('admin/usertitles').'">'.as_lang_html('admin/add_new_title').'</a></b></li>';
 
-			$as_content['form']['fields']['usertitles']=array(
+			$content['form']['fields']['usertitles']=array(
 				'label' => as_lang_html('admin/user_titles'),
 				'style' => 'tall',
 				'type' => 'custom',
@@ -1581,7 +1581,7 @@
 				}
 			
 			if (strlen($listhtml))
-				$as_content['form']['fields']['plugins']=array(
+				$content['form']['fields']['plugins']=array(
 					'label' => as_lang_html('admin/widgets_explanation'),
 					'style' => 'tall',
 					'type' => 'custom',
@@ -1603,7 +1603,7 @@
 			}
 			
 			if (strlen($listhtml))
-				$as_content['form']['fields']['widgets']=array(
+				$content['form']['fields']['widgets']=array(
 					'label' => as_lang_html('admin/active_widgets_explanation'),
 					'type' => 'custom',
 					'html' => '<ul style="margin-bottom:0;">'.$listhtml.'</ul>',
@@ -1612,44 +1612,44 @@
 			break;
 		
 		case 'permissions':
-			$as_content['form']['fields']['permit_block']=array(
+			$content['form']['fields']['permit_block']=array(
 				'type' => 'static',
 				'label' => as_lang_html('options/permit_block'),
 				'value' => as_lang_html('options/permit_moderators'),
 			);
 			
 			if (!AS_FINAL_EXTERNAL_USERS) {
-				$as_content['form']['fields']['permit_approve_users']=array(
+				$content['form']['fields']['permit_approve_users']=array(
 					'type' => 'static',
 					'label' => as_lang_html('options/permit_approve_users'),
 					'value' => as_lang_html('options/permit_moderators'),
 				);
 	
-				$as_content['form']['fields']['permit_create_experts']=array(
+				$content['form']['fields']['permit_create_experts']=array(
 					'type' => 'static',
 					'label' => as_lang_html('options/permit_create_experts'),
 					'value' => as_lang_html('options/permit_moderators'),
 				);
 	
-				$as_content['form']['fields']['permit_see_emails']=array(
+				$content['form']['fields']['permit_see_emails']=array(
 					'type' => 'static',
 					'label' => as_lang_html('options/permit_see_emails'),
 					'value' => as_lang_html('options/permit_admins'),
 				);
 		
-				$as_content['form']['fields']['permit_delete_users']=array(
+				$content['form']['fields']['permit_delete_users']=array(
 					'type' => 'static',
 					'label' => as_lang_html('options/permit_delete_users'),
 					'value' => as_lang_html('options/permit_admins'),
 				);
 		
-				$as_content['form']['fields']['permit_create_eds_mods']=array(
+				$content['form']['fields']['permit_create_eds_mods']=array(
 					'type' => 'static',
 					'label' => as_lang_html('options/permit_create_eds_mods'),
 					'value' => as_lang_html('options/permit_admins'),
 				);
 		
-				$as_content['form']['fields']['permit_create_admins']=array(
+				$content['form']['fields']['permit_create_admins']=array(
 					'type' => 'static',
 					'label' => as_lang_html('options/permit_create_admins'),
 					'value' => as_lang_html('options/permit_supers'),
@@ -1662,64 +1662,64 @@
 			require_once AS_INCLUDE_DIR.'as-util-sort.php';
 			
 			if (isset($mailingprogress)) {
-				unset($as_content['form']['buttons']['save']);
-				unset($as_content['form']['buttons']['reset']);
+				unset($content['form']['buttons']['save']);
+				unset($content['form']['buttons']['reset']);
 				
 				if ($startmailing) {
-					unset($as_content['form']['hidden']['dosaveoptions']);
+					unset($content['form']['hidden']['dosaveoptions']);
 
 					foreach ($showoptions as $optionname)
-						$as_content['form']['fields'][$optionname]['type']='static';
+						$content['form']['fields'][$optionname]['type']='static';
 						
-					$as_content['form']['fields']['mailing_body']['value']=as_html(as_opt('mailing_body'), true);
+					$content['form']['fields']['mailing_body']['value']=as_html(as_opt('mailing_body'), true);
 
-					$as_content['form']['buttons']['stop']=array(
+					$content['form']['buttons']['stop']=array(
 						'tags' => 'name="domailingpause" id="domailingpause"',
 						'label' => as_lang_html('admin/pause_mailing_button'),
 					);
 
 				} else {
-					$as_content['form']['buttons']['resume']=array(
+					$content['form']['buttons']['resume']=array(
 						'tags' => 'name="domailingresume"',
 						'label' => as_lang_html('admin/resume_mailing_button'),
 					);
 
-					$as_content['form']['buttons']['cancel']=array(
+					$content['form']['buttons']['cancel']=array(
 						'tags' => 'name="domailingcancel"',
 						'label' => as_lang_html('admin/cancel_mailing_button'),
 					);
 				}
 			
 			} else {
-				$as_content['form']['buttons']['spacer']=array();
+				$content['form']['buttons']['spacer']=array();
 	
-				$as_content['form']['buttons']['test']=array(
+				$content['form']['buttons']['test']=array(
 					'tags' => 'name="domailingtest" id="domailingtest"',
 					'label' => as_lang_html('admin/send_test_button'),
 				);
 
-				$as_content['form']['buttons']['start']=array(
+				$content['form']['buttons']['start']=array(
 					'tags' => 'name="domailingstart" id="domailingstart"',
 					'label' => as_lang_html('admin/start_mailing_button'),
 				);
 			}
 			
 			if (!$startmailing) {
-				$as_content['form']['fields']['mailing_enabled']['note']=as_lang_html('admin/mailing_explanation');
-				$as_content['form']['fields']['mailing_body']['rows']=12;
-				$as_content['form']['fields']['mailing_body']['note']=as_lang_html('admin/mailing_unsubscribe');
+				$content['form']['fields']['mailing_enabled']['note']=as_lang_html('admin/mailing_explanation');
+				$content['form']['fields']['mailing_body']['rows']=12;
+				$content['form']['fields']['mailing_body']['note']=as_lang_html('admin/mailing_unsubscribe');
 			}
 			break;
 	}
 	
 
 	if (isset($checkboxtodisplay))
-		as_set_display_rules($as_content, $checkboxtodisplay);
+		as_set_display_rules($content, $checkboxtodisplay);
 
-	$as_content['navigation']['sub']=as_admin_sub_navigation();
+	$content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

@@ -60,9 +60,9 @@
 //	Check we have permission to view this page, and whether we can block or unblock IPs
 
 	if (as_user_maximum_permit_error('permit_anon_view_ips')) {
-		$as_content=as_content_prepare();
-		$as_content['error']=as_lang_html('users/no_permission');
-		return $as_content;
+		$content=as_content_prepare();
+		$content['error']=as_lang_html('users/no_permission');
+		return $content;
 	}
 	
 	$blockable=as_user_level_maximum()>=AS_USER_LEVEL_MODERATOR; // allow moderator in one category to block across all categories
@@ -133,12 +133,12 @@
 
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html_sub('main/ip_address_x', as_html($ip));
-	$as_content['error']=@$pageerror;
+	$content['title']=as_lang_html_sub('main/ip_address_x', as_html($ip));
+	$content['error']=@$pageerror;
 
-	$as_content['form']=array(
+	$content['form']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 		
 		'style' => 'wide',
@@ -168,35 +168,35 @@
 				$matchclauses[]=$blockipclause;
 		
 		if (count($matchclauses)) {
-			$as_content['form']['fields']['status']=array(
+			$content['form']['fields']['status']=array(
 				'type' => 'static',
 				'label' => as_lang_html('misc/matches_blocked_ips'),
 				'value' => as_html(implode("\n", $matchclauses), true),
 			);
 			
-			$as_content['form']['buttons']['unblock']=array(
+			$content['form']['buttons']['unblock']=array(
 				'tags' => 'name="dounblock"',
 				'label' => as_lang_html('misc/unblock_ip_button'),
 			);
 			
 			if (count($questions) && !as_user_maximum_permit_error('permit_hide_show'))
-				$as_content['form']['buttons']['hideall']=array(
+				$content['form']['buttons']['hideall']=array(
 					'tags' => 'name="dohideall" onclick="as_show_waiting_after(this, false);"',
 					'label' => as_lang_html('misc/hide_all_ip_button'),
 				);
 
 		} else
-			$as_content['form']['buttons']['block']=array(
+			$content['form']['buttons']['block']=array(
 				'tags' => 'name="doblock"',
 				'label' => as_lang_html('misc/block_ip_button'),
 			);
 	}
 
 	
-	$as_content['q_list']['qs']=array();
+	$content['q_list']['qs']=array();
 	
 	if (count($questions)) {
-		$as_content['q_list']['title']=as_lang_html_sub('misc/recent_activity_from_x', as_html($ip));
+		$content['q_list']['title']=as_lang_html_sub('misc/recent_activity_from_x', as_html($ip));
 	
 		foreach ($questions as $question) {
 			$htmloptions=as_post_html_options($question);
@@ -224,14 +224,14 @@
 				}
 			}
 
-			$as_content['q_list']['qs'][]=$htmlfields;
+			$content['q_list']['qs'][]=$htmlfields;
 		}
 
 	} else
-		$as_content['q_list']['title']=as_lang_html_sub('misc/no_activity_from_x', as_html($ip));
+		$content['q_list']['title']=as_lang_html_sub('misc/no_activity_from_x', as_html($ip));
 	
 	
-	return $as_content;
+	return $content;
 	
 
 /*

@@ -79,17 +79,17 @@
 
 //	Prepare content for theme
 
-	$as_content=as_content_prepare(true);
+	$content=as_content_prepare(true);
 
 	if (strlen(as_get('q'))) {
-		$as_content['search']['value']=as_html($inquery);
+		$content['search']['value']=as_html($inquery);
 	
 		if (count($results))
-			$as_content['title']=as_lang_html_sub('main/results_for_x', as_html($inquery));
+			$content['title']=as_lang_html_sub('main/results_for_x', as_html($inquery));
 		else
-			$as_content['title']=as_lang_html_sub('main/no_results_for_x', as_html($inquery));
+			$content['title']=as_lang_html_sub('main/no_results_for_x', as_html($inquery));
 			
-		$as_content['q_list']['form']=array(
+		$content['q_list']['form']=array(
 			'tags' => 'method="post" action="'.as_self_html().'"',
 
 			'hidden' => array(
@@ -97,7 +97,7 @@
 			),
 		);
 		
-		$as_content['q_list']['qs']=array();
+		$content['q_list']['qs']=array();
 		
 		$qdefaults=as_post_html_defaults('Q');
 		
@@ -129,27 +129,27 @@
 			$fields['title']=as_html($result['title']);
 			$fields['url']=as_html($result['url']);
 			
-			$as_content['q_list']['qs'][]=$fields;
+			$content['q_list']['qs'][]=$fields;
 		}
 
-		$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $start+$gotcount,
+		$content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $start+$gotcount,
 			as_opt('pages_prev_next'), array('q' => $inquery), $gotcount>=$count);
 		
 		if (as_opt('feed_for_search'))
-			$as_content['feed']=array(
+			$content['feed']=array(
 				'url' => as_path_html(as_feed_request('search/'.$inquery)),
 				'label' => as_lang_html_sub('main/results_for_x', as_html($inquery)),
 			);
 
-		if (empty($as_content['page_links']))
-			$as_content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
+		if (empty($content['page_links']))
+			$content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
 
 	} else
-		$as_content['error']=as_lang_html('main/search_explanation');
+		$content['error']=as_lang_html('main/search_explanation');
 	
 
 		
-	return $as_content;
+	return $content;
 
 
 /*

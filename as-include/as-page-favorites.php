@@ -55,21 +55,21 @@
 	
 //	Prepare and return content for theme
 
-	$as_content=as_content_prepare(true);
+	$content=as_content_prepare(true);
 
-	$as_content['title']=as_lang_html('misc/my_favorites_title');
+	$content['title']=as_lang_html('misc/my_favorites_title');
 	
 
 //	Favorite questions
 
-	$as_content['q_list']=array(
+	$content['q_list']=array(
 		'title' => count($questions) ? as_lang_html('main/nav_qs') : as_lang_html('misc/no_favorite_qs'),
 		
 		'qs' => array(),
 	);
 	
 	if (count($questions)) {
-		$as_content['q_list']['form']=array(
+		$content['q_list']['form']=array(
 			'tags' => 'method="post" action="'.as_self_html().'"',
 
 			'hidden' => array(
@@ -80,7 +80,7 @@
 		$defaults=as_post_html_defaults('Q');
 			
 		foreach ($questions as $question)
-			$as_content['q_list']['qs'][]=as_post_html_fields($question, $userid, as_cookie_get(),
+			$content['q_list']['qs'][]=as_post_html_fields($question, $userid, as_cookie_get(),
 				$usershtml, null, as_post_html_options($question, $defaults));
 	}
 	
@@ -88,7 +88,7 @@
 //	Favorite users
 
 	if (!AS_FINAL_EXTERNAL_USERS) {
-		$as_content['ranking_users']=array(
+		$content['ranking_users']=array(
 			'title' => count($users) ? as_lang_html('main/nav_users') : as_lang_html('misc/no_favorite_users'),
 			'items' => array(),
 			'rows' => ceil(count($users)/as_opt('columns_users')),
@@ -96,7 +96,7 @@
 		);
 		
 		foreach ($users as $user)
-			$as_content['ranking_users']['items'][]=array(
+			$content['ranking_users']['items'][]=array(
 				'label' => as_get_user_avatar_html($user['flags'], $user['email'], $user['handle'],
 					$user['avatarblobid'], $user['avatarwidth'], $user['avatarheight'], as_opt('avatar_users_size'), true).' '.$usershtml[$user['userid']],
 				'score' => as_html(number_format($user['points'])),
@@ -107,7 +107,7 @@
 //	Favorite tags
 
 	if (as_using_tags()) {
-		$as_content['ranking_tags']=array(
+		$content['ranking_tags']=array(
 			'title' => count($tags) ? as_lang_html('main/nav_tags') : as_lang_html('misc/no_favorite_tags'),
 			'items' => array(),
 			'rows' => ceil(count($tags)/as_opt('columns_tags')),
@@ -115,7 +115,7 @@
 		);
 		
 		foreach ($tags as $tag)
-			$as_content['ranking_tags']['items'][]=array(
+			$content['ranking_tags']['items'][]=array(
 				'label' => as_tag_html($tag['word'], false, true),
 				'count' => number_format($tag['tagcount']),
 			);
@@ -125,14 +125,14 @@
 //	Favorite categories
 
 	if (as_using_categories()) {
-		$as_content['nav_list_categories']=array(
+		$content['nav_list_categories']=array(
 			'title' => count($categories) ? as_lang_html('main/nav_categories') : as_lang_html('misc/no_favorite_categories'),
 			'nav' => array(),
 			'type' => 'browse-cat',
 		);
 		
 		foreach ($categories as $category)
-			$as_content['nav_list_categories']['nav'][$category['categoryid']]=array(
+			$content['nav_list_categories']['nav'][$category['categoryid']]=array(
 				'label' => as_html($category['title']),
 				'state' => 'open',
 				'favorited' => true,
@@ -148,12 +148,12 @@
 
 //	Sub navigation for account pages and suggestion
 	
-	$as_content['suggest_next']=as_lang_html_sub('misc/suggest_favorites_add', '<span class="as-favorite-image">&nbsp;</span>');
+	$content['suggest_next']=as_lang_html_sub('misc/suggest_favorites_add', '<span class="as-favorite-image">&nbsp;</span>');
 	
-	$as_content['navigation']['sub']=as_user_sub_navigation(as_get_logged_in_handle(), 'favorites', true);
+	$content['navigation']['sub']=as_user_sub_navigation(as_get_logged_in_handle(), 'favorites', true);
 	
 	
-	return $as_content;
+	return $content;
 
 
 /*

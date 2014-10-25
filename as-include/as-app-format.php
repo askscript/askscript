@@ -1348,14 +1348,14 @@
 	}
 
 	
-	function as_set_display_rules(&$as_content, $effects)
+	function as_set_display_rules(&$content, $effects)
 /*
-	For each [target] => [source] in $effects, set up $as_content so that the visibility of the DOM element ID
+	For each [target] => [source] in $effects, set up $content so that the visibility of the DOM element ID
 	target is equal to the checked state or boolean-casted value of the DOM element ID source. Each source can
 	also combine multiple DOM IDs using JavaScript(=PHP) operators. This is twisted but rather convenient.
 */
 	{
-		$function='as_display_rule_'.count(@$as_content['script_lines']);
+		$function='as_display_rule_'.count(@$content['script_lines']);
 		
 		$keysourceids=array();
 		
@@ -1389,25 +1389,25 @@
 		$funcscript[]="}";
 		$loadscript[]=$function."(true);";
 		
-		$as_content['script_lines'][]=$funcscript;
-		$as_content['script_onloads'][]=$loadscript;
+		$content['script_lines'][]=$funcscript;
+		$content['script_onloads'][]=$loadscript;
 	}
 
 	
-	function as_set_up_tag_field(&$as_content, &$field, $fieldname, $tags, $exampletags, $completetags, $maxtags)
+	function as_set_up_tag_field(&$content, &$field, $fieldname, $tags, $exampletags, $completetags, $maxtags)
 /*
-	Set up $as_content and $field (with HTML name $fieldname) for tag auto-completion, where
+	Set up $content and $field (with HTML name $fieldname) for tag auto-completion, where
 	$exampletags are suggestions and $completetags are simply the most popular ones. Show up to $maxtags.
 */
 	{
 		$template='<a href="#" class="as-tag-link" onclick="return as_tag_click(this);">^</a>';
 
-		$as_content['script_rel'][]='as-content/as-ask.js?'.AS_VERSION;
-		$as_content['script_var']['as_tag_template']=$template;
-		$as_content['script_var']['as_tag_onlycomma']=(int)as_opt('tag_separator_comma');
-		$as_content['script_var']['as_tags_examples']=as_html(implode(',', $exampletags));
-		$as_content['script_var']['as_tags_complete']=as_html(implode(',', $completetags));
-		$as_content['script_var']['as_tags_max']=(int)$maxtags;
+		$content['script_rel'][]='as-content/as-ask.js?'.AS_VERSION;
+		$content['script_var']['as_tag_template']=$template;
+		$content['script_var']['as_tag_onlycomma']=(int)as_opt('tag_separator_comma');
+		$content['script_var']['as_tags_examples']=as_html(implode(',', $exampletags));
+		$content['script_var']['as_tags_complete']=as_html(implode(',', $completetags));
+		$content['script_var']['as_tags_max']=(int)$maxtags;
 		
 		$separatorcomma=as_opt('tag_separator_comma');
 		
@@ -1445,9 +1445,9 @@
 	}
 	
 	
-	function as_set_up_category_field(&$as_content, &$field, $fieldname, $navcategories, $categoryid, $allownone, $allownosub, $maxdepth=null, $excludecategoryid=null)
+	function as_set_up_category_field(&$content, &$field, $fieldname, $navcategories, $categoryid, $allownone, $allownosub, $maxdepth=null, $excludecategoryid=null)
 /*
-	Set up $as_content and $field (with HTML name $fieldname) for hierarchical category navigation, with the initial value
+	Set up $content and $field (with HTML name $fieldname) for hierarchical category navigation, with the initial value
 	set to $categoryid (and $navcategories retrieved for $categoryid using as_db_category_nav_selectspec(...)).
 	If $allownone is true, it will allow selection of no category. If $allownosub is true, it will allow a category to be
 	selected without selecting a subcategory within. Set $maxdepth to the maximum depth of category that can be selected
@@ -1464,13 +1464,13 @@
 			$maxdepth=AS_CATEGORY_DEPTH;
 		$maxdepth=min(AS_CATEGORY_DEPTH, $maxdepth);
 
-		$as_content['script_rel'][]='as-content/as-ask.js?'.AS_VERSION;
-		$as_content['script_onloads'][]='as_category_select('.as_js($fieldname).', '.as_js($startpath).');';
+		$content['script_rel'][]='as-content/as-ask.js?'.AS_VERSION;
+		$content['script_onloads'][]='as_category_select('.as_js($fieldname).', '.as_js($startpath).');';
 		
-		$as_content['script_var']['as_cat_exclude']=$excludecategoryid;	
-		$as_content['script_var']['as_cat_allownone']=(int)$allownone;
-		$as_content['script_var']['as_cat_allownosub']=(int)$allownosub;
-		$as_content['script_var']['as_cat_maxdepth']=$maxdepth;
+		$content['script_var']['as_cat_exclude']=$excludecategoryid;	
+		$content['script_var']['as_cat_allownone']=(int)$allownone;
+		$content['script_var']['as_cat_allownosub']=(int)$allownosub;
+		$content['script_var']['as_cat_maxdepth']=$maxdepth;
 
 		$field['type']='select';
 		$field['tags']='name="'.$fieldname.'_0" id="'.$fieldname.'_0" onchange="as_category_select('.as_js($fieldname).');"';
@@ -1554,9 +1554,9 @@
 	}
 	
 	
-	function as_set_up_name_field(&$as_content, &$fields, $inname, $fieldprefix='')
+	function as_set_up_name_field(&$content, &$fields, $inname, $fieldprefix='')
 /*
-	Set up $as_content and add to $fields to allow the user to enter their name for a post if they are not logged in
+	Set up $content and add to $fields to allow the user to enter their name for a post if they are not logged in
 	$inname is from previous submission/validation. Pass $fieldprefix to add a prefix to the form field name used.
 */
 	{
@@ -1568,9 +1568,9 @@
 	}
 
 	
-	function as_set_up_notify_fields(&$as_content, &$fields, $basetype, $login_email, $innotify, $inemail, $errors_email, $fieldprefix='')
+	function as_set_up_notify_fields(&$content, &$fields, $basetype, $login_email, $innotify, $inemail, $errors_email, $fieldprefix='')
 /*
-	Set up $as_content and add to $fields to allow user to set if they want to be notified regarding their post.
+	Set up $content and add to $fields to allow user to set if they want to be notified regarding their post.
 	$basetype is 'Q', 'A' or 'C' for question, answer or comment. $login_email is the email of logged in user,
 	or null if this is an anonymous post. $innotify, $inemail and $errors_email are from previous submission/validation.
 	Pass $fieldprefix to add a prefix to the form field names and IDs used.
@@ -1618,7 +1618,7 @@
 				'error' => as_html($errors_email),
 			);
 			
-			as_set_display_rules($as_content, array(
+			as_set_display_rules($content, array(
 				$fieldprefix.'email_display' => $fieldprefix.'notify',
 				$fieldprefix.'email_shown' => $fieldprefix.'notify',
 				$fieldprefix.'email_hidden' => '!'.$fieldprefix.'notify',
@@ -1635,9 +1635,11 @@
 	Return the theme that should be used for displaying the page
 */
 	{
-		if (as_to_override(__FUNCTION__)) { $args=func_get_args(); return as_call_override(__FUNCTION__, $args); }
+		$theme = as_opt('site_theme');
+		if (!file_exists(THEME_DIR.$theme))
+			$theme='default';
 		
-		return as_opt(as_is_mobile_probably() ? 'site_theme_mobile' : 'site_theme');
+		return $theme;
 	}
 	
 	
@@ -1659,13 +1661,13 @@
 		
 	//	Then load the selected theme if valid, otherwise load the Classic theme
 	
-		if (!file_exists(AS_THEME_DIR.$theme.'/as-styles.css'))
+		if (!file_exists(THEME_DIR.$theme.'/as-styles.css'))
 			$theme='Classic';
 
 		$themeroothtml=as_html(as_path_to_root().'as-theme/'.$theme.'/');
 		
-		if (file_exists(AS_THEME_DIR.$theme.'/as-theme.php')) {
-			require_once AS_THEME_DIR.$theme.'/as-theme.php';
+		if (file_exists(THEME_DIR.$theme.'/as-theme.php')) {
+			require_once THEME_DIR.$theme.'/as-theme.php';
 	
 			if (class_exists('as_html_theme'))
 				$classname='as_html_theme';
@@ -1759,18 +1761,18 @@
 	}
 	
 	
-	function as_editor_load_field($editor, &$as_content, $content, $format, $fieldname, $rows, $focusnow=false, $loadnow=true)
+	function as_editor_load_field($editor, &$content, $content, $format, $fieldname, $rows, $focusnow=false, $loadnow=true)
 /*
-	Return a form field from the $editor module while making necessary modifications to $as_content. The parameters
+	Return a form field from the $editor module while making necessary modifications to $content. The parameters
 	$content, $format, $fieldname, $rows and $focusnow are passed through to the module's get_field() method. ($focusnow
 	is deprecated as a parameter to get_field() but it's still passed through for old editor modules.) Based on
-	$focusnow and $loadnow, also add the editor's load and/or focus scripts to $as_content's onload handlers.
+	$focusnow and $loadnow, also add the editor's load and/or focus scripts to $content's onload handlers.
 */
 	{
 		if (!isset($editor))
 			as_fatal_error('No editor found for format: '.$format);
 		
-		$field=$editor->get_field($as_content, $content, $format, $fieldname, $rows, $focusnow);
+		$field=$editor->get_field($content, $content, $format, $fieldname, $rows, $focusnow);
 		
 		$onloads=array();
 
@@ -1781,7 +1783,7 @@
 			$onloads[]=$editor->focus_script($fieldname);
 			
 		if (count($onloads))
-			$as_content['script_onloads'][]=$onloads;
+			$content['script_onloads'][]=$onloads;
 			
 		return $field;
 	}
@@ -1923,7 +1925,7 @@
 
 	function as_notice_form($noticeid, $content, $rawnotice=null)
 /*
-	Return an form to add to the $as_content['notices'] array for displaying a user notice with id $noticeid
+	Return an form to add to the $content['notices'] array for displaying a user notice with id $noticeid
 	and $content. Pass the raw database information for the notice in $rawnotice.
 */
 	{
@@ -1942,7 +1944,7 @@
 	
 	function as_favorite_form($entitytype, $entityid, $favorite, $title)
 /*
-	Return a form to set in $as_content['favorite'] for the favoriting button for entity $entitytype with $entityid.
+	Return a form to set in $content['favorite'] for the favoriting button for entity $entitytype with $entityid.
 	Set $favorite to whether the entity is currently a favorite and a description title for the button in $title.
 */
 	{

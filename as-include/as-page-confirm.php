@@ -85,19 +85,19 @@
 
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 	
-	$as_content['title']=as_lang_html('users/confirm_title');
-	$as_content['error']=@$pageerror;
+	$content['title']=as_lang_html('users/confirm_title');
+	$content['error']=@$pageerror;
 
 	if ($useremailed)
-		$as_content['error']=as_lang_html('users/confirm_emailed'); // not an error, but display it prominently anyway
+		$content['error']=as_lang_html('users/confirm_emailed'); // not an error, but display it prominently anyway
 	
 	elseif ($userconfirmed) {
-		$as_content['error']=as_lang_html('users/confirm_complete');
+		$content['error']=as_lang_html('users/confirm_complete');
 		
 		if (!isset($loginuserid))
-			$as_content['suggest_next']=strtr(
+			$content['suggest_next']=strtr(
 				as_lang_html('users/log_in_to_access'),
 				
 				array(
@@ -110,11 +110,11 @@
 		require_once AS_INCLUDE_DIR.'as-util-string.php';
 		
 		if (strlen($incode))
-			$as_content['error']=as_lang_html('users/confirm_wrong_resend');
+			$content['error']=as_lang_html('users/confirm_wrong_resend');
 			
 		$email=as_get_logged_in_email();
 		
-		$as_content['form']=array(
+		$content['form']=array(
 			'tags' => 'method="post" action="'.as_path_html('confirm').'"',
 			
 			'style' => 'tall',
@@ -143,15 +143,15 @@
 		);
 		
 		if (!as_email_validate($email)) {
-			$as_content['error']=as_lang_html('users/email_invalid');
-			unset($as_content['form']['buttons']['send']);
+			$content['error']=as_lang_html('users/email_invalid');
+			unset($content['form']['buttons']['send']);
 		}
 
 	} else
-		$as_content['error']=as_insert_login_links(as_lang_html('users/confirm_wrong_log_in'), 'confirm');
+		$content['error']=as_insert_login_links(as_lang_html('users/confirm_wrong_log_in'), 'confirm');
 
 		
-	return $as_content;
+	return $content;
 
 
 /*

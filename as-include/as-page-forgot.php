@@ -83,12 +83,12 @@
 	
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('users/reset_title');
-	$as_content['error']=@$errors['page'];
+	$content['title']=as_lang_html('users/reset_title');
+	$content['error']=@$errors['page'];
 
-	$as_content['form']=array(
+	$content['form']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 		
 		'style' => 'tall',
@@ -116,12 +116,12 @@
 	);
 	
 	if (as_opt('captcha_on_reset_password'))
-		as_set_up_captcha_field($as_content, $as_content['form']['fields'], @$errors);
+		as_set_up_captcha_field($content, $content['form']['fields'], @$errors);
 	
-	$as_content['focusid']='emailhandle';
+	$content['focusid']='emailhandle';
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

@@ -33,7 +33,7 @@
 		}
 	
 	
-		function admin_form(&$as_content)
+		function admin_form(&$content)
 		{
 			$saved=false;
 			
@@ -43,7 +43,7 @@
 				$saved=true;
 			}
 			
-			as_set_display_rules($as_content, array(
+			as_set_display_rules($content, array(
 				'mouseover_content_max_len_display' => 'mouseover_content_on_field',
 			));
 			

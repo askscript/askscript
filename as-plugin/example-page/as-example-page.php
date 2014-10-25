@@ -60,13 +60,13 @@
 		
 		function process_request($request)
 		{
-			$as_content=as_content_prepare();
+			$content=as_content_prepare();
 
-			$as_content['title']=as_lang_html('example_page/page_title');
-			$as_content['error']='An example error';
-			$as_content['custom']='Some <b>custom html</b>';
+			$content['title']=as_lang_html('example_page/page_title');
+			$content['error']='An example error';
+			$content['custom']='Some <b>custom html</b>';
 
-			$as_content['form']=array(
+			$content['form']=array(
 				'tags' => 'method="post" action="'.as_self_html().'"',
 				
 				'style' => 'wide',
@@ -98,9 +98,9 @@
 				),
 			);
 
-			$as_content['custom_2']='<p><br>More <i>custom html</i></p>';
+			$content['custom_2']='<p><br>More <i>custom html</i></p>';
 			
-			return $as_content;
+			return $content;
 		}
 	
 	}

@@ -41,14 +41,14 @@
 		}
 
 		
-		function output_widget($region, $place, $themeobject, $template, $request, $as_content)
+		function output_widget($region, $place, $themeobject, $template, $request, $content)
 		{
 			require_once AS_INCLUDE_DIR.'as-db-selects.php';
 			
-			if (@$as_content['q_view']['raw']['type']!='Q') // question might not be visible, etc...
+			if (@$content['q_view']['raw']['type']!='Q') // question might not be visible, etc...
 				return;
 				
-			$questionid=$as_content['q_view']['raw']['postid'];
+			$questionid=$content['q_view']['raw']['postid'];
 			
 			$userid=as_get_logged_in_userid();
 			$cookieid=as_cookie_get();

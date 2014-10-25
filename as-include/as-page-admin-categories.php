@@ -47,8 +47,8 @@
 
 //	Check admin privileges (do late to allow one DB query)
 
-	if (!as_admin_check_privileges($as_content))
-		return $as_content;
+	if (!as_admin_check_privileges($content))
+		return $content;
 		
 		
 //	Work out the appropriate state for the page
@@ -240,13 +240,13 @@
 	
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/categories_title');
-	$as_content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
+	$content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/categories_title');
+	$content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
 	
 	if ($setmissing) {
-		$as_content['form']=array(
+		$content['form']=array(
 			'tags' => 'method="post" action="'.as_path_html(as_request()).'"',
 			
 			'style' => 'tall',
@@ -280,13 +280,13 @@
 			),
 		);
 
-		as_set_up_category_field($as_content, $as_content['form']['fields']['reassign'], 'reassign',
+		as_set_up_category_field($content, $content['form']['fields']['reassign'], 'reassign',
 			$categories, @$editcategory['categoryid'], as_opt('allow_no_category'), as_opt('allow_no_sub_category'));
 			
 	
 	} elseif (isset($editcategory)) {
 
-		$as_content['form']=array(
+		$content['form']=array(
 			'tags' => 'method="post" action="'.as_path_html(as_request()).'"',
 			
 			'style' => 'tall',
@@ -349,33 +349,33 @@
 		
 		
 		if ($setparent) {
-			unset($as_content['form']['fields']['delete']);
-			unset($as_content['form']['fields']['reassign']);
-			unset($as_content['form']['fields']['questions']);
-			unset($as_content['form']['fields']['content']);
+			unset($content['form']['fields']['delete']);
+			unset($content['form']['fields']['reassign']);
+			unset($content['form']['fields']['questions']);
+			unset($content['form']['fields']['content']);
 			
-			$as_content['form']['fields']['parent']=array(
+			$content['form']['fields']['parent']=array(
 				'label' => as_lang_html('admin/category_parent'),
 			);
 				
 			$childdepth=as_db_category_child_depth($editcategory['categoryid']);
 	
-			as_set_up_category_field($as_content, $as_content['form']['fields']['parent'], 'parent',
+			as_set_up_category_field($content, $content['form']['fields']['parent'], 'parent',
 				isset($incategories) ? $incategories : $categories, isset($inparentid) ? $inparentid : @$editcategory['parentid'],
 				true, true, AS_CATEGORY_DEPTH-1-$childdepth, @$editcategory['categoryid']);
 				
-			$as_content['form']['fields']['parent']['options']['']=as_lang_html('admin/category_top_level');
+			$content['form']['fields']['parent']['options']['']=as_lang_html('admin/category_top_level');
 			
-			@$as_content['form']['fields']['parent']['note'].=as_lang_html_sub('admin/category_max_depth_x', AS_CATEGORY_DEPTH);
+			@$content['form']['fields']['parent']['note'].=as_lang_html_sub('admin/category_max_depth_x', AS_CATEGORY_DEPTH);
 
 		} elseif (isset($editcategory['categoryid'])) { // existing category
 			if ($hassubcategory) {
-				$as_content['form']['fields']['name']['note']=as_lang_html('admin/category_no_delete_subs');
-				unset($as_content['form']['fields']['delete']);
-				unset($as_content['form']['fields']['reassign']);
+				$content['form']['fields']['name']['note']=as_lang_html('admin/category_no_delete_subs');
+				unset($content['form']['fields']['delete']);
+				unset($content['form']['fields']['reassign']);
 
 			} else {
-				$as_content['form']['fields']['delete']=array(
+				$content['form']['fields']['delete']=array(
 					'tags' => 'name="dodelete" id="dodelete"',
 					'label' =>
 						'<span id="reassign_shown">'.as_lang_html('admin/delete_category_reassign').'</span>'.
@@ -384,16 +384,16 @@
 					'type' => 'checkbox',
 				);
 			
-				$as_content['form']['fields']['reassign']=array(
+				$content['form']['fields']['reassign']=array(
 					'id' => 'reassign_display',
 					'tags' => 'name="reassign"',
 				);
 				
-				as_set_up_category_field($as_content, $as_content['form']['fields']['reassign'], 'reassign',
+				as_set_up_category_field($content, $content['form']['fields']['reassign'], 'reassign',
 					$categories, $editcategory['parentid'], true, true, null, $editcategory['categoryid']);
 			}
 			
-			$as_content['form']['fields']['questions']=array(
+			$content['form']['fields']['questions']=array(
 				'label' => as_lang_html('admin/total_qs'),
 				'type' => 'static',
 				'value' => '<a href="'.as_path_html('questions/'.as_category_path_request($categories, $editcategory['categoryid'])).'">'.
@@ -407,7 +407,7 @@
 				$nosubcount=as_db_count_categoryid_qs($editcategory['categoryid']);
 				
 				if ($nosubcount)
-					$as_content['form']['fields']['questions']['error']=
+					$content['form']['fields']['questions']['error']=
 						strtr(as_lang_html('admin/category_no_sub_error'), array(
 							'^q' => number_format($nosubcount),
 							'^1' => '<a href="'.as_path_html(as_request(), array('edit' => $editcategory['categoryid'], 'missing' => 1)).'">',
@@ -415,7 +415,7 @@
 						));
 			}
 			
-			as_set_display_rules($as_content, array(
+			as_set_display_rules($content, array(
 				'position_display' => '!dodelete',
 				'slug_display' => '!dodelete',
 				'content_display' => '!dodelete',
@@ -427,31 +427,31 @@
 			));
 
 		} else { // new category
-			unset($as_content['form']['fields']['delete']);
-			unset($as_content['form']['fields']['reassign']);
-			unset($as_content['form']['fields']['slug']);
-			unset($as_content['form']['fields']['questions']);
+			unset($content['form']['fields']['delete']);
+			unset($content['form']['fields']['reassign']);
+			unset($content['form']['fields']['slug']);
+			unset($content['form']['fields']['questions']);
 		
-			$as_content['focusid']='name';
+			$content['focusid']='name';
 		}
 		
 		if (!$setparent) {
 			$pathhtml=as_category_path_html($categories, @$editcategory['parentid']);
 			
 			if (count($categories)) {
-				$as_content['form']['fields']['parent']=array(
+				$content['form']['fields']['parent']=array(
 					'id' => 'parent_display',
 					'label' => as_lang_html('admin/category_parent'),
 					'type' => 'static',
 					'value' => (strlen($pathhtml) ? $pathhtml : as_lang_html('admin/category_top_level')),
 				);
 				
-				$as_content['form']['fields']['parent']['value']=
+				$content['form']['fields']['parent']['value']=
 					'<a href="'.as_path_html(as_request(), array('edit' => @$editcategory['parentid'])).'">'.
-					$as_content['form']['fields']['parent']['value'].'</a>';
+					$content['form']['fields']['parent']['value'].'</a>';
 				
 				if (isset($editcategory['categoryid']))
-					$as_content['form']['fields']['parent']['value'].=' - '.
+					$content['form']['fields']['parent']['value'].=' - '.
 						'<a href="'.as_path_html(as_request(), array('edit' => $editcategory['categoryid'], 'setparent' => 1)).
 						'" style="white-space: nowrap;">'.as_lang_html('admin/category_move_parent').'</a>';
 			}
@@ -484,7 +484,7 @@
 				$positionoptions[1+@max(array_keys($positionoptions))]=$positionvalue;
 			}
 	
-			$as_content['form']['fields']['position']=array(
+			$content['form']['fields']['position']=array(
 				'id' => 'position_display',
 				'tags' => 'name="position"',
 				'label' => as_lang_html('admin/position'),
@@ -511,21 +511,21 @@
 					$childrenhtml.=' - <a href="'.as_path_html(as_request(), array('addsub' => $editcategory['categoryid'])).
 						'" style="white-space: nowrap;"><b>'.as_lang_html('admin/category_add_sub').'</b></a>';
 					
-					$as_content['form']['fields']['children']=array(
+					$content['form']['fields']['children']=array(
 						'id' => 'children_display',
 						'label' => as_lang_html('admin/category_subs'),
 						'type' => 'static',
 						'value' => $childrenhtml,
 					);
 				} else {
-					$as_content['form']['fields']['name']['note']=as_lang_html_sub('admin/category_no_add_subs_x', AS_CATEGORY_DEPTH);
+					$content['form']['fields']['name']['note']=as_lang_html_sub('admin/category_no_add_subs_x', AS_CATEGORY_DEPTH);
 				}
 				
 			}
 		}
 			
 	} else {
-		$as_content['form']=array(
+		$content['form']=array(
 			'tags' => 'method="post" action="'.as_path_html(as_request()).'"',
 			
 			'ok' => $savedoptions ? as_lang_html('admin/options_saved') : null,
@@ -557,7 +557,7 @@
 		);
 
 		if (count($categories)) {
-			unset($as_content['form']['fields']['intro']);
+			unset($content['form']['fields']['intro']);
 			
 			$navcategoryhtml='';
 
@@ -566,13 +566,13 @@
 					$navcategoryhtml.='<a href="'.as_path_html('admin/categories', array('edit' => $category['categoryid'])).'">'.
 						as_html($category['title']).'</a> - '.as_lang_html_sub('main/x_questions', $category['qcount']).'<br/>';
 
-			$as_content['form']['fields']['nav']=array(
+			$content['form']['fields']['nav']=array(
 				'label' => as_lang_html('admin/top_level_categories'),
 				'type' => 'static',
 				'value' => $navcategoryhtml,
 			);
 				
-			$as_content['form']['fields']['allow_no_category']=array(
+			$content['form']['fields']['allow_no_category']=array(
 				'label' => as_lang_html('options/allow_no_category'),
 				'tags' => 'name="option_allow_no_category"',
 				'type' => 'checkbox',
@@ -583,7 +583,7 @@
 				$nocatcount=as_db_count_categoryid_qs(null);
 				
 				if ($nocatcount)
-					$as_content['form']['fields']['allow_no_category']['error']=
+					$content['form']['fields']['allow_no_category']['error']=
 						strtr(as_lang_html('admin/category_none_error'), array(
 							'^q' => number_format($nocatcount),
 							'^1' => '<a href="'.as_path_html(as_request(), array('missing' => 1)).'">',
@@ -591,7 +591,7 @@
 						));
 			}
 			
-			$as_content['form']['fields']['allow_no_sub_category']=array(
+			$content['form']['fields']['allow_no_sub_category']=array(
 				'label' => as_lang_html('options/allow_no_sub_category'),
 				'tags' => 'name="option_allow_no_sub_category"',
 				'type' => 'checkbox',
@@ -599,25 +599,25 @@
 			);
 
 		} else
-			unset($as_content['form']['buttons']['save']);
+			unset($content['form']['buttons']['save']);
 	}
 
 	if (as_get('recalc')) {
-		$as_content['form']['ok']='<span id="recalc_ok">'.as_lang_html('admin/recalc_categories').'</span>';
-		$as_content['form']['hidden']['code_recalc']=as_get_form_security_code('admin/recalc');
+		$content['form']['ok']='<span id="recalc_ok">'.as_lang_html('admin/recalc_categories').'</span>';
+		$content['form']['hidden']['code_recalc']=as_get_form_security_code('admin/recalc');
 		
-		$as_content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
-		$as_content['script_var']['as_warning_recalc']=as_lang('admin/stop_recalc_warning');
+		$content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
+		$content['script_var']['as_warning_recalc']=as_lang('admin/stop_recalc_warning');
 		
-		$as_content['script_onloads'][]=array(
+		$content['script_onloads'][]=array(
 			"as_recalc_click('dorecalccategories', document.getElementById('dosaveoptions'), null, 'recalc_ok');"
 		);
 	}
 	
-	$as_content['navigation']['sub']=as_admin_sub_navigation();
+	$content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

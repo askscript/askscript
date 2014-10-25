@@ -56,15 +56,15 @@
 //	Check we haven't suspended registration, and this IP isn't blocked
 	
 	if (as_opt('suspend_register_users')) {
-		$as_content=as_content_prepare();
-		$as_content['error']=as_lang_html('users/register_suspended');
-		return $as_content;
+		$content=as_content_prepare();
+		$content['error']=as_lang_html('users/register_suspended');
+		return $content;
 	}
 	
 	if (as_user_permit_error()) {
-		$as_content=as_content_prepare();
-		$as_content['error']=as_lang_html('users/no_permission');
-		return $as_content;
+		$content=as_content_prepare();
+		$content['error']=as_lang_html('users/no_permission');
+		return $content;
 	}
 
 	
@@ -128,15 +128,15 @@
 
 //	Prepare content for theme
 
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('users/register_title');
+	$content['title']=as_lang_html('users/register_title');
 	
-	$as_content['error']=@$pageerror;
+	$content['error']=@$pageerror;
 
 	$custom=as_opt('show_custom_register') ? trim(as_opt('custom_register')) : '';
 	
-	$as_content['form']=array(
+	$content['form']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 		
 		'style' => 'tall',
@@ -185,7 +185,7 @@
 	);
 	
 	if (!strlen($custom))
-		unset($as_content['form']['fields']['custom']);
+		unset($content['form']['fields']['custom']);
 	
 	foreach ($userfields as $userfield) {
 		$value=@$inprofile[$userfield['fieldid']];	
@@ -194,7 +194,7 @@
 		if (strlen($label))
 			$label.=':';
 			
-		$as_content['form']['fields'][$userfield['title']]=array(
+		$content['form']['fields'][$userfield['title']]=array(
 			'label' => as_html($label),
 			'tags' => 'name="field_'.$userfield['fieldid'].'"',
 			'value' => as_html($value),
@@ -204,7 +204,7 @@
 	}
 	
 	if (as_opt('captcha_on_register'))
-		as_set_up_captcha_field($as_content, $as_content['form']['fields'], @$errors);
+		as_set_up_captcha_field($content, $content['form']['fields'], @$errors);
 	
 	$loginmodules=as_load_modules_with('login', 'login_html');
 	
@@ -214,15 +214,15 @@
 		$html=ob_get_clean();
 		
 		if (strlen($html))
-			@$as_content['custom'].='<br>'.$html.'<br>';
+			@$content['custom'].='<br>'.$html.'<br>';
 	}
 
-	$as_content['focusid']=isset($errors['handle']) ? 'handle'
+	$content['focusid']=isset($errors['handle']) ? 'handle'
 		: (isset($errors['password']) ? 'password'
 			: (isset($errors['email']) ? 'email' : 'handle'));
 
 			
-	return $as_content;
+	return $content;
 	
 
 /*

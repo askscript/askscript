@@ -44,8 +44,8 @@
 
 //	Check admin privileges (do late to allow one DB query)
 
-	if (!as_admin_check_privileges($as_content))
-		return $as_content;
+	if (!as_admin_check_privileges($content))
+		return $content;
 		
 		
 //	Process saving an old or new user title
@@ -116,12 +116,12 @@
 		
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/users_title');	
-	$as_content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
+	$content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/users_title');	
+	$content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
 
-	$as_content['form']=array(
+	$content['form']=array(
 		'tags' => 'method="post" action="'.as_path_html(as_request()).'"',
 		
 		'style' => 'tall',
@@ -170,18 +170,18 @@
 	);
 	
 	if (isset($pointstitle[$oldpoints]))
-		as_set_display_rules($as_content, array(
+		as_set_display_rules($content, array(
 			'points_display' => '!dodelete',
 		));
 	else
-		unset($as_content['form']['fields']['delete']);
+		unset($content['form']['fields']['delete']);
 
-	$as_content['focusid']='title';
+	$content['focusid']='title';
 
-	$as_content['navigation']['sub']=as_admin_sub_navigation();
+	$content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

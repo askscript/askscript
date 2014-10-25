@@ -55,8 +55,8 @@
 
 //	Check admin privileges (do late to allow one DB query)
 
-	if (!as_admin_check_privileges($as_content))
-		return $as_content;
+	if (!as_admin_check_privileges($content))
+		return $content;
 		
 		
 //	Define an array of navigation settings we can change, option name => language key
@@ -285,10 +285,10 @@
 		
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/pages_title');	
-	$as_content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
+	$content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/pages_title');	
+	$content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
 
 	if (isset($editpage)) {
 		$positionoptions=array();
@@ -335,7 +335,7 @@
 		$permitoptions=as_admin_permit_options(AS_PERMIT_ALL, AS_PERMIT_ADMINS, false, false);
 		$permitvalue=@$permitoptions[isset($inpermit) ? $inpermit : $editpage['permit']];
 		
-		$as_content['form']=array(
+		$content['form']=array(
 			'tags' => 'method="post" action="'.as_path_html(as_request()).'"',
 			
 			'style' => 'tall',
@@ -440,17 +440,17 @@
 		);
 		
 		if ($isexternal) {
-			unset($as_content['form']['fields']['slug']);
-			unset($as_content['form']['fields']['heading']);
-			unset($as_content['form']['fields']['content']);
+			unset($content['form']['fields']['slug']);
+			unset($content['form']['fields']['heading']);
+			unset($content['form']['fields']['content']);
 		
 		} else {
-			unset($as_content['form']['fields']['url']);
-			unset($as_content['form']['fields']['newwindow']);
+			unset($content['form']['fields']['url']);
+			unset($content['form']['fields']['newwindow']);
 		}
 		
 		if (isset($editpage['pageid']))
-			as_set_display_rules($as_content, array(
+			as_set_display_rules($content, array(
 				'position_display' => '!dodelete',
 				'permit_display' => '!dodelete',
 				($isexternal ? 'url_display' : 'slug_display') => '!dodelete',
@@ -459,20 +459,20 @@
 			));
 		
 		else {
-			unset($as_content['form']['fields']['slug']);
-			unset($as_content['form']['fields']['delete']);
+			unset($content['form']['fields']['slug']);
+			unset($content['form']['fields']['delete']);
 		}
 		
 		if ($isexternal || !isset($editpage['pageid']))
-			unset($as_content['form']['buttons']['saveview']);
+			unset($content['form']['buttons']['saveview']);
 		
-		$as_content['focusid']='name';
+		$content['focusid']='name';
 	
 	} else {
 
 	//	List of standard navigation links
 
-		$as_content['form']=array(
+		$content['form']=array(
 			'tags' => 'method="post" action="'.as_self_html().'"',
 			
 			'style' => 'tall',
@@ -501,14 +501,14 @@
 			),
 		);
 		
-		$as_content['form']['fields']['navlinks']=array(
+		$content['form']['fields']['navlinks']=array(
 			'label' => as_lang_html('admin/nav_links_explanation'),
 			'type' => 'static',
 			'tight' => true,
 		);
 
 		foreach ($navoptions as $optionname => $langkey) {
-			$as_content['form']['fields'][$optionname]=array(
+			$content['form']['fields'][$optionname]=array(
 				'label' => '<a href="'.as_path_html($navpaths[$optionname]).'">'.as_lang_html($langkey).'</a>',
 				'tags' => 'name="option_'.$optionname.'"',
 				'type' => 'checkbox',
@@ -516,7 +516,7 @@
 			);
 		}
 		
-		$as_content['form']['fields'][]=array(
+		$content['form']['fields'][]=array(
 			'type' => 'blank'
 		);
 
@@ -547,7 +547,7 @@
 		}
 
 		if (strlen($listhtml))
-			$as_content['form']['fields']['plugins']=array(
+			$content['form']['fields']['plugins']=array(
 				'label' => as_lang_html('admin/plugin_pages_explanation'),
 				'type' => 'custom',
 				'html' => '<ul style="margin-bottom:0;">'.$listhtml.'</ul>',
@@ -568,17 +568,17 @@
 			$listhtml.='</li>';
 		}
 		
-		$as_content['form']['fields']['pages']=array(
+		$content['form']['fields']['pages']=array(
 			'label' => strlen($listhtml) ? as_lang_html('admin/click_name_edit') : as_lang_html('admin/pages_explanation'),
 			'type' => 'custom',
 			'html' => strlen($listhtml) ? '<ul style="margin-bottom:0;">'.$listhtml.'</ul>' : null,
 		);
 	}
 
-	$as_content['navigation']['sub']=as_admin_sub_navigation();
+	$content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

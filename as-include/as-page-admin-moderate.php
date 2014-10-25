@@ -48,9 +48,9 @@
 //	Check admin privileges (do late to allow one DB query)
 
 	if (as_user_maximum_permit_error('permit_moderate')) {
-		$as_content=as_content_prepare();
-		$as_content['error']=as_lang_html('users/no_permission');
-		return $as_content;
+		$content=as_content_prepare();
+		$content['error']=as_lang_html('users/no_permission');
+		return $content;
 	}
 	
 
@@ -76,12 +76,12 @@
 
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('admin/recent_approve_title');
-	$as_content['error']=isset($pageerror) ? $pageerror : as_admin_page_error();
+	$content['title']=as_lang_html('admin/recent_approve_title');
+	$content['error']=isset($pageerror) ? $pageerror : as_admin_page_error();
 	
-	$as_content['q_list']=array(
+	$content['q_list']=array(
 		'form' => array(
 			'tags' => 'method="post" action="'.as_self_html().'"',
 
@@ -127,18 +127,18 @@
 				),
 			);
 
-			$as_content['q_list']['qs'][]=$htmlfields;
+			$content['q_list']['qs'][]=$htmlfields;
 		}
 
 	} else
-		$as_content['title']=as_lang_html('admin/no_approve_found');
+		$content['title']=as_lang_html('admin/no_approve_found');
 		
 
-	$as_content['navigation']['sub']=as_admin_sub_navigation();
-	$as_content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
+	$content['navigation']['sub']=as_admin_sub_navigation();
+	$content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
 	
 	
-	return $as_content;
+	return $content;
 	
 
 /*

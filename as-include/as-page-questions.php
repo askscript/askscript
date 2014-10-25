@@ -115,7 +115,7 @@
 	
 //	Prepare and return content for theme
 
-	$as_content=as_q_list_page_content(
+	$content=as_q_list_page_content(
 		$questions, // questions
 		as_opt('page_size_qs'), // questions per page
 		$start, // start offset
@@ -133,10 +133,10 @@
 	);
 	
 	if (AS_ALLOW_UNINDEXED_QUERIES || !$countslugs)
-		$as_content['navigation']['sub']=as_qs_sub_navigation($sort, $categoryslugs);
+		$content['navigation']['sub']=as_qs_sub_navigation($sort, $categoryslugs);
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

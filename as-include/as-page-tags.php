@@ -47,11 +47,11 @@
 	
 //	Prepare content for theme
 
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('main/popular_tags');
+	$content['title']=as_lang_html('main/popular_tags');
 	
-	$as_content['ranking']=array(
+	$content['ranking']=array(
 		'items' => array(),
 		'rows' => ceil($pagesize/as_opt('columns_tags')),
 		'type' => 'tags'
@@ -62,7 +62,7 @@
 		
 		$output=0;
 		foreach ($populartags as $word => $count) {
-			$as_content['ranking']['items'][]=array(
+			$content['ranking']['items'][]=array(
 				'label' => as_tag_html($word, false, @$favoritemap['tag'][as_strtolower($word)]),
 				'count' => number_format($count),
 			);
@@ -72,15 +72,15 @@
 		}
 
 	} else
-		$as_content['title']=as_lang_html('main/no_tags_found');
+		$content['title']=as_lang_html('main/no_tags_found');
 	
-	$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $tagcount, as_opt('pages_prev_next'));
+	$content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $tagcount, as_opt('pages_prev_next'));
 	
-	if (empty($as_content['page_links']))
-		$as_content['suggest_next']=as_html_suggest_ask();
+	if (empty($content['page_links']))
+		$content['suggest_next']=as_html_suggest_ask();
 		
 
-	return $as_content;
+	return $content;
 
 
 /*

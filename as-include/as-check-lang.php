@@ -24,7 +24,7 @@
 	More about this license: http://www.question2answer.org/license.php
 */
 
-	define('AS_BASE_DIR', dirname(dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME'])).'/');
+	define('BASE_DIR', dirname(dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME'])).'/');
 
 	require 'as-base.php';
 	require_once AS_INCLUDE_DIR.'as-app-users.php';

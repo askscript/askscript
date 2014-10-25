@@ -47,11 +47,11 @@
 
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('main/highest_users');
+	$content['title']=as_lang_html('main/highest_users');
 
-	$as_content['ranking']=array(
+	$content['ranking']=array(
 		'items' => array(),
 		'rows' => ceil($pagesize/as_opt('columns_users')),
 		'type' => 'users'
@@ -59,7 +59,7 @@
 	
 	if (count($users)) {
 		foreach ($users as $userid => $user)
-			$as_content['ranking']['items'][]=array(
+			$content['ranking']['items'][]=array(
 				'label' =>
 					(AS_FINAL_EXTERNAL_USERS
 						? as_get_external_avatar_html($user['userid'], as_opt('avatar_users_size'), true)
@@ -71,14 +71,14 @@
 			);
 	
 	} else
-		$as_content['title']=as_lang_html('main/no_active_users');
+		$content['title']=as_lang_html('main/no_active_users');
 	
-	$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $usercount, as_opt('pages_prev_next'));
+	$content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $usercount, as_opt('pages_prev_next'));
 
-	$as_content['navigation']['sub']=as_users_sub_navigation();
+	$content['navigation']['sub']=as_users_sub_navigation();
 	
 
-	return $as_content;
+	return $content;
 
 
 /*

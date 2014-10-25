@@ -121,7 +121,7 @@
 		}
 		
 
-		function output_widget($region, $place, $themeobject, $template, $request, $as_content)
+		function output_widget($region, $place, $themeobject, $template, $request, $content)
 		{
 			require_once AS_INCLUDE_DIR.'as-db-selects.php';
 			

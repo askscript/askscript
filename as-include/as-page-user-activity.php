@@ -62,17 +62,17 @@
 	
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare(true);
+	$content=as_content_prepare(true);
 	
 	if (count($questions))
-		$as_content['title']=as_lang_html_sub('profile/recent_activity_by_x', $userhtml);
+		$content['title']=as_lang_html_sub('profile/recent_activity_by_x', $userhtml);
 	else
-		$as_content['title']=as_lang_html_sub('profile/no_posts_by_x', $userhtml);
+		$content['title']=as_lang_html_sub('profile/no_posts_by_x', $userhtml);
 
 
 //	Recent activity by this user
 
-	$as_content['q_list']['form']=array(
+	$content['q_list']['form']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 
 		'hidden' => array(
@@ -80,7 +80,7 @@
 		),
 	);
 	
-	$as_content['q_list']['qs']=array();
+	$content['q_list']['qs']=array();
 	
 	$htmldefaults=as_post_html_defaults('Q');
 	$htmldefaults['whoview']=false;
@@ -88,17 +88,17 @@
 	$htmldefaults['avatarsize']=0;
 	
 	foreach ($questions as $question)
-		$as_content['q_list']['qs'][]=as_any_to_q_html_fields($question, $loginuserid, as_cookie_get(),
+		$content['q_list']['qs'][]=as_any_to_q_html_fields($question, $loginuserid, as_cookie_get(),
 			$usershtml, null, array('voteview' => false) + as_post_html_options($question, $htmldefaults));
 
 
 //	Sub menu for navigation in user pages
 
-	$as_content['navigation']['sub']=as_user_sub_navigation($handle, 'activity',
+	$content['navigation']['sub']=as_user_sub_navigation($handle, 'activity',
 		isset($loginuserid) && ($loginuserid==(AS_FINAL_EXTERNAL_USERS ? $userid : $useraccount['userid'])));
 
 
-	return $as_content;
+	return $content;
 
 
 /*

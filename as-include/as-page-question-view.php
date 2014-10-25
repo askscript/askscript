@@ -211,7 +211,7 @@
 	
 	function as_page_q_question_view($question, $parentquestion, $closepost, $usershtml, $formrequested)
 /*
-	Return the $as_content['q_view'] element for $question as viewed by the current user. If this question is a
+	Return the $content['q_view'] element for $question as viewed by the current user. If this question is a
 	follow-on, pass the question for this question's parent answer in $parentquestion, otherwise null. If the question
 	is closed, pass the post used to close this question in $closepost, otherwise null. $usershtml should be an array
 	which maps userids to HTML user representations, including the question's author and (if present) last editor. If a
@@ -402,7 +402,7 @@
 	
 	function as_page_q_answer_view($question, $answer, $isselected, $usershtml, $formrequested)
 /*
-	Returns an element to add to $as_content['a_list']['as'] for $answer as viewed by $userid and $cookieid. Pass the
+	Returns an element to add to $content['a_list']['as'] for $answer as viewed by $userid and $cookieid. Pass the
 	answer's $question and whether it $isselected. $usershtml should be an array which maps userids to HTML user
 	representations, including the answer's author and (if present) last editor. If a form has been explicitly requested
 	for the page, set $formrequested to true - this will hide the buttons.
@@ -533,7 +533,7 @@
 	
 	function as_page_q_comment_view($question, $parent, $comment, $usershtml, $formrequested)
 /*
-	Returns an element to add to the appropriate $as_content[...]['c_list']['cs'] array for $comment as viewed by the
+	Returns an element to add to the appropriate $content[...]['c_list']['cs'] array for $comment as viewed by the
 	current user. Pass the comment's $parent post and antecedent $question. $usershtml should be an array which maps
 	userids to HTML user representations, including the comments's author and (if present) last editor. If a form has
 	been explicitly requested for the page, set $formrequested to true - this will hide the buttons.
@@ -648,7 +648,7 @@
 
 	function as_page_q_comment_follow_list($question, $parent, $commentsfollows, $alwaysfull, $usershtml, $formrequested, $formpostid)
 /*
-	Return an array for $as_content[...]['c_list'] to display all of the comments and follow-on questions in
+	Return an array for $content[...]['c_list'] to display all of the comments and follow-on questions in
 	$commentsfollows which belong to post $parent with antecedent $question, as viewed by the current user. If
 	$alwaysfull then all comments will be included, otherwise the list may be shortened with a 'show previous x
 	comments' link. $usershtml should be an array which maps userids to HTML user representations, including all
@@ -722,9 +722,9 @@
 	}
 	
 
-	function as_page_q_add_a_form(&$as_content, $formid, $captchareason, $question, $in, $errors, $loadnow, $formrequested)
+	function as_page_q_add_a_form(&$content, $formid, $captchareason, $question, $in, $errors, $loadnow, $formrequested)
 /*
-	Return a $as_content form for adding an answer to $question. Pass an HTML element id to use for the form in $formid
+	Return a $content form for adding an answer to $question. Pass an HTML element id to use for the form in $formid
 	and the result of as_user_captcha_reason() in $captchareason. Pass previous inputs from a submitted version of this
 	form in the array $in and resulting errors in $errors. If $loadnow is true, the form will be loaded immediately. Set
 	$formrequested to true if the user explicitly requested it, as opposed being shown automatically.
@@ -787,7 +787,7 @@
 						),
 						
 						'content' => array_merge(
-							as_editor_load_field($editor, $as_content, @$in['content'], @$in['format'], 'a_content', 12, $formrequested, $loadnow),
+							as_editor_load_field($editor, $content, @$in['content'], @$in['format'], 'a_content', 12, $formrequested, $loadnow),
 							array(
 								'error' => as_html(@$errors['content']),
 							)
@@ -818,15 +818,15 @@
 					);
 					
 				if (!as_is_logged_in())
-					as_set_up_name_field($as_content, $form['fields'], @$in['name'], 'a_');
+					as_set_up_name_field($content, $form['fields'], @$in['name'], 'a_');
 					
-				as_set_up_notify_fields($as_content, $form['fields'], 'A', as_get_logged_in_email(),
+				as_set_up_notify_fields($content, $form['fields'], 'A', as_get_logged_in_email(),
 					isset($in['notify']) ? $in['notify'] : as_opt('notify_users_default'), @$in['email'], @$errors['email'], 'a_');
 					
 				$onloads=array();
 					
 				if ($captchareason) {
-					$captchaloadscript=as_set_up_captcha_field($as_content, $form['fields'], $errors, as_captcha_reason_note($captchareason));
+					$captchaloadscript=as_set_up_captcha_field($content, $form['fields'], $errors, as_captcha_reason_note($captchareason));
 						
 					if (strlen($captchaloadscript))
 						$onloads[]='document.getElementById('.as_js($formid).').as_show=function() { '.$captchaloadscript.' };';
@@ -845,7 +845,7 @@
 				}
 
 				if (count($onloads))
-					$as_content['script_onloads'][]=$onloads;
+					$content['script_onloads'][]=$onloads;
 				break;
 		}
 		
@@ -857,9 +857,9 @@
 	}
 	
 	
-	function as_page_q_add_c_form(&$as_content, $question, $parent, $formid, $captchareason, $in, $errors, $loadfocusnow)
+	function as_page_q_add_c_form(&$content, $question, $parent, $formid, $captchareason, $in, $errors, $loadfocusnow)
 /*
-	Returns a $as_content form for adding a comment to post $parent which is part of $question. Pass an HTML element id
+	Returns a $content form for adding a comment to post $parent which is part of $question. Pass an HTML element id
 	to use for the form in $formid and the result of as_user_captcha_reason() in $captchareason. Pass previous inputs
 	from a submitted version of this form in the array $in and resulting errors in $errors. If $loadfocusnow is true,
 	the form will be loaded and focused immediately.
@@ -924,7 +924,7 @@
 						),
 						
 						'content' => array_merge(
-							as_editor_load_field($editor, $as_content, @$in['content'], @$in['format'], $prefix.'content', 4, $loadfocusnow, $loadfocusnow),
+							as_editor_load_field($editor, $content, @$in['content'], @$in['format'], $prefix.'content', 4, $loadfocusnow, $loadfocusnow),
 							array(
 								'error' => as_html(@$errors['content']),
 							)
@@ -954,15 +954,15 @@
 					unset($form['fields']['custom']);
 			
 				if (!as_is_logged_in())
-					as_set_up_name_field($as_content, $form['fields'], @$in['name'], $prefix);
+					as_set_up_name_field($content, $form['fields'], @$in['name'], $prefix);
 
-				as_set_up_notify_fields($as_content, $form['fields'], 'C', as_get_logged_in_email(),
+				as_set_up_notify_fields($content, $form['fields'], 'C', as_get_logged_in_email(),
 					isset($in['notify']) ? $in['notify'] : as_opt('notify_users_default'), $in['email'], @$errors['email'], $prefix);
 				
 				$onloads=array();
 
 				if ($captchareason) {
-					$captchaloadscript=as_set_up_captcha_field($as_content, $form['fields'], $errors, as_captcha_reason_note($captchareason));
+					$captchaloadscript=as_set_up_captcha_field($content, $form['fields'], $errors, as_captcha_reason_note($captchareason));
 						
 					if (strlen($captchaloadscript))
 						$onloads[]='document.getElementById('.as_js($formid).').as_show=function() { '.$captchaloadscript.' };';
@@ -978,7 +978,7 @@
 				}
 
 				if (count($onloads))
-					$as_content['script_onloads'][]=$onloads;
+					$content['script_onloads'][]=$onloads;
 		}
 		
 		$form['id']=$formid;

@@ -49,7 +49,7 @@
 		}
 
 		
-		function admin_form(&$as_content)
+		function admin_form(&$content)
 		{
 			$saved=false;
 			
@@ -81,7 +81,7 @@
 		}
 
 
-		function output_widget($region, $place, $themeobject, $template, $request, $as_content)
+		function output_widget($region, $place, $themeobject, $template, $request, $content)
 		{
 			$divstyle='';
 			

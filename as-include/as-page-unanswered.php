@@ -120,7 +120,7 @@
 	
 //	Prepare and return content for theme
 
-	$as_content=as_q_list_page_content(
+	$content=as_q_list_page_content(
 		$questions, // questions
 		as_opt('page_size_una_qs'), // questions per page
 		$start, // start offset
@@ -137,10 +137,10 @@
 		$linkparams // category nav params
 	);
 	
-	$as_content['navigation']['sub']=as_unanswered_sub_navigation($by, $categoryslugs);
+	$content['navigation']['sub']=as_unanswered_sub_navigation($by, $categoryslugs);
 	
 	
-	return $as_content;
+	return $content;
 
 
 /*

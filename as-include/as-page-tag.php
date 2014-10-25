@@ -55,22 +55,22 @@
 
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare(true);
+	$content=as_content_prepare(true);
 	
-	$as_content['title']=as_lang_html_sub('main/questions_tagged_x', as_html($tag));
+	$content['title']=as_lang_html_sub('main/questions_tagged_x', as_html($tag));
 	
 	if (isset($userid) && isset($tagword)) {
 		$favoritemap=as_get_favorite_non_qs_map();
 		$favorite=@$favoritemap['tag'][as_strtolower($tagword['word'])];
 		
-		$as_content['favorite']=as_favorite_form(AS_ENTITY_TAG, $tagword['wordid'], $favorite,
+		$content['favorite']=as_favorite_form(AS_ENTITY_TAG, $tagword['wordid'], $favorite,
 			as_lang_sub($favorite ? 'main/remove_x_favorites' : 'main/add_tag_x_favorites', $tagword['word']));
 	}
 
 	if (!count($questions))
-		$as_content['q_list']['title']=as_lang_html('main/no_questions_found');
+		$content['q_list']['title']=as_lang_html('main/no_questions_found');
 
-	$as_content['q_list']['form']=array(
+	$content['q_list']['form']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 
 		'hidden' => array(
@@ -78,23 +78,23 @@
 		),
 	);
 
-	$as_content['q_list']['qs']=array();
+	$content['q_list']['qs']=array();
 	foreach ($questions as $postid => $question)
-		$as_content['q_list']['qs'][]=as_post_html_fields($question, $userid, as_cookie_get(), $usershtml, null, as_post_html_options($question));
+		$content['q_list']['qs'][]=as_post_html_fields($question, $userid, as_cookie_get(), $usershtml, null, as_post_html_options($question));
 		
-	$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $tagword['tagcount'], as_opt('pages_prev_next'));
+	$content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $tagword['tagcount'], as_opt('pages_prev_next'));
 
-	if (empty($as_content['page_links']))
-		$as_content['suggest_next']=as_html_suggest_qs_tags(true);
+	if (empty($content['page_links']))
+		$content['suggest_next']=as_html_suggest_qs_tags(true);
 
 	if (as_opt('feed_for_tag_qs'))
-		$as_content['feed']=array(
+		$content['feed']=array(
 			'url' => as_path_html(as_feed_request('tag/'.$tag)),
 			'label' => as_lang_html_sub('main/questions_tagged_x', as_html($tag)),
 		);
 
 		
-	return $as_content;
+	return $content;
 
 
 /*

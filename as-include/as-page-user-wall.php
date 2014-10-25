@@ -100,14 +100,14 @@
 	
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 	
-	$as_content['title']=as_lang_html_sub('profile/wall_for_x', $userhtml);
-	$as_content['error']=@$errors['page'];
+	$content['title']=as_lang_html_sub('profile/wall_for_x', $userhtml);
+	$content['error']=@$errors['page'];
 	
-	$as_content['script_rel'][]='as-content/as-user.js?'.AS_VERSION;
+	$content['script_rel'][]='as-content/as-user.js?'.AS_VERSION;
 
-	$as_content['message_list']=array(
+	$content['message_list']=array(
 		'tags' => 'id="wallmessages"',
 		
 		'form' => array(
@@ -126,10 +126,10 @@
 	
 	if ($start==0) { // only allow posting on first page
 		if ($wallposterrorhtml)
-			$as_content['message_list']['error']=$wallposterrorhtml; // an error that means we are not allowed to post
+			$content['message_list']['error']=$wallposterrorhtml; // an error that means we are not allowed to post
 		
 		else {
-			$as_content['message_list']['form']['fields']=array(
+			$content['message_list']['form']['fields']=array(
 				'message' => array(
 					'tags' => 'name="message" id="message"',
 					'value' => as_html(@$inmessage, false),
@@ -138,7 +138,7 @@
 				),
 			);
 			
-			$as_content['message_list']['form']['buttons']=array(
+			$content['message_list']['form']['buttons']=array(
 				'post' => array(
 					'tags' => 'name="dowallpost" onclick="return as_submit_wall_post(this, false);"',
 					'label' => as_lang_html('profile/post_wall_button'),
@@ -148,18 +148,18 @@
 	}
 
 	foreach ($usermessages as $message)
-		$as_content['message_list']['messages'][]=as_wall_post_view($message);
+		$content['message_list']['messages'][]=as_wall_post_view($message);
 	
-	$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $count, as_opt('pages_prev_next'));
+	$content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $count, as_opt('pages_prev_next'));
 
 
 //	Sub menu for navigation in user pages
 
-	$as_content['navigation']['sub']=as_user_sub_navigation($handle, 'wall',
+	$content['navigation']['sub']=as_user_sub_navigation($handle, 'wall',
 		isset($loginuserid) && ($loginuserid==(AS_FINAL_EXTERNAL_USERS ? $userid : $useraccount['userid'])));
 
 
-	return $as_content;
+	return $content;
 
 
 /*

@@ -102,11 +102,11 @@
 	
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('users/login_title');
+	$content['title']=as_lang_html('users/login_title');
 	
-	$as_content['error']=@$pageerror;
+	$content['error']=@$pageerror;
 
 	if (empty($inemailhandle) || isset($errors['emailhandle']))
 		$forgotpath=as_path('forgot');
@@ -115,7 +115,7 @@
 	
 	$forgothtml='<a href="'.as_html($forgotpath).'">'.as_lang_html('users/forgot_link').'</a>';
 	
-	$as_content['form']=array(
+	$content['form']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 		
 		'style' => 'tall',
@@ -167,13 +167,13 @@
 		$html=ob_get_clean();
 		
 		if (strlen($html))
-			@$as_content['custom'].='<br>'.$html.'<br>';
+			@$content['custom'].='<br>'.$html.'<br>';
 	}
 
-	$as_content['focusid']=(isset($inemailhandle) && !isset($errors['emailhandle'])) ? 'password' : 'emailhandle';
+	$content['focusid']=(isset($inemailhandle) && !isset($errors['emailhandle'])) ? 'password' : 'emailhandle';
 	
 
-	return $as_content;
+	return $content;
 
 
 /*

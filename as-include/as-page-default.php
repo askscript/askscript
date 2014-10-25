@@ -30,7 +30,6 @@
 	}
 
 	require_once AS_INCLUDE_DIR.'as-db-selects.php';
-	require_once AS_INCLUDE_DIR.'as-app-format.php';
 
 
 //	Determine whether path begins with qa or not (question and answer listing can be accessed either way)
@@ -66,16 +65,16 @@
 	if ( isset($custompage) && !($custompage['flags']&AS_PAGE_FLAGS_EXTERNAL) ) {
 		as_set_template('custom-'.$custompage['pageid']);
 
-		$as_content=as_content_prepare();
+		$content=as_content_prepare();
 		
 		$level=as_get_logged_in_level();
 
 		if ( (!as_permit_value_error($custompage['permit'], $userid, $level, as_get_logged_in_flags())) || !isset($custompage['permit']) ) {
-			$as_content['title']=as_html($custompage['heading']);
-			$as_content['custom']=$custompage['content'];
+			$content['title']=as_html($custompage['heading']);
+			$content['custom']=$custompage['content'];
 			
 			if ($level>=AS_USER_LEVEL_ADMIN) {
-				$as_content['navigation']['sub']=array(
+				$content['navigation']['sub']=array(
 					'admin/pages' => array(
 						'label' => as_lang('admin/edit_custom_page'),
 						'url' => as_path_html('admin/pages', array('edit' => $custompage['pageid'])),
@@ -84,9 +83,9 @@
 			}
 		
 		} else
-			$as_content['error']=as_lang_html('users/no_permission');
+			$content['error']=as_lang_html('users/no_permission');
 		
-		return $as_content;
+		return $content;
 	}
 
 
@@ -114,12 +113,12 @@
 
 	if ( (!$explicitqa) && (!$countslugs) && as_opt('show_custom_home') ) {
 		as_set_template('custom');
-		$as_content=as_content_prepare();
-		$as_content['title']=as_html(as_opt('custom_home_heading'));
+		$content=as_content_prepare();
+		$content['title']=as_html(as_opt('custom_home_heading'));
 		if (as_opt('show_home_description'))
-			$as_content['description']=as_html(as_opt('home_description'));
-		$as_content['custom']=as_opt('custom_home_content');
-		return $as_content;
+			$content['description']=as_html(as_opt('home_description'));
+		$content['custom']=as_opt('custom_home_content');
+		return $content;
 	}
 
 
@@ -147,7 +146,7 @@
 	
 //	Prepare and return content for theme for Q&A listing page
 
-	$as_content=as_q_list_page_content(
+	$content=as_q_list_page_content(
 		$questions, // questions
 		$pagesize, // questions per page
 		0, // start offset
@@ -167,10 +166,10 @@
 	);
 	
 	if ( (!$explicitqa) && (!$countslugs) && as_opt('show_home_description') )
-		$as_content['description']=as_html(as_opt('home_description'));
+		$content['description']=as_html(as_opt('home_description'));
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

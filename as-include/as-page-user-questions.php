@@ -63,17 +63,17 @@
 	
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare(true);
+	$content=as_content_prepare(true);
 	
 	if (count($questions))
-		$as_content['title']=as_lang_html_sub('profile/questions_by_x', $userhtml);
+		$content['title']=as_lang_html_sub('profile/questions_by_x', $userhtml);
 	else
-		$as_content['title']=as_lang_html_sub('profile/no_questions_by_x', $userhtml);
+		$content['title']=as_lang_html_sub('profile/no_questions_by_x', $userhtml);
 
 
 //	Recent questions by this user
 
-	$as_content['q_list']['form']=array(
+	$content['q_list']['form']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 
 		'hidden' => array(
@@ -81,26 +81,26 @@
 		),
 	);
 	
-	$as_content['q_list']['qs']=array();
+	$content['q_list']['qs']=array();
 	
 	$htmldefaults=as_post_html_defaults('Q');
 	$htmldefaults['whoview']=false;
 	$htmldefaults['avatarsize']=0;
 	
 	foreach ($questions as $question)
-		$as_content['q_list']['qs'][]=as_post_html_fields($question, $loginuserid, as_cookie_get(),
+		$content['q_list']['qs'][]=as_post_html_fields($question, $loginuserid, as_cookie_get(),
 			$usershtml, null, as_post_html_options($question, $htmldefaults));
 
-	$as_content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $count, as_opt('pages_prev_next'));
+	$content['page_links']=as_html_page_links(as_request(), $start, $pagesize, $count, as_opt('pages_prev_next'));
 
 
 //	Sub menu for navigation in user pages
 
-	$as_content['navigation']['sub']=as_user_sub_navigation($handle, 'questions',
+	$content['navigation']['sub']=as_user_sub_navigation($handle, 'questions',
 		isset($loginuserid) && ($loginuserid==(AS_FINAL_EXTERNAL_USERS ? $userid : $useraccount['userid'])));
 
 
-	return $as_content;
+	return $content;
 
 
 /*

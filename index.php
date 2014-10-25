@@ -26,7 +26,10 @@
 
 //	Set base path here so this works with symbolic links for multiple installations
 
-	define('AS_BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+	define('BASE_DIR', dirname(empty($_SERVER['SCRIPT_FILENAME']) ? __FILE__ : $_SERVER['SCRIPT_FILENAME']).'/');
+	
+	define('AS_VERSION', '1.6.3'); // also used as suffix for .js and .css requests
+	define('AS_BUILD_DATE', '2014-01-19');
 	
 	require 'as-include/as-load.php';
 

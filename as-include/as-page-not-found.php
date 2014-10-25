@@ -36,12 +36,12 @@
 
 	as_set_template('not-found');
 
-	$as_content=as_content_prepare();
-	$as_content['error']=as_lang_html('main/page_not_found');
-	$as_content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
+	$content=as_content_prepare();
+	$content['error']=as_lang_html('main/page_not_found');
+	$content['suggest_next']=as_html_suggest_qs_tags(as_using_tags());
 	
 	
-	return $as_content;
+	return $content;
 
 
 /*

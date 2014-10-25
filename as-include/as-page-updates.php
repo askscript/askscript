@@ -72,7 +72,7 @@
 	
 //	Prepare and return content for theme
 
-	$as_content=as_q_list_page_content(
+	$content=as_q_list_page_content(
 		as_any_sort_and_dedupe($questions),
 		null, // questions per page
 		0, // start offset
@@ -90,7 +90,7 @@
 		)) : null // suggest what to do next
 	);
 	
-	$as_content['navigation']['sub']=array(
+	$content['navigation']['sub']=array(
 		'all' => array(
 			'label' => as_lang_html('misc/nav_all_my_updates'),
 			'url' => as_path_html('updates'),
@@ -111,7 +111,7 @@
 	);
 	
 	
-	return $as_content;
+	return $content;
 
 
 /*

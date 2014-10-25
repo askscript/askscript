@@ -38,8 +38,8 @@
 	
 //	Check admin privileges
 
-	if (!as_admin_check_privileges($as_content))
-		return $as_content;
+	if (!as_admin_check_privileges($content))
+		return $content;
 
 
 //	Process user actions
@@ -79,12 +79,12 @@
 	
 //	Prepare content for theme
 
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/points_title');
-	$as_content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
+	$content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/points_title');
+	$content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
 
-	$as_content['form']=array(
+	$content['form']=array(
 		'tags' => 'method="post" action="'.as_self_html().'" name="points_form" onsubmit="document.forms.points_form.has_js.value=1; return true;"',
 		
 		'style' => 'wide',
@@ -105,27 +105,27 @@
 
 	
 	if (as_clicked('doshowdefaults')) {
-		$as_content['form']['ok']=as_lang_html('admin/points_defaults_shown');
+		$content['form']['ok']=as_lang_html('admin/points_defaults_shown');
 	
-		$as_content['form']['buttons']['cancel']=array(
+		$content['form']['buttons']['cancel']=array(
 			'tags' => 'name="docancel"',
 			'label' => as_lang_html('main/cancel_button'),
 		);
 
 	} else {
 		if ($recalculate) {
-			$as_content['form']['ok']='<span id="recalc_ok"></span>';
-			$as_content['form']['hidden']['code_recalc']=as_get_form_security_code('admin/recalc');
+			$content['form']['ok']='<span id="recalc_ok"></span>';
+			$content['form']['hidden']['code_recalc']=as_get_form_security_code('admin/recalc');
 			
-			$as_content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
-			$as_content['script_var']['as_warning_recalc']=as_lang('admin/stop_recalc_warning');
+			$content['script_rel'][]='as-content/as-admin.js?'.AS_VERSION;
+			$content['script_var']['as_warning_recalc']=as_lang('admin/stop_recalc_warning');
 			
-			$as_content['script_onloads'][]=array(
+			$content['script_onloads'][]=array(
 				"as_recalc_click('dorecalcpoints', document.getElementById('dosaverecalc'), null, 'recalc_ok');"
 			);
 		}
 		
-		$as_content['form']['buttons']['showdefaults']=array(
+		$content['form']['buttons']['showdefaults']=array(
 			'tags' => 'name="doshowdefaults"',
 			'label' => as_lang_html('admin/show_defaults_button'),
 		);
@@ -172,18 +172,18 @@
 		
 		$optionfield['prefix']='<span style="width:1em; display:inline-block; display:-moz-inline-stack;">'.$prefix.'</span>';
 		
-		$as_content['form']['fields'][$optionname]=$optionfield;
+		$content['form']['fields'][$optionname]=$optionfield;
 	}
 	
-	as_array_insert($as_content['form']['fields'], 'points_post_a', array('blank0' => array('type' => 'blank')));
-	as_array_insert($as_content['form']['fields'], 'points_vote_up_q', array('blank1' => array('type' => 'blank')));
-	as_array_insert($as_content['form']['fields'], 'points_multiple', array('blank2' => array('type' => 'blank')));
+	as_array_insert($content['form']['fields'], 'points_post_a', array('blank0' => array('type' => 'blank')));
+	as_array_insert($content['form']['fields'], 'points_vote_up_q', array('blank1' => array('type' => 'blank')));
+	as_array_insert($content['form']['fields'], 'points_multiple', array('blank2' => array('type' => 'blank')));
 	
 	
-	$as_content['navigation']['sub']=as_admin_sub_navigation();
+	$content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

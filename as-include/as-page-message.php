@@ -47,9 +47,9 @@
 		as_redirect('users');
 
 	if (!isset($loginuserid)) {
-		$as_content=as_content_prepare();
-		$as_content['error']=as_insert_login_links(as_lang_html('misc/message_must_login'), as_request());
-		return $as_content;
+		$content=as_content_prepare();
+		$content['error']=as_insert_login_links(as_lang_html('misc/message_must_login'), as_request());
+		return $content;
 	}
 
 
@@ -86,9 +86,9 @@
 	}
 
 	if (isset($errorhtml)) {
-		$as_content=as_content_prepare();
-		$as_content['error']=$errorhtml;
-		return $as_content;
+		$content=as_content_prepare();
+		$content['error']=$errorhtml;
+		return $content;
 	}
 
 
@@ -153,13 +153,13 @@
 
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 	
-	$as_content['title']=as_lang_html('misc/private_message_title');
+	$content['title']=as_lang_html('misc/private_message_title');
 
-	$as_content['error']=@$pageerror;
+	$content['error']=@$pageerror;
 
-	$as_content['form_message']=array(
+	$content['form_message']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 		
 		'style' => 'tall',
@@ -189,17 +189,17 @@
 		),
 	);
 	
-	$as_content['focusid']='message';
+	$content['focusid']='message';
 
 	if ($messagesent) {
-		$as_content['form_message']['ok']=as_lang_html('misc/message_sent');
-		unset($as_content['form_message']['buttons']);
+		$content['form_message']['ok']=as_lang_html('misc/message_sent');
+		unset($content['form_message']['buttons']);
 
 		if (as_opt('show_message_history'))
-			unset($as_content['form_message']['fields']['message']);
+			unset($content['form_message']['fields']['message']);
 		else {
-			unset($as_content['form_message']['fields']['message']['note']);
-			unset($as_content['form_message']['fields']['message']['label']);
+			unset($content['form_message']['fields']['message']['note']);
+			unset($content['form_message']['fields']['message']['label']);
 		}
 	}
 	
@@ -214,22 +214,22 @@
 		$showmessages=array_slice(array_reverse($recent, true), 0, AS_DB_RETRIEVE_MESSAGES);
 		
 		if (count($showmessages)) {
-			$as_content['message_list']=array(
+			$content['message_list']=array(
 				'title' => as_lang_html_sub('misc/message_recent_history', as_html($toaccount['handle'])),
 			);
 			
 			$options=as_message_html_defaults();
 			
 			foreach ($showmessages as $message)
-				$as_content['message_list']['messages'][]=as_message_html_fields($message, $options);
+				$content['message_list']['messages'][]=as_message_html_fields($message, $options);
 		}
 	}
 
 
-	$as_content['raw']['account']=$toaccount; // for plugin layers to access
+	$content['raw']['account']=$toaccount; // for plugin layers to access
 	
 
-	return $as_content;
+	return $content;
 
 
 /*

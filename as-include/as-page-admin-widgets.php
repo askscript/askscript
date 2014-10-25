@@ -63,8 +63,8 @@
 
 //	Check admin privileges (do late to allow one DB query)
 
-	if (!as_admin_check_privileges($as_content))
-		return $as_content;
+	if (!as_admin_check_privileges($content))
+		return $content;
 		
 		
 //	Define an array of relevant templates we can use
@@ -167,10 +167,10 @@
 		
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/layout_title');	
-	$as_content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
+	$content['title']=as_lang_html('admin/admin_title').' - '.as_lang_html('admin/layout_title');	
+	$content['error']=$securityexpired ? as_lang_html('admin/form_security_expired') : as_admin_page_error();
 	
 	$positionoptions=array();
 	
@@ -226,7 +226,7 @@
 	
 	$positionvalue=@$positionoptions[$editwidget['place'].$editwidget['position']];
 	
-	$as_content['form']=array(
+	$content['form']=array(
 		'tags' => 'method="post" action="'.as_path_html(as_request()).'"',
 		
 		'style' => 'tall',
@@ -290,46 +290,46 @@
 	);
 	
 	foreach ($templateoptions as $template => $optionhtml)
-		$as_content['form']['fields']['templates']['html'].=
+		$content['form']['fields']['templates']['html'].=
 			'<input type="checkbox" name="template_'.as_html($template).'"'.
 			(is_numeric(strpos(','.@$editwidget['tags'].',', ','.$template.',')) ? ' checked' : '').
 			'/> '.$optionhtml.'<br/>';
 			
 	if (isset($editwidget['widgetid']))
-		as_set_display_rules($as_content, array(
+		as_set_display_rules($content, array(
 			'templates_display' => '!(dodelete||template_all)',
 			'all_display' => '!dodelete',
 		));
 
 	else {
-		unset($as_content['form']['fields']['delete']);
-		as_set_display_rules($as_content, array(
+		unset($content['form']['fields']['delete']);
+		as_set_display_rules($content, array(
 			'templates_display' => '!template_all',
 		));
 	}
 	
 	if (!$widgetfound) {
-		unset($as_content['form']['fields']['title']['tight']);
-		$as_content['form']['fields']['title']['error']=as_lang_html('admin/widget_not_available');
-		unset($as_content['form']['fields']['position']);
-		unset($as_content['form']['fields']['all']);
-		unset($as_content['form']['fields']['templates']);
+		unset($content['form']['fields']['title']['tight']);
+		$content['form']['fields']['title']['error']=as_lang_html('admin/widget_not_available');
+		unset($content['form']['fields']['position']);
+		unset($content['form']['fields']['all']);
+		unset($content['form']['fields']['templates']);
 		if (!isset($editwidget['widgetid']))
-			unset($as_content['form']['buttons']['save']);
+			unset($content['form']['buttons']['save']);
 		
 	} elseif (!count($positionoptions)) {
-		unset($as_content['form']['fields']['title']['tight']);
-		$as_content['form']['fields']['title']['error']=as_lang_html('admin/widget_no_positions');
-		unset($as_content['form']['fields']['position']);
-		unset($as_content['form']['fields']['all']);
-		unset($as_content['form']['fields']['templates']);
-		unset($as_content['form']['buttons']['save']);
+		unset($content['form']['fields']['title']['tight']);
+		$content['form']['fields']['title']['error']=as_lang_html('admin/widget_no_positions');
+		unset($content['form']['fields']['position']);
+		unset($content['form']['fields']['all']);
+		unset($content['form']['fields']['templates']);
+		unset($content['form']['buttons']['save']);
 	}
 
-	$as_content['navigation']['sub']=as_admin_sub_navigation();
+	$content['navigation']['sub']=as_admin_sub_navigation();
 
 	
-	return $as_content;
+	return $content;
 
 
 /*

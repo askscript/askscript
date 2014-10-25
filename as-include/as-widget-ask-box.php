@@ -68,10 +68,10 @@
 		}
 	
 	
-		function output_widget($region, $place, $themeobject, $template, $request, $as_content)
+		function output_widget($region, $place, $themeobject, $template, $request, $content)
 		{
-			if (isset($as_content['categoryids']))
-				$params=array('cat' => end($as_content['categoryids']));
+			if (isset($content['categoryids']))
+				$params=array('cat' => end($content['categoryids']));
 			else
 				$params=null;
 ?>

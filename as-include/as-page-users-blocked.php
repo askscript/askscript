@@ -48,9 +48,9 @@
 //	Check we have permission to view this page (moderator or above)
 
 	if (as_get_logged_in_level() < AS_USER_LEVEL_MODERATOR) {
-		$as_content=as_content_prepare();
-		$as_content['error']=as_lang_html('users/no_permission');
-		return $as_content;
+		$content=as_content_prepare();
+		$content['error']=as_lang_html('users/no_permission');
+		return $content;
 	}
 
 
@@ -61,27 +61,27 @@
 
 //	Prepare content for theme
 
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=count($users) ? as_lang_html('users/blocked_users') : as_lang_html('users/no_blocked_users');
+	$content['title']=count($users) ? as_lang_html('users/blocked_users') : as_lang_html('users/no_blocked_users');
 	
-	$as_content['ranking']=array(
+	$content['ranking']=array(
 		'items' => array(),
 		'rows' => ceil(count($users)/as_opt('columns_users')),
 		'type' => 'users'
 	);
 	
 	foreach ($users as $user) {
-		$as_content['ranking']['items'][]=array(
+		$content['ranking']['items'][]=array(
 			'label' => $usershtml[$user['userid']],
 			'score' => as_html(as_user_level_string($user['level'])),
 		);
 	}
 
-	$as_content['navigation']['sub']=as_users_sub_navigation();
+	$content['navigation']['sub']=as_users_sub_navigation();
 	
 	
-	return $as_content;
+	return $content;
 
 
 /*

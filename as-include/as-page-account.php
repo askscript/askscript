@@ -200,12 +200,12 @@
 
 //	Prepare content for theme
 
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('profile/my_account_title');	
-	$as_content['error']=@$errors['page'];
+	$content['title']=as_lang_html('profile/my_account_title');	
+	$content['error']=@$errors['page'];
 	
-	$as_content['form_profile']=array(
+	$content['form_profile']=array(
 		'tags' => 'enctype="multipart/form-data" method="post" action="'.as_self_html().'"',
 		
 		'style' => 'wide',
@@ -282,20 +282,20 @@
 	);
 	
 	if (as_get_state()=='profile-saved')
-		$as_content['form_profile']['ok']=as_lang_html('users/profile_saved');
+		$content['form_profile']['ok']=as_lang_html('users/profile_saved');
 	
 	if (!as_opt('allow_private_messages'))
-		unset($as_content['form_profile']['fields']['messages']);
+		unset($content['form_profile']['fields']['messages']);
 		
 	if (!as_opt('allow_user_walls'))
-		unset($as_content['form_profile']['fields']['wall']);
+		unset($content['form_profile']['fields']['wall']);
 		
 	if (!as_opt('mailing_enabled'))
-		unset($as_content['form_profile']['fields']['mailings']);
+		unset($content['form_profile']['fields']['mailings']);
 		
 	if ($isblocked) {
-		unset($as_content['form_profile']['buttons']['save']);
-		$as_content['error']=as_lang_html('users/no_permission');
+		unset($content['form_profile']['buttons']['save']);
+		$content['error']=as_lang_html('users/no_permission');
 	}
 
 //	Avatar upload stuff
@@ -335,7 +335,7 @@
 				$avatarvalue=$avataroptions['uploaded'];
 		}
 		
-		$as_content['form_profile']['fields']['avatar']=array(
+		$content['form_profile']['fields']['avatar']=array(
 			'type' => 'select-radio',
 			'label' => as_lang_html('users/avatar_label'),
 			'tags' => 'name="avatar"',
@@ -345,7 +345,7 @@
 		);
 		
 	} else
-		unset($as_content['form_profile']['fields']['avatar']);
+		unset($content['form_profile']['fields']['avatar']);
 
 
 //	Other profile fields
@@ -359,7 +359,7 @@
 		if (strlen($label))
 			$label.=':';
 			
-		$as_content['form_profile']['fields'][$userfield['title']]=array(
+		$content['form_profile']['fields'][$userfield['title']]=array(
 			'label' => as_html($label),
 			'tags' => 'name="field_'.$userfield['fieldid'].'"',
 			'value' => as_html($value),
@@ -372,14 +372,14 @@
 	
 //	Raw information for plugin layers to access
 
-	$as_content['raw']['account']=$useraccount;
-	$as_content['raw']['profile']=$userprofile;
-	$as_content['raw']['points']=$userpoints;
+	$content['raw']['account']=$useraccount;
+	$content['raw']['profile']=$userprofile;
+	$content['raw']['points']=$userpoints;
 	
 
 //	Change password form
 
-	$as_content['form_password']=array(
+	$content['form_password']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 		
 		'style' => 'wide',
@@ -423,18 +423,18 @@
 	);
 	
 	if (!$haspassword) {
-		$as_content['form_password']['fields']['old']['type']='static';
-		$as_content['form_password']['fields']['old']['value']=as_lang_html('users/password_none');
+		$content['form_password']['fields']['old']['type']='static';
+		$content['form_password']['fields']['old']['value']=as_lang_html('users/password_none');
 	}
 	
 	if (as_get_state()=='password-changed')
-		$as_content['form_profile']['ok']=as_lang_html('users/password_changed');
+		$content['form_profile']['ok']=as_lang_html('users/password_changed');
 		
 
-	$as_content['navigation']['sub']=as_user_sub_navigation($useraccount['handle'], 'account', true);
+	$content['navigation']['sub']=as_user_sub_navigation($useraccount['handle'], 'account', true);
 		
 		
-	return $as_content;
+	return $content;
 	
 
 /*

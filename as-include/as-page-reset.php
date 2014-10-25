@@ -85,17 +85,17 @@
 	
 //	Prepare content for theme
 	
-	$as_content=as_content_prepare();
+	$content=as_content_prepare();
 
-	$as_content['title']=as_lang_html('users/reset_title');
-	$as_content['error']=@$errors['page'];
+	$content['title']=as_lang_html('users/reset_title');
+	$content['error']=@$errors['page'];
 
 	if (empty($inemailhandle) || isset($errors['emailhandle']))
 		$forgotpath=as_path('forgot');
 	else
 		$forgotpath=as_path('forgot',  array('e' => $inemailhandle));
 	
-	$as_content['form']=array(
+	$content['form']=array(
 		'tags' => 'method="post" action="'.as_self_html().'"',
 		
 		'style' => 'tall',
@@ -132,10 +132,10 @@
 		),
 	);
 	
-	$as_content['focusid']=(isset($errors['emailhandle']) || !strlen(@$inemailhandle)) ? 'emailhandle' : 'code';
+	$content['focusid']=(isset($errors['emailhandle']) || !strlen(@$inemailhandle)) ? 'emailhandle' : 'code';
 
 	
-	return $as_content;
+	return $content;
 
 
 /*
